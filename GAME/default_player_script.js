@@ -131,7 +131,7 @@ Default_Player_Sikieiki.prototype.init=function(){
     b.on_graze=function(){
         stgPlaySE("se_graze");
     };
-    stgAddObject(new TestShotController(b));
+    //stgAddObject(new TestShotController(b));
 };
 
 stg_player_templates.siki=Default_Player_Sikieiki;

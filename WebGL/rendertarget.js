@@ -66,3 +66,4 @@ WebglRenderTarget.prototype.selfDraw=function(){
     this.second_texture=this.gltex;
     this.gltex=t;
 };
+

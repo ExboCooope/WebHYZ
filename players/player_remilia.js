@@ -85,12 +85,20 @@ Player_Remilia.player_script=function(){
         }
     }
     this.last_anime=current_dir;
+   if(key[stg_const.KEY_SPELL]){
+       this.invincible=360;
+   }
+    if(this.state==stg_const.PLAYER_NORMAL || this.state==stg_const.PLAYER_REBIRTH ){
+        spriteUseInviEffect();
+    }
+
 };
 
 
 Player_Remilia.pre_load=function(){
     stgCreateImageTexture("remilia_b","players/remilia_boss.png");
     stgCreateImageTexture("remilia_a","players/remilia_player.png");
+
     renderCreate2DTemplateA1("remilia_stand","remilia_a",0,96,48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_left","remilia_a",0,96+48,48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_right","remilia_a",48,96+48,-48,48,48,0,0,1);

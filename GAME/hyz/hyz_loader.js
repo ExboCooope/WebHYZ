@@ -64,6 +64,9 @@ hyz_loader.init=function(){
         stgCreateImageTexture("3dTex1","bg/grass2.png");
         stgCreateImageTexture("3dTex2","bg/wall.png");
         stgCreateImageTexture("3dTex3","bg/floor.png");
+        stgCreateImageTexture("laser1","laser.png");
+        stgCreateImageTexture("cardbg2_c","cardbg2_c.png");
+
 
         renderCreate2DTemplateA1("ene_boom","pl_effect",192,176,64,64,64,0,0,1);
         renderCreate2DTemplateA1("bounce_0","pl_effect",192,240,16,16,16,0,0,1);
@@ -90,7 +93,11 @@ hyz_loader.init=function(){
         stg_procedures["drawCombineFrame"].transparent=1;
 
         //创建绘制流程
-
+        for(var i in stg_player_templates){
+            if(stg_player_templates[i].pre_load){
+                stg_player_templates[i].pre_load();
+            }
+        }
 
         //设置只有一个玩家
         stg_players_number=2;

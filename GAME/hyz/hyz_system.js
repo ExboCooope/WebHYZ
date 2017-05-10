@@ -271,10 +271,56 @@ hyz_system_script.init=function(){
     hyzAddObject(a,1);
 };
 
+hyz_system_script.playerintersect=function(){
+
+    var i;var j;
+    var a;var b;
+    var tarr=[0,0,0];
+    for(i=0;i<stg_players.length;i++) {
+        a = stg_players[i];
+        a.intersect_x=0;
+        a.intersect_y=0;
+    }
+    for(i=0;i<stg_players.length;i++){
+        a=stg_players[i];
+        if(a.state!=stg_const.PLAYER_DEAD){
+            for(j=i+1;j<stg_players.length;j++){
+                b=stg_players[j];
+                if(b.state!=stg_const.PLAYER_DEAD) {
+                    if(hyzIsInOneFrame(a,b)) {
+                        sqrt2d(b.pos[0]- a.pos[0], b.pos[1]- a.pos[1],tarr);
+                        if(tarr[0]<24){
+                            var q=(24-tarr[0])/2;
+                            tarr[1]*=q;
+                            tarr[2]*=q;
+                            a.intersect_x-=tarr[1];
+                            a.intersect_y-=tarr[2];
+                            b.intersect_x+=tarr[1];
+                            b.intersect_y+=tarr[2];
+                        }
+                    }
+                }
+            }
+        }
+    }
+    for(i=0;i<stg_players.length;i++) {
+        a = stg_players[i];
+        if(a.intersect_x|| a.intersect_y) {
+            if(a.state==stg_const.PLAYER_NORMAL) {
+
+                a.pos[0] += a.intersect_x;
+                a.pos[1] += a.intersect_y;
+                stgRefreshPosition(a);
+            }
+        }
+    }
+};
+
+
 hyz_system_script.script=function(){
 
     stg_common_data.current_combo_time[0];
-
+    this.playerintersect();
 
 
     if(stg_replay_end==1){
@@ -484,6 +530,18 @@ function hyzGetPlayer(sid){
     return stg_players[sid-1];
 }
 hyz.battle_style=0;
+function hyzIsInOneFrame(obj1,obj2){
+    if(hyz.battle_style==1){
+        if(obj1.sid ==obj2.sid){
+            return true;
+        }
+        if(obj1.sid>0 && obj1.sid<3 && obj2.sid>0 && obj2.sid<3){
+            return true;
+        }
+        return false;
+    }
+    return obj1.sid==obj2.sid;
+}
 function hyzSetBattleStyle(style,changetype){
     if(hyz.battle_style!=style){
         hyz.battle_style=style;
@@ -583,3 +641,170 @@ function hyzSetPositionA1(target,x,y){
         target.move.pos[1]=y;
     }
 }
+
+function spriteUseInviEffect(){
+    if(!stg_target.render)return;
+    if(stg_target.invincible%24>11) {
+        stg_target.render.color=[0.3,0.3,0.8];
+        stg_target.update=1;
+    }else{
+        stg_target.render.color=[1,1,1];
+        if(stg_target.invincible)stg_target.update=1;
+    }
+}
+
+function CircleObject(r0,r1,a0,a1,ptx){
+    ptx=ptx||(PI2*r1/6)>>0;
+    if(ptx<8)ptx=8;
+    ptx++;
+    this._ptx=ptx;
+    this.plist=WGLA.newBuffer(_gl,4,2,2*ptx,WGLConst.DATA_FLOAT);
+    this.clist=WGLA.newBuffer(_gl,4,4,2*ptx,WGLConst.DATA_FLOAT);
+    this.tlist=WGLA.newBuffer(_gl,4,2,2*ptx,WGLConst.DATA_FLOAT);
+
+    this.poscache=new Float32Array(4*ptx);
+    this.anglecache=new Float32Array(2*ptx);
+    this.r0=r0;
+    this.r1=r1;
+    this.a0=a0;
+    this.a1=a1;
+}
+
+CircleObject.prototype.SetColor=function(r,g,b,a){
+    var hd=0;
+    var ga=[r,g,b,a];
+    var n=this._ptx*2;
+    for (var i = 0; i < n; i++) {
+        this.clist.buffer.set(ga,hd) ;
+        hd+=4;
+    }
+    this.clist.uploadData();
+};
+CircleObject.prototype.SetTexture=function(texname,x0,y0,x1,y1,dir){
+    if(!this.render)this.render=new StgRender("basic_shader");
+    texname=texname||this.render.texture;
+    this.render.texture=texname;
+    if(!texname){
+        this.render=0;
+        return;
+    }
+    var tex=stg_textures[texname];
+    var tw=tex.width;
+    var th=tex.height;
+    var hd=0;
+    var i=0;
+    x0=x0/tw;
+    y0=y0/th;
+    x1=x1/tw;
+    y1=y1/th;
+    var dx=(x1-x0)/(this._ptx-1);
+    var dy=(y1-y0)/(this._ptx-1);
+    if(dir==0) {
+        for (i = 0; i < this._ptx; i++) {
+            this.tlist.buffer[hd++] = x0 + dx*i ;
+            this.tlist.buffer[hd++] = y0 ;
+            this.tlist.buffer[hd++] = x0 + dx*i;
+            this.tlist.buffer[hd++] = y1 ;
+        }
+    }else{
+        for (i = 0; i < this._ptx; i++) {
+            this.tlist.buffer[hd++] = x0  ;
+            this.tlist.buffer[hd++] = y0 + dy*i;
+            this.tlist.buffer[hd++] = x1;
+            this.tlist.buffer[hd++] = y0 + dy*i;
+        }
+    }
+    this.tlist.uploadData();
+};
+
+
+CircleObject.prototype.SetTexture2=function(texname,x0,y0,x1,y1){
+    if(!this.render)this.render=new StgRender("basic_shader");
+    texname=texname||this.render.texture;
+    this.render.texture=texname;
+    if(!texname){
+        this.render=0;
+        return;
+    }
+    var tex=stg_textures[texname];
+    var tw=tex.width;
+    var th=tex.height;
+    var hd=0;
+    var i=0;
+    x0=x0/tw;
+    y0=y0/th;
+    x1=x1/tw;
+    y1=y1/th;
+    for (i = 0; i < this._ptx; i++) {
+        this.tlist.buffer[hd++] = x0 ;
+        this.tlist.buffer[hd++] = y0 ;
+        this.tlist.buffer[hd++] = x1 ;
+        this.tlist.buffer[hd++] = y1 ;
+    }
+    this.tlist.uploadData();
+};
+
+CircleObject.prototype.on_render=function(gl){
+    var flag=0;
+    var i=0;
+    var j=0;
+    var k=0;
+    var n=this._ptx;
+    if(this._a0!=this.a0 || this._a1!=this.a1){
+        //update sin cos cache
+        flag=1;
+        this._a0=this.a0;
+        this._a1=this.a1;
+        var da=(this.a1-this.a0)*PI180;
+        var a0=this.a0*PI180
+        for(i=0;i<n;i++){
+            var a=i*da/(n-1)+a0;
+            this.anglecache[j++]=sin(a);
+            this.anglecache[j++]=cos(a);
+        }
+    }
+    if(this._r0 !=this.r0 || this._r1!=this.r1 || flag){
+        //update pos cache
+        flag=1;
+        j=0;
+        this._r0=this.r0;
+        this._r1=this.r1;
+        var r0=this._r0;
+        var r1=this._r1;
+
+        for(i=0;i<n;i++){
+            this.poscache[j++]=r0*this.anglecache[k+1];
+            this.poscache[j++]=r0*this.anglecache[k];
+            this.poscache[j++]=r1*this.anglecache[k+1];
+            this.poscache[j++]=r1*this.anglecache[k];
+            k+=2;
+        }
+
+    }
+    if(this._x0 != this.pos[0] || this._x1!=this.pos[1] || flag){
+        this._x0=this.pos[0];
+        this._x1=this.pos[1];
+        var x=this._x0;
+        var y=this._x1;
+        var t=this.plist.buffer;
+        var p=this.poscache;
+        j=0;k=0;
+        for(i=0;i<n;i++){
+            t[j++]=x+p[k++];
+            t[j++]=y+p[k++];
+            t[j++]=x+p[k++];
+            t[j++]=y+p[k++];
+        }
+        this.plist.uploadData();
+    }
+    if(this.blend){
+        this.blend();
+    }
+    GlBufferInput(hyzPrimitive2DShader, "aPosition",this.plist);
+    GlBufferInput(hyzPrimitive2DShader, "aColor",this.clist);
+    GlBufferInput(hyzPrimitive2DShader, "aTexture",this.tlist);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,n*2);
+    if(this.blend!=blend_default){
+        blend_default();
+    }
+};

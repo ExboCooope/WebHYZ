@@ -19,9 +19,9 @@ var LASER={};
 var _hit_box_tiny=new StgHitDef();
 _hit_box_tiny.range=1;
 var _hit_box_small=new StgHitDef();
-_hit_box_small.range=2;
+_hit_box_small.range=4;
 var _hit_box_medium=new StgHitDef();
-_hit_box_medium.range=4;
+_hit_box_medium.range=7;
 var _hit_box_large=new StgHitDef();
 _hit_box_large.range=14;
 var _hit_box_laser={};
@@ -61,6 +61,10 @@ function bullet00Assignment(){
 
     stgAddShader("sprite_shader",default_2d_shader);
     stg_bullet_parser=render01BltParser;
+
+    stgCreateImageTexture("break_circle","th14_BreakCircle.png");
+    renderCreate2DTemplateA1("bcircle","break_circle",0,0,256,256,0,0,0,1);
+
 }
 
 function render01BltParser(object,name){
@@ -125,8 +129,7 @@ HeadedLaserA1.prototype.init=function(){
     this._n=0;
     this.n=this.maxn-1;
     this.objlist[0]=this;
-    this.render=new StgRender("basic_shader");
-    this.render.texture="123";
+
 };
 
 HeadedLaserA1.prototype.on_render=function(gl){
@@ -187,6 +190,17 @@ HeadedLaserA1.prototype.beforehit=function(){
             this.plist.uploadData(b,2);
         }
     }
+    b=(poslisthead-1+this.maxn)%this.maxn*2;
+    for(i=0;i<n;i++){
+        var sy=(this.tex_data[2]-this.tex_data[0])*i/this.maxn+this.tex_data[0];
+        this.tlist.buffer[b*2+1]=this.tex_data[1];
+        this.tlist.buffer[b*2]=sy;
+        this.tlist.buffer[b*2+3]=this.tex_data[3];
+        this.tlist.buffer[b*2+2]=sy;
+        b=b-2;
+        if(b<0)b+=this.maxn*2;
+    }
+    this.tlist.uploadData();
     /*
     for(i=0;i<n;i++){
 
@@ -220,6 +234,14 @@ HeadedLaserA1.prototype.addPosToHead=function(pos){
     }
 };
 
+HeadedLaserA1.prototype.SetTexture=function(sTexture,sx1,sy1,sx2,sy2,dir){
+    this.render=new StgRender("basic_shader");
+    this.render.texture=sTexture;
+    var w=stg_textures[sTexture].width;
+    var h=stg_textures[sTexture].height;
+    this.tex_data=[sx1/w,sy1/h,sx2/w,sy2/h];
+    this.tex_dir=dir;
+};
 
 HeadedLaserA1.prototype.setLength=function(ilength){
 

@@ -131,7 +131,7 @@ function stgCreateShotW2(x,y,speed,angle_center,bulletname,delay,color,n,speed_m
 }
 
 function stgCreateShotR1(x,y,speed,angle,bulletname,delay,color,range,angle_add){
-    return stgCreateShotA1(x+range*cos(angle*PI180),y+range*sin(angle*PI180),speed,angle+angle_add,bulletname,delay,color);
+    return stgCreateShotA1(x+range*cos(angle*PI180),y+range*sin(angle*PI180),speed,angle+(angle_add||0),bulletname,delay,color);
 }
 
 function StgBullet(){

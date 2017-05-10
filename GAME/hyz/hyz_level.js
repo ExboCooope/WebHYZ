@@ -47,39 +47,11 @@ hyz.level.init=function(){
     // var e1=new Hyz_enemy(0,0);
   //  hyzAddObject(e1,1);
  //   stgAddObject(hyz.enemy_maker);
-    var test_object={};
-    test_object.render=new StgRender("basic_shader");
-    test_object.render.texture="123";
 
-    test_object.on_render=function(gl){
-        if(!test_object.render.buffer){
-           // test_object.render.buffer=[gl.createBuffer(),gl.createBuffer(),gl.createBuffer()];
-            var a=WGLA.newBuffer(gl,4,2,3,WGLConst.DATA_FLOAT);
-            a.buffer.set([50,50,50,100,100,50]);
-            a.uploadData();
-           // var a=new Float32Array([50,50,50,100,100,50]);
-            var b=new Float32Array([1,0,0,1,0,1,0,1,0,0,1,1]);
-            var c=new Float32Array([0,0,0,1,1,0]);
-            test_object.render.buffer=[a,b,c];
-            //gl.bindBuffer(gl.ARRAY_BUFFER,test_object.render.buffer[0]);
-           // gl.bufferData(gl.ARRAY_BUFFER,a,gl.STATIC_DRAW);
-           // gl.bindBuffer(gl.ARRAY_BUFFER,test_object.render.buffer[1]);
-          //  gl.bufferData(gl.ARRAY_BUFFER,b,gl.STATIC_DRAW);
-          //  gl.bindBuffer(gl.ARRAY_BUFFER,test_object.render.buffer[2]);
-          //  gl.bufferData(gl.ARRAY_BUFFER,c,gl.STATIC_DRAW);
-        }
-        _webGlUniformInput(hyzPrimitive2DShader, "texture",stg_textures["3dTex2"]);
-       // _webGlUniformInput(hyzPrimitive2DShader, "aPosition",test_object.render.buffer[0]);
-        GlBufferInput(hyzPrimitive2DShader, "aPosition",test_object.render.buffer[0]);
-        _webGlUniformInput(hyzPrimitive2DShader, "aColor",test_object.render.buffer[1]);
-        _webGlUniformInput(hyzPrimitive2DShader, "aTexture",test_object.render.buffer[2]);
-        gl.drawArrays(gl.TRIANGLES,0,3);
-    }
-    test_object.layer=75;
-    hyzAddObject(test_object,1);
-
-    var test2=new HeadedLaserA1(30,10+stg_rand(stg_frame_w-10),100,8);
+/*
+    var test2=new HeadedLaserA1(12,10+stg_rand(stg_frame_w-10),100,8);
     test2.layer=78;
+    test2.SetTexture("laser1",0,0,256,32,0);
     test2.script=function(){
         if(this.frame==1)stgEnableMove();
         if(this.frame%120==1){
@@ -93,7 +65,7 @@ hyz.level.init=function(){
 //        stgSetPositionA1(this,70+60*sin(this.frame*5*PI180),70+60*cos(this.frame*5*PI180));
     };
     hyzAddObject(test2,1);
-
+*/
 
 
 //    hyzAddObject(a,1);
@@ -108,7 +80,22 @@ hyz.level.init=function(){
     this.f=0;
 };
 hyz.level.script=function(){
-    this.f++;
+   // this.f++;
+    /*
+    if(this.frame==30){
+        var a=new CircleObject(18,27,0,360,96);
+        a.SetColor(1,1,1,0.75);
+        a.SetTexture("bullet",286,128,286,192,0);
+        a.layer=stg_const.LAYER_BULLET-1;
+        hyzAddObject(a,1);
+        stgSetPositionA1(a,50,50);
+        a.script=function(){
+            if(a.frame==1){luaMoveTo(stg_frame_w/2,stg_frame_h/2,60,1)}
+            if(a.frame>60 && a.frame<120){a.r0+=3;a.r1+=3;}
+            if(a.frame==120){a.SetColor(1,1,1,1)};
+            if(a.frame>120 && a.frame<140){a.r0-=4;a.r1+=4;}
+        }
+    }*/
     this.chain1.value=""+stg_common_data.current_hit[0];
     /*
     if(this.f%6==0) {
@@ -123,6 +110,47 @@ hyz.level.script=function(){
         blt.side=stg_const.SIDE_PLAYER;
     }*/
    // stg_players[1].key[stg_const.KEY_SHOT]=1;
+
+    if(this.frame==60){
+        var a=new CircleObject(0,400,0,360,200);
+        //hyzAddObject(a,1);
+        a.SetColor(1,1,1,1);
+        a.SetTexture("cardbg2_c",0,0,1024,1024,0);
+        stgSetPositionA1(a,stg_frame_w/2,stg_frame_h/2);
+        a.blend=blend_test3;
+        a.layer=21;
+        a.script=function(){
+            var x=this.frame/240*512;
+            a.SetTexture("cardbg2_c",0-x,0-x,1024-x,1024-x,0);
+           // a.a0+=1;
+           // a.a1+=1;
+        }
+
+        var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
+        blt.sid = 1;
+        stgLookAtTarget(blt,hyzGetPlayer(1),5);//朝向玩家，每帧最多转3度
+        blt.move_rotate = -1;//物体角度决定移动角度
+
+        var b=new BreakCircleEffect(60);
+        hyzAddObject(b,1);
+        stgSetPositionA1(b,100,100);
+      //  renderSetSpriteScale(0.5,0.5,b);
+     //
+
+        /*
+        var  blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 0, 0, "sLD", 0, 0);
+        blt.sid=1;
+        blt.resolve_move=1;
+        blt.on_move=function(){
+            if(this.frame<120){
+                this.pos[0]=stg_frame_w/2+40*sind(this.frame*4);
+                this.pos[1]=stg_frame_h/2+40*sind(this.frame*8);
+            }else{
+                this.on_move=0;
+                this.resolve_move=0;
+            }
+        }*/
+    }
 
     if(this.frame%60==1){
         var l=hyzGetSpellLevel(2);

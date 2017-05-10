@@ -13,7 +13,7 @@ function luaMoveTo(x,y,frames,mode,obj){
     obj.lua.move.frame=frames;
     obj.lua.move.cframe=0;
     obj.lua.move.script=mode?bezier42:clamp;
-    obj.on_move=luastg.moveTo;
+    obj.after_move=luastg.moveTo;
 }
 function luaBezierMoveTo(poslist,frames,obj){
     obj=obj||stg_target;
@@ -25,7 +25,7 @@ function luaBezierMoveTo(poslist,frames,obj){
     obj.lua.move.frame=frames;
     obj.lua.move.cframe=0;
 
-    obj.on_move=luastg.bmoveTo;
+    obj.after_move=luastg.bmoveTo;
 }
 function luaSmoothBezierMoveTo(rate,pos,frames,obj){
     obj=obj||stg_target;
@@ -37,7 +37,7 @@ function luaSmoothBezierMoveTo(rate,pos,frames,obj){
     obj.lua.move.frame=frames;
     obj.lua.move.cframe=0;
 
-    obj.on_move=luastg.bmoveTo;
+    obj.after_move=luastg.bmoveTo;
 }
 
 luastg.moveTo=function(){
@@ -46,7 +46,7 @@ luastg.moveTo=function(){
     var f= a.cframe/ a.frame;
     stgSetPositionSpeedAngleA1(this, a.lpos, [a.script(a.spos[0], a.tpos[0],f), a.script(a.spos[1], a.tpos[1],f)]);
     if(a.cframe== a.frame){
-        this.on_move=0;
+        this.after_move=0;
     }
     a.lpos[0]=this.pos[0];
     a.lpos[1]=this.pos[1];
@@ -72,8 +72,45 @@ luastg.bmoveTo=function(){
     beziern(this.pos, a.spos,a.tpos,f);
     stgSetPositionSpeedAngleA1(this, a.lpos, this.pos);
     if(a.cframe== a.frame){
-        this.on_move=0;
+        this.after_move=0;
     }
     a.lpos[0]=this.pos[0];
     a.lpos[1]=this.pos[1];
 };
+
+luastg.BossResourceHolder=function(ImageName,xs,ys,standi,lefti,righti,spelli){
+    this.resname=ImageName+"_lua";
+    var tw=stg_textures[ImageName].width;
+    var th=stg_textures[ImageName].height;
+    renderCreate2DTemplateA2(this.resname,ImageName,0,0,tw/xs,th/ys,xs,ys,0,1);
+    this.render=new StgRender("sprite_shader");
+};
+
+luastg.general={};
+luastg.general.define=function(svar){
+
+};
+
+luastg.task={};
+luastg.task.wait=function(itime){
+
+};
+
+var luastg_runtime={};
+
+luastg._replace_function=function(v){
+    return v.search(/\d/)?"luastg_runtime."+v:v;
+}
+
+luastg._expressions={};
+
+luastg.express=function(sexpr){
+    if(luastg._expressions[sexpr]){
+        return luastg._expressions[sexpr];
+    }
+    var a= sexpr.replace(/\w+/g,luastg._replace_function);
+    var s="luastg._tempfunction=function(){return "+a+";}";
+    eval(s);
+    luastg._expressions[sexpr]=luastg._tempfunction;
+    return luastg._tempfunction;
+}

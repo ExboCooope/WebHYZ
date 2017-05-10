@@ -18,6 +18,20 @@ var atan2pr=function(source,dest){
 var sqrt2=function(source,dest){
     return sqrt((source[0]-dest[0])*(source[0]-dest[0])+(source[1]-dest[1])*(source[1]-dest[1]));
 };
+var sqrt2d=function(x,y,res){
+    res[0]=sqrt(x*x+y*y);
+    res[1]=res[0]?x/res[0]:0;
+    res[2]=res[0]?y/res[0]:0;
+}
+var sind=function(x){
+    return sin(x*PI180);
+}
+var cosd=function(x){
+    return cos(x*PI180);
+}
+var tand=function(x){
+    return tan(x*PI180);
+}
 
 var sqrt2x=function(x,y){
     return sqrt(x*x+y*y);
@@ -132,6 +146,16 @@ StgMove.prototype.setAccelerate=function(acc,angle){
     }
     this.acceleration=acc;
 };
+
+StgMove.prototype.resolve=function(pos){
+    this._speed[0]=pos[0]-this.pos[0];
+    this._speed[1]=pos[1]-this.pos[1];
+    this.speed=sqrt2x(this._speed[0],this._speed[1]);
+    this.speed_angle= this.speed?atan2p(this.pos,pos):this.speed_angle;
+    this.pos[0]=pos[0];
+    this.pos[1]=pos[1];
+
+}
 
 function StgHitDef(){
     this.type=0;
@@ -314,6 +338,10 @@ function _tickMove(stgMove){
     stgMove.speed_angle=stgMove.speed?atan2(stgMove._speed[1],stgMove._speed[0]):stgMove.speed_angle;
 }
 
+function stgApplyPlayer(target){
+    _StgDefaultPlayer(target||stg_target);
+}
+
 function _StgDefaultPlayer(stgPlayerObject){
     stgPlayerObject.character_name="";
     stgPlayerObject.slot=0;
@@ -473,7 +501,7 @@ var stg_hit_check=[
     [1,0,1],
     [1,1,0]
 ];
-
+/*
 function stgInstantRefresh(){
     _hit_by_pool=[];
     _hit_pool=[];
@@ -539,7 +567,7 @@ function stgInstantRefresh(){
             }
         }
     }
-}
+}*/
 
 function stgRefreshPosition(object) {
     var a = object;
@@ -550,14 +578,21 @@ function stgRefreshPosition(object) {
         a.rotate = [0, 0, 0];
     }
     if (a.move) {
-        a.pos[0] = a.move.pos[0];
-        a.pos[1] = a.move.pos[1];
-        a.pos[2] = a.move.pos[2];
+        if( a.move_rotate==-1){
+            a.move.speed_angle=a.rotate[2];
+        }
+        if(a.resolve_move) {
+            a.move.resolve(a.pos);
+        }else {
+            a.pos[0] = a.move.pos[0];
+            a.pos[1] = a.move.pos[1];
+            a.pos[2] = a.move.pos[2];
+        }
+        if (a.move_rotate==1) {
+            a.rotate[2] = a.move.speed_angle;
+        }
+    }
 
-    }
-    if (a.move_rotate) {
-        a.rotate[2] = a.move.speed_angle;
-    }
     if (a.opos) {
         a.pos[0] += a.opos[0];
         a.pos[1] += a.opos[1];
@@ -577,6 +612,35 @@ function stgRefreshPosition(object) {
             a.pos[0] += a.base.target.pos[0];
             a.pos[1] += a.base.target.pos[1];
             a.pos[2] += a.base.target.pos[2];
+        }else if(a.base.type==stg_const.BASE_MOVE_ROTATE){
+            a.pos[0] += a.base.target.pos[0];
+            a.pos[1] += a.base.target.pos[1];
+            a.pos[2] += a.base.target.pos[2];
+            if (a.rotate) {
+                a.rotate[0] += a.base.target.rotate[0];
+                a.rotate[1] += a.base.target.rotate[1];
+                a.rotate[2] += a.base.target.rotate[2];
+            }
+        }else if(a.base.type==stg_const.BASE_ROTATE_MOVE){
+            var ang=a.base.target.rotate[2];
+            var tmpx= a.base.target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
+            var tmpy= a.base.target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
+            a.pos[0] =tmpx;
+            a.pos[1] =tmpy;
+            a.pos[2] += a.base.target.pos[2];
+
+        }else if(a.base.type==stg_const.BASE_ROTATE_MOVE_ROTATE){
+            var ang=a.base.target.rotate[2];
+            var tmpx= a.base.target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
+            var tmpy= a.base.target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
+            a.pos[0] =tmpx;
+            a.pos[1] =tmpy;
+            a.pos[2] += a.base.target.pos[2];
+            if (a.rotate) {
+                a.rotate[0] += a.base.target.rotate[0];
+                a.rotate[1] += a.base.target.rotate[1];
+                a.rotate[2] += a.base.target.rotate[2];
+            }
         }
     }
     if (a.orotate) {
@@ -639,6 +703,12 @@ function stgRefreshPosition(object) {
                 stgDeleteObject(a);
             }
         }
+    }
+    if(a.type == stg_const.OBJ_PLAYER && a.state!=stg_const.PLAYER_REBIRTH){
+        if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
+        if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
+        if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
+        if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
     }
 }
 
@@ -878,18 +948,30 @@ function _stgMainLoop_Engine(){
             if(!a.rotate){
                 a.rotate=[0,0,0];
             }
-            if(a.move){
+            if(a.on_move){
+                a.on_move();
+            }
+            if(a.move && a.move_rotate==-1){
+                a.move.speed_angle=a.rotate[2];
+            }
+
+            if(a.move && !a.resolve_move){
+
                 _tickMove(a.move);
                 a.pos[0]= a.move.pos[0];
                 a.pos[1]= a.move.pos[1];
                 a.pos[2]= a.move.pos[2];
 
             }
-            if(a.on_move){
-                a.on_move();
+
+            if(a.move && a.resolve_move) {
+                a.move.resolve(a.pos);
             }
-            if(a.move_rotate){
+            if(a.move && a.move_rotate==1){
                 a.rotate[2]= a.move.speed_angle;
+            }
+            if(a.after_move){
+                a.after_move();
             }
             if(a.opos){
                 a.pos[0]+= a.opos[0];
@@ -910,6 +992,35 @@ function _stgMainLoop_Engine(){
                     a.pos[0]+= a.base.target.pos[0];
                     a.pos[1]+= a.base.target.pos[1];
                     a.pos[2]+= a.base.target.pos[2];
+                }else if(a.base.type==stg_const.BASE_MOVE_ROTATE){
+                    a.pos[0] += a.base.target.pos[0];
+                    a.pos[1] += a.base.target.pos[1];
+                    a.pos[2] += a.base.target.pos[2];
+                    if (a.rotate) {
+                        a.rotate[0] += a.base.target.rotate[0];
+                        a.rotate[1] += a.base.target.rotate[1];
+                        a.rotate[2] += a.base.target.rotate[2];
+                    }
+                }else if(a.base.type==stg_const.BASE_ROTATE_MOVE){
+                    var ang=a.base.target.rotate[2];
+                    var tmpx= a.base.target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
+                    var tmpy= a.base.target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
+                    a.pos[0] =tmpx;
+                    a.pos[1] =tmpy;
+                    a.pos[2] += a.base.target.pos[2];
+
+                }else if(a.base.type==stg_const.BASE_ROTATE_MOVE_ROTATE){
+                    var ang=a.base.target.rotate[2];
+                    var tmpx= a.base.target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
+                    var tmpy= a.base.target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
+                    a.pos[0] =tmpx;
+                    a.pos[1] =tmpy;
+                    a.pos[2] += a.base.target.pos[2];
+                    if (a.rotate) {
+                        a.rotate[0] += a.base.target.rotate[0];
+                        a.rotate[1] += a.base.target.rotate[1];
+                        a.rotate[2] += a.base.target.rotate[2];
+                    }
                 }
 
                 if(a.base.auto_remove && a.base.target.remove){
@@ -1273,4 +1384,10 @@ function stgGetRandomPlayer(){
     var i=stg_players_number;
     var k=(stg_rand(0,1)*i)>>0;
     return stg_players[k];
+}
+
+function stgLookAtTarget(object,target,turnrate){
+    object=object||stg_target;
+    turnrate=turnrate?turnrate*PI180:null;
+    object.look_at={target:target,turn_rate:turnrate};
 }

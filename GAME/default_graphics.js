@@ -596,6 +596,11 @@ function _renderApply2DTemplate(oRender,oTemplate,iColor){
         renderApply2DCenter(oRender);
     }
 }
+function renderObjectApply2DTemplate(object,sTemplate,iColor){
+    if(!object.render)object.render=new StgRender("sprite_shader");
+    renderApply2DTemplate(object.render,sTemplate,iColor);
+}
+
 function renderApply2DTemplate(oRender,sTemplate,iColor){
     var oTemplate=renderCreate2DTemplateA1[sTemplate];
     oRender.uvt=[oTemplate.data[0]+oTemplate.data[4]*iColor,oTemplate.data[1]+oTemplate.data[5]*iColor,oTemplate.data[2],oTemplate.data[3]];

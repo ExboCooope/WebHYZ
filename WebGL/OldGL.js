@@ -53,7 +53,7 @@ WGLA._WGLBuffer=function(glcontext,databytelength,datagroupcount,datacount,datat
       //  data_selector=Float64Array;
        // this.gldatatype
     }
-    this.buffer=new data_selector(databytelength*datagroupcount*datacount);
+    this.buffer=new data_selector(datagroupcount*datacount);
 };
 
 //returns a dataview at target location

@@ -80,6 +80,7 @@ var hyzPrimitive2DShader={
                 _gl.useProgram(this.program);
             }
             if (!render.texture)return;
+            _webGlUniformInput(this,"texture",stg_textures[render.texture]);
             if(object.on_render)object.on_render(_gl);
         }
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
@@ -394,16 +395,14 @@ var hyzSpriteShader={
             // _gl.activeTexture(_gl.TEXTURE0);
             _webGlUniformInput(this, "texture", stg_textures[i]);
 
-            if(this.layer_blend[q]){
-                _gl.blendEquation(_gl.FUNC_ADD);
-                _gl.blendFunc(_gl.ONE,_gl.ONE);
+            if(this.layer_blend[q] && this.layer_blend[q][i] ){
+                this.layer_blend[q][i]();
+                this.dma_pool[q][i].draw();
+                blend_default();
+            }else{
+                this.dma_pool[q][i].draw();
             }
 
-            this.dma_pool[q][i].draw();
-            if(this.layer_blend[q]){
-                _gl.blendEquation(_gl.FUNC_ADD);
-                _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
-            }
         }
     },
 
@@ -439,8 +438,9 @@ var hyzSpriteShader={
             }
         }else if(this.mode==1){
             _gl.useProgram(this.program);
-            _gl.blendEquation(_gl.FUNC_ADD);
-            _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+           // _gl.blendEquation(_gl.FUNC_ADD);
+           // _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+            blend_default();
             var p=stg_procedures[procedureName];
             for(var q in this.dma_pool){
                 for(var i in this.dma_pool[q]) {
@@ -448,15 +448,12 @@ var hyzSpriteShader={
                     // _gl.activeTexture(_gl.TEXTURE0);
                     _webGlUniformInput(this, "texture", stg_textures[i]);
 
-                    if(this.layer_blend[q]){
-                        _gl.blendEquation(_gl.FUNC_ADD);
-                        _gl.blendFunc(_gl.ONE,_gl.ONE);
-                    }
-
-                    this.dma_pool[q][i].draw();
-                    if(this.layer_blend[q]){
-                        _gl.blendEquation(_gl.FUNC_ADD);
-                        _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+                    if(this.layer_blend[q] && this.layer_blend[q][i]){
+                        this.layer_blend[q][i]();
+                        this.dma_pool[q][i].draw();
+                        blend_default();
+                    }else{
+                        this.dma_pool[q][i].draw();
                     }
                 }
             }
@@ -489,8 +486,10 @@ var hyzSpriteShader={
         "varying vec4 vColor;" +
         "void main(void){" +
         "vec4 smpColor = texture2D(texture, vTexture);" +
-        // "gl_FragColor  = vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
+       // "gl_FragColor  = vec4(1.0,1.0,1.0,0.0) ;"+
+       //  "gl_FragColor  = smpColor * vColor ;"+//vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
         "gl_FragColor  = vec4(vColor[0],vColor[1],vColor[2],1.0)*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3]*vColor[3];" +
+    //   "gl_FragColor  = vColor*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3];" +
         "}",
     input:{
         aPosition:[0,2,null,0,1,0],
@@ -513,4 +512,32 @@ function NewHyzSpriteObject(obj,templatename,color){
 function hyzChangeSprite(obj,templatename,color) {
     renderApply2DTemplate(obj.render,templatename,color||0);
     obj.update=1;
+}
+/*
+ 原始  R0*（1-A1A2） +  R1*R2*A1*A2，A0 *（1-A1A2）+ A1*A2
+ */
+var blend_default=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+}
+var blend_add=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFunc(_gl.ONE,_gl.ONE);
+}
+var blend_test1=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+}
+var blend_test2=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE,_gl.ONE,_gl.ONE);
+}
+var blend_test3=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.ZERO,_gl.SRC_COLOR,_gl.ZERO,_gl.ONE);
+}
+
+var blend_xor1=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.ONE_MINUS_DST_COLOR,_gl.ONE_MINUS_SRC_COLOR,_gl.ZERO,_gl.ONE);
 }

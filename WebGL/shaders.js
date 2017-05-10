@@ -137,7 +137,8 @@ function _webGlUniformInput(shader,text,value){
             tex.gltex= _gl.createTexture();
             _gl.bindTexture(_gl.TEXTURE_2D, tex.gltex);
             _gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.RGBA, _gl.RGBA, _gl.UNSIGNED_BYTE, tex);
-            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_NEAREST);
+           // _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR_MIPMAP_NEAREST);
+            _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MIN_FILTER, _gl.LINEAR);
             _gl.texParameteri(_gl.TEXTURE_2D, _gl.TEXTURE_MAG_FILTER, _gl.LINEAR);
             _gl.generateMipmap(_gl.TEXTURE_2D);
         }
@@ -334,7 +335,11 @@ WebglDMA.prototype.release=function(){
     }
 };
 
-
+function spriteSetColor1(obj,r,g,b,a){
+    if(!obj)obj=stg_target;
+    if(!obj.render||!obj.render.aColor)return;
+    var t=obj.render.aColor;
+}
 
 function shader1_object_parser(oDMA,oObject,iIndex,iNew){
     var gl=_gl;

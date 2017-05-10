@@ -312,10 +312,11 @@ function stgSaveKeyMap(){
 function stgLoadKeyMap(){
     var t=window.localStorage.getItem("keymap");
     //t=0;
-    if(!t || t.length!=2){
+    var tmp_map=t?JSON.parse(t):0;
+    if(!tmp_map || tmp_map.length!=2){
         _key_map=[clone(stg_const.KEY_MAP),clone(stg_const.KEY_MAP2)];
     }else{
-        _key_map=JSON.parse(t);
+        _key_map=tmp_map;
     }
 }
 

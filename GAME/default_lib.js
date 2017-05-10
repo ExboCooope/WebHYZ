@@ -371,6 +371,100 @@ StgGrazer.prototype.script=function(){
     }
 };
 
-function stgMoveTo(x,y,time,obj){
-
+function renderSetSpriteBlend(layer,texturename,blendfunc){
+    var shader=stg_shaders["sprite_shader"];
+    if(!shader.layer_blend[layer]){
+        shader.layer_blend[layer]={};
+    }
+    if(!texturename){
+        shader.layer_blend[layer]={};
+    }else {
+        shader.layer_blend[layer][texturename] = blendfunc;
+    }
 }
+
+function renderSetObjectSpriteBlend(object,blendfunc){
+    renderSetSpriteBlend(object.layer,object.render.texture,blendfunc);
+}
+
+function renderSetSpriteScale(x,y,obj){
+    obj=obj||stg_target;
+    if(!obj.render)return;
+    obj.render.scale[0]=x;
+    obj.render.scale[1]=y;
+    obj.update=1;
+}
+
+function BossBreakCircleSingle(speed1,speed2,speed3){
+    speed3=speed3||0.5;
+    this.layer=78;
+    renderObjectApply2DTemplate(this,"bcircle",0);
+    this.cspeed=speed1;
+    this.cspeed3=speed3;
+    this.crange=0;
+    this._speed=speed2;
+    renderSetSpriteScale(0,0);
+    renderSetObjectSpriteBlend(this,blend_xor1);
+}
+BossBreakCircleSingle.prototype.script=function(){
+    this.crange+=this.cspeed;
+    if(this.cspeed<this._speed)this.cspeed+=this.cspeed3;
+    var scale=this.crange/128;
+    var r=this.crange;
+    if(r<stg_frame_h+stg_frame_w) {
+        renderSetSpriteScale(scale,scale);
+    }else{
+        this.finish=1;
+        this.script=0;
+    }
+};
+
+function BreakCircleEffect(countertime){
+    this.ct=countertime>>0;
+    this.arra=[];
+    this.arra[0]=new BossBreakCircleSingle(0,8,1);
+    this.arra[1]=new BossBreakCircleSingle(0,6);
+    this.arra[2]=new BossBreakCircleSingle(0,6);
+    this.arra[3]=new BossBreakCircleSingle(0,6);
+    this.arra[4]=new BossBreakCircleSingle(0,6);
+    this.arra[5]=new BossBreakCircleSingle(0,8,1);
+}
+BreakCircleEffect.prototype.script=function(){
+    if(this.frame==1){
+
+        stgAddObject(this.arra[0]);
+        stgSetPositionA1(this.arra[0],this.pos[0],this.pos[1]);
+    }
+
+    if(this.frame==1){
+        stgAddObject(this.arra[1]);
+        stgSetPositionA1(this.arra[1],this.pos[0]+40,this.pos[1]);
+        stgAddObject(this.arra[2]);
+        stgSetPositionA1(this.arra[2],this.pos[0],this.pos[1]+40);
+        stgAddObject(this.arra[3]);
+        stgSetPositionA1(this.arra[3],this.pos[0]-40,this.pos[1]);
+        stgAddObject(this.arra[4]);
+        stgSetPositionA1(this.arra[4],this.pos[0],this.pos[1]-40);
+    }
+    if(this.frame==this.ct){
+        stgAddObject(this.arra[5]);
+        stgSetPositionA1(this.arra[5],this.pos[0],this.pos[1]);
+    }
+    var cnt=0;
+    for(var i=1;i<5;i++){
+        if(this.arra[i].finish){
+            cnt+=1;
+        }
+    }
+    if(cnt==4){
+        stgDeleteObject(this.arra[1]);
+        stgDeleteObject(this.arra[2]);
+        stgDeleteObject(this.arra[3]);
+        stgDeleteObject(this.arra[4]);
+    }
+    if(this.arra[5].finish){
+        stgDeleteObject(this.arra[0]);
+        stgDeleteObject(this.arra[5]);
+        stgDeleteSelf();
+    }
+};
