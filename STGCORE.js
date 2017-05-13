@@ -879,6 +879,10 @@ function _stgMainLoop_PlayerState(){
                     }
                     if(a.invincible==0 && a.state==stg_const.PLAYER_HIT){
                         a.state=stg_const.PLAYER_DEAD;
+                        if(a.on_death){
+                            stg_target=a;
+                            a.on_death();
+                        }
                         a.invincible= a.down_time;
                     }
                     if(a.invincible==0 && a.state==stg_const.PLAYER_DEAD){
@@ -933,7 +937,7 @@ function _stgMainLoop_Engine(){
                     if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
                     if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
                 }
-
+                playerSpellRefresh(a);
             }
 
         }
@@ -1390,4 +1394,10 @@ function stgLookAtTarget(object,target,turnrate){
     object=object||stg_target;
     turnrate=turnrate?turnrate*PI180:null;
     object.look_at={target:target,turn_rate:turnrate};
+}
+
+function StgBase(target,type,auto_remove){
+    this.target=target;
+    this.type=type;
+    this.auto_remove=auto_remove||0;
 }

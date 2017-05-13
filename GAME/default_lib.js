@@ -394,6 +394,17 @@ function renderSetSpriteScale(x,y,obj){
     obj.render.scale[1]=y;
     obj.update=1;
 }
+function renderSetSpriteColor(r,g,b,a,obj) {
+    if (!obj)obj = stg_target;
+    if (!obj.render)return;
+    obj.alpha= a;
+    obj.render.color=[r/255.0,g/255.0,b/255.0];
+    obj.update=1;
+}
+function renderCreateSpriteRender(object){
+    object=object||stg_target;
+    object.render=new StgRender("sprite_shader");
+}
 
 function BossBreakCircleSingle(speed1,speed2,speed3){
     speed3=speed3||0.5;
@@ -403,7 +414,7 @@ function BossBreakCircleSingle(speed1,speed2,speed3){
     this.cspeed3=speed3;
     this.crange=0;
     this._speed=speed2;
-    renderSetSpriteScale(0,0);
+    renderSetSpriteScale(0,0,this);
     renderSetObjectSpriteBlend(this,blend_xor1);
 }
 BossBreakCircleSingle.prototype.script=function(){
@@ -468,3 +479,41 @@ BreakCircleEffect.prototype.script=function(){
         stgDeleteSelf();
     }
 };
+
+function stgPlayerSpell(player,spellobject){
+    if(player.bomb<0){
+        return false;
+    }
+    player.bomb--;
+    if(player.state==stg_const.PLAYER_HIT){
+        player.state=stg_const.PLAYER_NORMAL;
+    }
+    if(!player.current_spell){
+        player.current_spell=[];
+    }
+    player.current_spell.push(spellobject);
+    var t=stg_target;
+    stg_target=player;
+    stgAddObject(spellobject);
+    stg_target=t;
+    return true;
+}
+
+function playerSpellRefresh(player){
+    if(player.current_spell){
+        var j=0;
+        for(var i=0;i<player.current_spell.length;i++){
+            var s=player.current_spell[i];
+            if(s.remove){
+                //player.current_spell[i]=0;
+            }else{
+                player.current_spell[j]=player.current_spell[i];
+                j++;
+            }
+        }
+        for(;j<i;j++){
+            player.current_spell.pop();
+        }
+    }
+    player.bombing=player.current_spell?player.current_spell.length:0;
+}

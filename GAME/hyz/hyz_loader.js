@@ -25,9 +25,11 @@ hyz_loader.init=function(){
         stgLoadSE("se_ok","se/se_ok00.wav").ready=1;
         stgLoadSE("se_cancel","se/se_cancel00.wav").ready=1;
         stgLoadSE("se_extend","se/se_extend.wav").ready=1;
+        stgLoadSE("se_cast","se/se_cat00.wav").ready=1;
+
 
         loadHyzFont();
-
+        loadItemSystem();
         //横向场地
         stg_height=480;
         stg_width=640;
@@ -66,6 +68,9 @@ hyz_loader.init=function(){
         stgCreateImageTexture("3dTex3","bg/floor.png");
         stgCreateImageTexture("laser1","laser.png");
         stgCreateImageTexture("cardbg2_c","cardbg2_c.png");
+        stgCreateImageTexture("life","LifeGauge.png");
+
+
 
 
         renderCreate2DTemplateA1("ene_boom","pl_effect",192,176,64,64,64,0,0,1);

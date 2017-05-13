@@ -12,13 +12,20 @@ function stgCreateShotA1(x,y,speed,angle,bulletname,delay,color){
     a.invincible=delay;
     a.layer=stg_const.LAYER_BULLET;
     if(stg_target.side==stg_const.SIDE_PLAYER){
-        a.layer=stg_const.LAYER_PLAYER;
+        a.layer=stg_const.LAYER_PLAYER_BULLET;
     }
     a.color=color;
     stg_bullet_parser(a,bulletname);
     stgAddObject(a);
     return a;
 }
+function stgCreateShotP1(x,y,speed,angle,bulletname,delay,color,damage,pene){
+   var a=stgCreateShotA1(x,y,speed,angle,bulletname,delay,color);
+    a.damage=damage||1;
+    a.penetrate=pene||1;
+    return a;
+}
+
 function stgApplyShot(object,bulletname,color) {
     var a=object;
     StgBullet.call(a);

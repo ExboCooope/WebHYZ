@@ -31,6 +31,7 @@ hyz.set_up_frame_object={
 
 hyz.level={};
 hyz.level.init=function(){
+    hyzSetBattleStyle(0,0);
     stgAddObject(hyz.set_up_frame_object);
     stgAddObject(background_controller);
     stgAddObject(background_01);
@@ -46,7 +47,7 @@ hyz.level.init=function(){
 
     // var e1=new Hyz_enemy(0,0);
   //  hyzAddObject(e1,1);
- //   stgAddObject(hyz.enemy_maker);
+    stgAddObject(hyz.enemy_maker);
 
 /*
     var test2=new HeadedLaserA1(12,10+stg_rand(stg_frame_w-10),100,8);
@@ -81,13 +82,13 @@ hyz.level.init=function(){
 };
 hyz.level.script=function(){
    // this.f++;
-    /*
+
     if(this.frame==30){
         var a=new CircleObject(18,27,0,360,96);
         a.SetColor(1,1,1,0.75);
         a.SetTexture("bullet",286,128,286,192,0);
         a.layer=stg_const.LAYER_BULLET-1;
-        hyzAddObject(a,1);
+       // hyzAddObject(a,1);
         stgSetPositionA1(a,50,50);
         a.script=function(){
             if(a.frame==1){luaMoveTo(stg_frame_w/2,stg_frame_h/2,60,1)}
@@ -95,7 +96,7 @@ hyz.level.script=function(){
             if(a.frame==120){a.SetColor(1,1,1,1)};
             if(a.frame>120 && a.frame<140){a.r0-=4;a.r1+=4;}
         }
-    }*/
+    }
     this.chain1.value=""+stg_common_data.current_hit[0];
     /*
     if(this.f%6==0) {
@@ -113,7 +114,7 @@ hyz.level.script=function(){
 
     if(this.frame==60){
         var a=new CircleObject(0,400,0,360,200);
-        //hyzAddObject(a,1);
+       // hyzAddObject(a,1);
         a.SetColor(1,1,1,1);
         a.SetTexture("cardbg2_c",0,0,1024,1024,0);
         stgSetPositionA1(a,stg_frame_w/2,stg_frame_h/2);
@@ -126,14 +127,19 @@ hyz.level.script=function(){
            // a.a1+=1;
         }
 
-        var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
-        blt.sid = 1;
-        stgLookAtTarget(blt,hyzGetPlayer(1),5);//朝向玩家，每帧最多转3度
-        blt.move_rotate = -1;//物体角度决定移动角度
+     //   var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
+     //   blt.sid = 1;
+   //     stgLookAtTarget(blt,hyzGetPlayer(1),5);//朝向玩家，每帧最多转3度
+    //    blt.move_rotate = -1;//物体角度决定移动角度
+     //   test_bulletgroup(100,100);
 
-        var b=new BreakCircleEffect(60);
-        hyzAddObject(b,1);
-        stgSetPositionA1(b,100,100);
+       // this.sid=1;
+      //  gCreateItem([100,100],stg_const.ITEM_SCORE,36,30);
+      //  this.sid=0;
+
+       // var b=new BreakCircleEffect(60);
+      //  hyzAddObject(b,1);
+      //  stgSetPositionA1(b,100,100);
       //  renderSetSpriteScale(0.5,0.5,b);
      //
 
@@ -289,8 +295,41 @@ Hyz_enemy.prototype.script=function(){
         stgDeleteSelf();
         stgAddObject(new Hyz_boom(this.pos[0],this.pos[1],1+this.enetype*0.2));
         stgAddObject(new HyzCrossEffect(this.sid-1,this.sid,this.pos,3-this.sid,[stg_rand(0,288),stg_rand(0,144)],60,1,0));
+        gCreateItem(this.pos,stg_const.ITEM_SCORE,1,16);
     }
 };
+
+function test_bulletgroup(x,y){
+    var a=stgCreateShotA1(x,y,1,atan2pr(stg_target.pos,hyzGetPlayer(1).pos),"mZY",0,1);
+    a.sid=1;
+    var s=function(){
+        this.pos[0]=80*sin(this.t);
+        this.pos[1]=80*cos(this.t);
+        this.t+=2*PI180;
+    };
+    var s2=function(){
+        if(this.frame%20==0 && this.frame<=600){
+            stgCreateShotA1(this.pos[0],this.pos[1],2,this.rotate[2]/PI180,"sMD",12,stg_rand_int(0,7));
+        }
+    };
+    var b;
+    for(var i=0;i<8;i++){
+        b=stgCreateShotA1(0,0,0,0,"sLD",0,i);
+        b.on_move=s;
+        b.resolve_move=1;
+        b.move_rotate=1;
+        b.base={target:a,type:stg_const.BASE_MOVE};
+        b.sid=1;
+        b.t=PI2*i/8;
+        if(i%2==0){
+            b.move_rotate=0;
+            stgLookAtTarget(b,hyzGetPlayer(1),360);
+        }
+        b.script=s2;
+
+    }
+}
+
 
 function Hyz_boom(x,y,scale){
     stgSetPositionA1(this,x,y);

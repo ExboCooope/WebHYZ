@@ -64,7 +64,7 @@ function item_script_0(){
 function item_script_1(){
     var a=stg_target;
     if(a.attracter){
-        if(a.attracter.state==stg_const.PLAYER_DEAD){
+        if(a.attracter.state==stg_const.PLAYER_DEAD || !hyzIsInOneFrame(this, a.attracter)){
             delete a.attracter;
             a.move.speed=0;
             a.move.speed_angle=PI/2;
@@ -82,7 +82,7 @@ function item_script_1(){
         for(var i=0;i<stg_players_number;i++){
 
             var p=stg_players[i];
-            if(p.state!=stg_const.PLAYER_DEAD){
+            if(p.state!=stg_const.PLAYER_DEAD && hyzIsInOneFrame(this,p)){
                 var t=sqrt2(p.pos, a.pos);
                 if(t< p.item_attract_range){
                     kp=p;

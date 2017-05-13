@@ -335,11 +335,6 @@ WebglDMA.prototype.release=function(){
     }
 };
 
-function spriteSetColor1(obj,r,g,b,a){
-    if(!obj)obj=stg_target;
-    if(!obj.render||!obj.render.aColor)return;
-    var t=obj.render.aColor;
-}
 
 function shader1_object_parser(oDMA,oObject,iIndex,iNew){
     var gl=_gl;

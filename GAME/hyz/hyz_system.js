@@ -269,6 +269,10 @@ hyz_system_script.init=function(){
     this.fps_drawer=new RenderText(300, 464);
     var a=new HyzHitChainShower();
     hyzAddObject(a,1);
+    var b=new HyzUI(0,1);
+    stgAddObject(b);
+    var c=new HyzUI(1,2);
+    stgAddObject(c);
 };
 
 hyz_system_script.playerintersect=function(){
@@ -319,7 +323,13 @@ hyz_system_script.playerintersect=function(){
 
 hyz_system_script.script=function(){
 
-    stg_common_data.current_combo_time[0];
+    if(stg_system_input[stg_const.KEY_USER1]){
+        hyzSetBattleStyle(1,0);
+    }
+    if(stg_system_input[stg_const.KEY_USER2]){
+        hyzSetBattleStyle(0,0);
+    }
+   // stg_common_data.current_combo_time[0];
     this.playerintersect();
 
 
@@ -551,7 +561,7 @@ function hyzSetBattleStyle(style,changetype){
                 var a=_pool[i];
                 if(a.sid==2){
                     var pos= a.pos;
-                    if(pos){
+                    if(pos && !a.base){
                         stgSetPositionA1(a,pos[0]+320,pos[1]);
                     }
                 }
@@ -577,7 +587,7 @@ function hyzSetBattleStyle(style,changetype){
                     var a = _pool[i];
                     if (a.sid == 2) {
                         var pos = a.pos;
-                        if (pos) {
+                        if (pos && !a.base){
                             stgSetPositionA1(a, pos[0] - 320, pos[1]);
                         }
                     }
@@ -586,7 +596,7 @@ function hyzSetBattleStyle(style,changetype){
                 for (var i = 0; i < _pool.length; i++) {
                     var a = _pool[i];
                     var pos = a.pos;
-                    if (pos) {
+                    if (pos && !a.base) {
                         if (a.type == stg_const.OBJ_ENEMY || a.type == stg_const.OBJ_BULLET) {
 
                             if (pos[0] > 304) {

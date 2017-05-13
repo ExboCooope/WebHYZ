@@ -26,6 +26,9 @@ Default_Player_Sikieiki.prototype.init=function(){
     renderCreate2DTemplateA1("siki_left","siki_body",0,48,32,48,32,0,0,1);
     renderCreate2DTemplateA1("siki_right","siki_body",0,96,32,48,32,0,0,1);
     renderCreate2DTemplateA1("siki_option","siki_body",64,144,16,16,16,0,0,1);
+
+    renderSetSpriteBlend(stg_const.LAYER_PLAYER_BULLET,"siki_body",blend_test2);
+
     b.layer=stg_const.LAYER_PLAYER;
     if(stg_common_data.player){
         if(stg_common_data.player[this.player_pos]){
@@ -131,7 +134,7 @@ Default_Player_Sikieiki.prototype.init=function(){
     b.on_graze=function(){
         stgPlaySE("se_graze");
     };
-    //stgAddObject(new TestShotController(b));
+    stgAddObject(new TestShotController(b));
 };
 
 stg_player_templates.siki=Default_Player_Sikieiki;

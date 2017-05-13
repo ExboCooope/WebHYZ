@@ -13,6 +13,15 @@ Player_Remilia.prototype.init=function(){
     this.side=stg_const.SIDE_PLAYER;
     var b=new StgObject();
     _StgDefaultPlayer(b);
+    b.hitby=new StgHitDef();
+    b.hitby.setPointA1(0,0,2);
+    b.on_death=Player_Remilia.on_death;
+    b.on_collect=function(){
+        stgPlaySE("se_item");
+    };
+    b.on_graze=function(){
+        stgPlaySE("se_graze");
+    };
     if(stg_common_data.player){
         if(stg_common_data.player[this.player_pos]){
             miscApplyAttr(b,stg_common_data.player[this.player_pos]);
@@ -26,6 +35,19 @@ Player_Remilia.prototype.init=function(){
     stgAddObject(c);
     NewHyzSpriteObject(b,"remilia_stand",0);
     b.script=Player_Remilia.player_script;
+    b.shot_f=0;
+
+    this.options=[new Player_Remilia.Option(b,0),new Player_Remilia.Option(b,1),new Player_Remilia.Option(b,2),new Player_Remilia.Option(b,3)];
+    stgAddObject(this.options[0]);
+    stgAddObject(this.options[1]);
+    stgAddObject(this.options[2]);
+    stgAddObject(this.options[3]);
+};
+
+Player_Remilia.on_death=function(){
+    var a=new BreakCircleEffect(90);
+    stgAddObject(a);
+    stgSetPositionA1(a,this.pos[0],this.pos[1]);
 };
 
 Player_Remilia.player_script=function(){
@@ -41,6 +63,7 @@ Player_Remilia.player_script=function(){
     }else{
         this.t++;
     }
+    //this.render.scale=1;
     var t=this.t;
     if(t%4==0){
         if(current_dir==0) {
@@ -86,13 +109,75 @@ Player_Remilia.player_script=function(){
     }
     this.last_anime=current_dir;
    if(key[stg_const.KEY_SPELL]){
-       this.invincible=360;
+       if(!this.bombing){
+           if(stgPlayerSpell(this,new Player_Remilia.Spell(this))){
+               this.invincible=330;
+           }
+       }
    }
     if(this.state==stg_const.PLAYER_NORMAL || this.state==stg_const.PLAYER_REBIRTH ){
         spriteUseInviEffect();
     }
+    if(this.state==stg_const.PLAYER_NORMAL){
+        Player_Remilia.shoot_function();
+    }
 
 };
+
+Player_Remilia.shoot_function=function(){
+    var key=stg_target.key;
+    var key_shot=key[stg_const.KEY_SHOT];
+    var key_slow=key[stg_const.KEY_SLOW];
+    var key_bomb=key[stg_const.KEY_SPELL];
+    var f=stg_target.shot_f;
+var blt;
+    if(key_shot){
+        if(f==0){
+            blt=stgCreateShotP1(stg_target.pos[0]-4,stg_target.pos[1]-8,12,270,"remilia_sht1",0,1,3,1);
+            renderSetSpriteScale(1,0.4,blt);
+          //  renderSetSpriteColor(255,255,255,128,blt);
+         //   blt.layer++;
+            blt=stgCreateShotP1(stg_target.pos[0]+4,stg_target.pos[1]-8,12,270,"remilia_sht1",0,1,3,1);
+            renderSetSpriteScale(1,0.4,blt);
+        //    renderSetSpriteColor(255,255,255,128,blt);
+        //    blt.layer++;
+        }
+        f=(f+1)%3;
+    }
+
+};
+
+Player_Remilia.Spell=function(player){
+    this.ignore_super_pause=true;
+    this.player=player;
+};
+
+Player_Remilia.Spell.prototype.init=function(){
+    hyzSetSuperPauseTime(60);
+    stgPlaySE("se_cast");
+};
+
+Player_Remilia.Spell.prototype.script=function(){
+    if(this.frame>0){
+        var key_shot=this.player.key[stg_const.KEY_SHOT];
+        if(key_shot){
+            var blt;
+            var p=this.player.pos;
+            if(this.frame%6==0){
+                blt=stgCreateShotP1(p[0]-16,p[1]-8,12,270,"remilia_sht1",0,1,3,1);
+                renderSetSpriteScale(2,4,blt);
+                blt=stgCreateShotP1(p[0]+16,p[1]-8,12,270,"remilia_sht1",0,1,3,1);
+                renderSetSpriteScale(2,4,blt);
+                blt=stgCreateShotP1(p[0],p[1]-20,12,270,"remilia_sht1",0,1,3,1);
+                renderSetSpriteScale(2,4,blt);
+            }
+        }
+    }
+    if(this.frame>300){
+        stgDeleteSelf();
+    }
+};
+
 
 
 Player_Remilia.pre_load=function(){
@@ -102,9 +187,17 @@ Player_Remilia.pre_load=function(){
     renderCreate2DTemplateA1("remilia_stand","remilia_a",0,96,48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_left","remilia_a",0,96+48,48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_right","remilia_a",48,96+48,-48,48,48,0,0,1);
+    renderCreate2DTemplateA1("remilia_option","remilia_a",0,192,32,32,0,0,0,1);
+    renderCreate2DTemplateA1("remilia_option2","remilia_a",32,192,20,32,0,0,0,1);
+
 
     stgCreateImageTexture("pl_effect","etama2.png");
     renderCreate2DTemplateA1("pan_ding_dian","pl_effect",0,112,64,64,64,0,0,1);
+
+    stgCreate2DBulletTemplateA1("remilia_sht1","remilia_a",64,224,32,16,0,16,0,1,_hit_box_large,{move_rotate:1});
+    stgCreate2DBulletTemplateA1("remilia_sht2","remilia_a",32,192,20,32,0,0,0,1,_hit_box_large,{move_rotate:1});
+
+    renderSetSpriteBlend(stg_const.LAYER_PLAYER_BULLET,"remilia_a",blend_add);
 
 };
 
@@ -142,6 +235,66 @@ Player_Remilia.ExLargeBullet.prototype.script=function(){
         blt.script=Player_Remilia.ExSmallBulletFunc;
     }
 };
+
+Player_Remilia.Option=function(player,id){
+    this.player=player;
+    this.id=id;
+};
+Player_Remilia.Option.prototype.init=function(){
+//    renderCreateSpriteRender();
+//    renderApply2DTemplate(0,"remilia_option2",0);
+    this.layer=stg_const.LAYER_PLAYER_BULLET+1;
+    this._base=new StgBase(this.player,stg_const.BASE_MOVE,1);
+    this.circle=new Player_Remilia.OptionCircle(this);
+    stgAddObject(this.circle);
+
+};
+Player_Remilia.Option.prototype.on_move=function(){
+    if(this.player.key[stg_const.KEY_SLOW]){
+        this.base=0;
+        renderSetSpriteColor(255,0,0,255,this.circle);
+    }else{
+        this.base=this._base;
+        renderSetSpriteColor(255,255,255,255,this.circle);
+        if(this.id==0){
+            this.pos[0]=45;
+            this.pos[1]=-20;
+        }else if(this.id==1){
+            this.pos[0]=22;
+            this.pos[1]=-30;
+        }else if(this.id==2){
+            this.pos[0]=-22;
+            this.pos[1]=-30;
+        }else if(this.id==3){
+            this.pos[0]=-45;
+            this.pos[1]=-20;
+        }
+    }
+    this.rotate[2]=270*PI180;
+};
+
+Player_Remilia.Option.prototype.script=function(){
+    if(this.player.key[stg_const.KEY_SHOT]){
+        if(this.frame%6==0){
+            stgCreateShotP1(this.pos[0],this.pos[1],9,stg_rand(260,280),"remilia_sht2",0,0,6,1).layer++;
+        }
+    }
+};
+
+
+Player_Remilia.OptionCircle=function(option){
+    this.option=option;
+};
+
+Player_Remilia.OptionCircle.prototype.init=function(){
+    renderCreateSpriteRender();
+    renderApply2DTemplate(0,"remilia_option",0);
+    this.layer=stg_const.LAYER_PLAYER_BULLET;
+    this.base=new StgBase(this.option,stg_const.BASE_COPY,1);
+    this.self_rotate=4*PI180;
+};
+
+
 
 Player_Remilia.ExSmallBulletFunc=function(){
     if(this.frame>this.tframe){
