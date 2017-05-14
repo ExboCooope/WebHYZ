@@ -106,6 +106,7 @@ var stg_const={
     BASE_ROTATE_MOVE:4,
     BASE_ROTATE_MOVE_ROTATE:5,
     BASE_COPY:6,
+    BASE_NONE:0,
 
     TEX_IMG:1, //img标签的纹理，支持使用
     TEX_CANVAS2D:2, //canvas2d的纹理，支持写入和使用

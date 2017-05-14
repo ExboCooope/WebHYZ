@@ -21,6 +21,8 @@ Player_Remilia.prototype.init=function(){
     };
     b.on_graze=function(){
         stgPlaySE("se_graze");
+        var a=new GrazeParticle(this.pos[0],this.pos[1],stg_rand(0,360));
+        stgAddObject(a);
     };
     if(stg_common_data.player){
         if(stg_common_data.player[this.player_pos]){
@@ -155,10 +157,12 @@ Player_Remilia.Spell=function(player){
 Player_Remilia.Spell.prototype.init=function(){
     hyzSetSuperPauseTime(60);
     stgPlaySE("se_cast");
+    var a=new Player_Remilia.CutInPic(stg_frame_w/2,stg_frame_h/2+50);
+    stgAddObject(a);
 };
 
 Player_Remilia.Spell.prototype.script=function(){
-    if(this.frame>0){
+    if(this.frame>60){
         var key_shot=this.player.key[stg_const.KEY_SHOT];
         if(key_shot){
             var blt;
@@ -183,12 +187,14 @@ Player_Remilia.Spell.prototype.script=function(){
 Player_Remilia.pre_load=function(){
     stgCreateImageTexture("remilia_b","players/remilia_boss.png");
     stgCreateImageTexture("remilia_a","players/remilia_player.png");
+    stgCreateImageTexture("remilia_pic1","players/remilia_pic1.png");
 
     renderCreate2DTemplateA1("remilia_stand","remilia_a",0,96,48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_left","remilia_a",0,96+48,48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_right","remilia_a",48,96+48,-48,48,48,0,0,1);
     renderCreate2DTemplateA1("remilia_option","remilia_a",0,192,32,32,0,0,0,1);
     renderCreate2DTemplateA1("remilia_option2","remilia_a",32,192,20,32,0,0,0,1);
+    renderCreate2DTemplateA1("remilia_pic1","remilia_pic1",0,0,800,600,0,0,0,1);
 
 
     stgCreateImageTexture("pl_effect","etama2.png");
@@ -200,6 +206,31 @@ Player_Remilia.pre_load=function(){
     renderSetSpriteBlend(stg_const.LAYER_PLAYER_BULLET,"remilia_a",blend_add);
 
 };
+
+Player_Remilia.CutInPic=function(x,y){
+    this.ignore_super_pause=1;
+    renderCreateSpriteRender(this);
+    renderApply2DTemplate(this.render,"remilia_pic1",0);
+    this.pos=[x,y,0];
+};
+
+Player_Remilia.CutInPic.prototype.init=function(){
+    this.layer=76;
+    renderSetSpriteScale(0.04,0.04,this);
+};
+Player_Remilia.CutInPic.prototype.script=function(){
+    if(this.frame<=10){
+        renderSetSpriteScale(0.4*this.frame/10,0.04,this);
+    }else if(this.frame<=20){
+        renderSetSpriteScale(0.4,0.4*(this.frame-10)/10,this);
+    }else if(this.frame>40){
+        renderSetSpriteColor(255,255,255,255*(1-(this.frame-40)/20));
+        if(this.frame>60){
+            stgDeleteSelf();
+        }
+    }
+};
+
 
 Player_Remilia.ExLargeBullet=function(x,y,type1,type2,angle){
     this.x=x;

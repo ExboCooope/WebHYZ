@@ -26,6 +26,8 @@ hyz_loader.init=function(){
         stgLoadSE("se_cancel","se/se_cancel00.wav").ready=1;
         stgLoadSE("se_extend","se/se_extend.wav").ready=1;
         stgLoadSE("se_cast","se/se_cat00.wav").ready=1;
+        stgLoadSE("se_boss_cast","se/se_ch02.wav").ready=1;
+        stgLoadSE("se_enemy_dead","se/se_enep00.wav").ready=1;
 
 
         loadHyzFont();
@@ -49,6 +51,7 @@ hyz_loader.init=function(){
         stg_main_canvas=stgCreateCanvas("ui",stg_width,stg_height,stg_const.TEX_CANVAS2D);
         stgCreateCanvas("back",stg_width,stg_height,stg_const.TEX_CANVAS2D);
         stgCreateCanvas("pause",stg_width,stg_height,stg_const.TEX_CANVAS2D);
+        stgCreateCanvas("magic_circle",256,256,stg_const.TEX_CANVAS3D_TARGET);
 
         //激活鼠标事件捕捉
         stgEnableMouse();
@@ -69,8 +72,14 @@ hyz_loader.init=function(){
         stgCreateImageTexture("laser1","laser.png");
         stgCreateImageTexture("cardbg2_c","cardbg2_c.png");
         stgCreateImageTexture("life","LifeGauge.png");
+        stgCreateImageTexture("particle","particles.png");
+        stgCreateImageTexture("slz","slz.png");
+        stgCreateImageTexture("bossres","res/boss.png");
+        stgCreateImageTexture("mcircle","eff_magic_circle.png");
 
-
+        renderCreate2DTemplateA1("mcircle","mcircle",0,0,256,256,0,0,0,1);
+        renderCreate2DTemplateA2("particle","particle",0,0,32,32,4,4,0,1);
+        renderCreate2DTemplateA1("magic_circle","magic_circle",0,0,256,256,0,0,0,1);
 
 
         renderCreate2DTemplateA1("ene_boom","pl_effect",192,176,64,64,64,0,0,1);
@@ -88,6 +97,10 @@ hyz_loader.init=function(){
         stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"3d_shader","#FFF");
 
         stgCreateProcedure1("drawUI","ui",81,100,"testShader2");
+
+        stgCreateProcedure1("drawMagicCircle","magic_circle",0,0,"sprite_shader","#000");
+        stg_procedures["drawMagicCircle"].transparent=1;
+        stg_procedures["drawMagicCircle"].sid=0;
 
         //stg_procedures["drawRightFrame"].transparent=1;
        // stg_procedures["drawLeftFrame"].transparent=1;

@@ -147,6 +147,13 @@ StgMove.prototype.setAccelerate=function(acc,angle){
     this.acceleration=acc;
 };
 
+function stgSetRotate(angle,obj){
+    obj=obj||stg_target;
+    if(!obj.rotate)obj.rotate=[0,0,0];
+    obj.rotate[2]=angle*PI180;
+}
+
+
 StgMove.prototype.resolve=function(pos){
     this._speed[0]=pos[0]-this.pos[0];
     this._speed[1]=pos[1]-this.pos[1];
@@ -285,6 +292,12 @@ function stgApplyEnemy(e){
     e.on_hit_by=default_enemy_onhitby;
     e.type=stg_const.OBJ_ENEMY;
     return e;
+}
+
+function stgApplyBoss(e){
+    e.spell_time=0;
+    e.spell_life=0;
+    e.spell_bonus=0;
 }
 
 function default_enemy_onhitby(bullet){
@@ -943,7 +956,7 @@ function _stgMainLoop_Engine(){
         }
     }
     for(i=0;i<_pool.length;i++){
-        if(_pool[i].active && (!stg_super_pause_time|| a.ignore_super_pause)){
+        if(_pool[i].active && (!stg_super_pause_time|| _pool[i].ignore_super_pause)){
             a=_pool[i];
             _pool[i].frame++;
             if(!a.pos){

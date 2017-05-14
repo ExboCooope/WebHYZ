@@ -78,13 +78,64 @@ luastg.bmoveTo=function(){
     a.lpos[1]=this.pos[1];
 };
 
-luastg.BossResourceHolder=function(ImageName,xs,ys,standi,lefti,righti,spelli){
+luastg.BossResourceHolder=function(ImageName,xs,ys,standi,lefti,righti,spelli,boss){
     this.resname=ImageName+"_lua";
     var tw=stg_textures[ImageName].width;
     var th=stg_textures[ImageName].height;
     renderCreate2DTemplateA2(this.resname,ImageName,0,0,tw/xs,th/ys,xs,ys,0,1);
     this.render=new StgRender("sprite_shader");
+    this.boss=boss;
+    this.base=new StgBase(boss,stg_const.BASE_NONE,1);
+    this.resolve_move=1;
+    this.animes=[standi,righti,lefti,spelli];
+    this.xs=xs;
+    this.layer=stg_const.LAYER_ENEMY;
+    stgEnableMove(this);
 };
+
+luastg.BossResourceHolder.prototype.on_move=function() {
+    this.pos[0]=this.boss.pos[0];
+    this.pos[1]=this.boss.pos[1];
+};
+luastg.BossResourceHolder.prototype.init=function() {
+    this.anime=0;
+    this.animei=0;
+    this.animef=0;
+    this.cast=0;
+};
+luastg.BossResourceHolder.prototype.script=function(){
+    //获得当前动作
+    var angle=this.move.speed?this.move.speed_angle/PI180:90;
+    var ani=0;
+    if(angle>135 && angle<225){
+        ani=2;
+    }else if(angle<45 || angle>315){
+        ani=1;
+    }
+    if(this.boss.cast){
+        ani=3;
+    }
+
+    if(this.anime==ani){
+        this.animef++;
+        if(this.animef>6){
+            this.animef=0;
+            this.animei++;
+            if(this.animei>=this.animes[ani][0]){
+                this.animei=this.animes[ani][1];
+            }
+            renderApply2DTemplate3(this.render,this.resname,ani*this.xs+this.animei);
+            this.update=1;
+        }
+    }else{
+        this.animef=0;
+        this.animei=0;
+        this.anime=ani;
+        renderApply2DTemplate3(this.render,this.resname,ani*this.xs+this.animei);
+        this.update=1;
+    }
+};
+
 
 luastg.general={};
 luastg.general.define=function(svar){
@@ -113,4 +164,9 @@ luastg.express=function(sexpr){
     eval(s);
     luastg._expressions[sexpr]=luastg._tempfunction;
     return luastg._tempfunction;
+}
+
+function luaSetPosition(x,y,obj){
+    obj=obj||stg_target;
+    stgSetPositionA1(obj,x+stg_frame_w/2,stg_frame_h/2-y);
 }

@@ -17,7 +17,7 @@ hyz.set_up_frame_object={
     init:function(){
         stgAddObject(hyz.resolution);
         stgShowCanvas("frame",0,0,0,0,5);
-        stg_display = ["drawBackground","drawBGFrame","drawLeftFrame",
+        stg_display = ["drawMagicCircle","drawBackground","drawBGFrame","drawLeftFrame",
             "drawRightFrame","drawCombineFrame","drawUI"];
         hyz.resolution.refresh();
         stgAddObject(hyz.left_bg_object);
@@ -35,6 +35,7 @@ hyz.level.init=function(){
     stgAddObject(hyz.set_up_frame_object);
     stgAddObject(background_controller);
     stgAddObject(background_01);
+    stgAddObject(hyz.magicCircle);
     stg_players[0].sid=1;
     stg_common_data.current_hit=[0,0];
     stg_common_data.current_chain_score=[0,0];
@@ -47,7 +48,7 @@ hyz.level.init=function(){
 
     // var e1=new Hyz_enemy(0,0);
   //  hyzAddObject(e1,1);
-    stgAddObject(hyz.enemy_maker);
+   // stgAddObject(hyz.enemy_maker);
 
 /*
     var test2=new HeadedLaserA1(12,10+stg_rand(stg_frame_w-10),100,8);
@@ -71,7 +72,7 @@ hyz.level.init=function(){
 
 //    hyzAddObject(a,1);
 
-    a=new HyzFontHolder2();
+    var a=new HyzFontHolder2();
     a.value="a12345!";
     stgSetPositionA1(a,100,30);
     a.layer=24;
@@ -79,13 +80,14 @@ hyz.level.init=function(){
     hyzAddObject(a,1);
     this.chain1=a;
     this.f=0;
+
 };
 hyz.level.script=function(){
    // this.f++;
 
     if(this.frame==30){
         var a=new CircleObject(18,27,0,360,96);
-        a.SetColor(1,1,1,0.75);
+        a.SetColor(255,255,255,200);
         a.SetTexture("bullet",286,128,286,192,0);
         a.layer=stg_const.LAYER_BULLET-1;
        // hyzAddObject(a,1);
@@ -93,7 +95,7 @@ hyz.level.script=function(){
         a.script=function(){
             if(a.frame==1){luaMoveTo(stg_frame_w/2,stg_frame_h/2,60,1)}
             if(a.frame>60 && a.frame<120){a.r0+=3;a.r1+=3;}
-            if(a.frame==120){a.SetColor(1,1,1,1)};
+            if(a.frame==120){a.SetColor(255,255,255,255)};
             if(a.frame>120 && a.frame<140){a.r0-=4;a.r1+=4;}
         }
     }
@@ -127,6 +129,12 @@ hyz.level.script=function(){
            // a.a1+=1;
         }
 
+
+        a=new BossSLZ();
+        a.sid=1;
+        stgAddObject(a);
+
+
      //   var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
      //   blt.sid = 1;
    //     stgLookAtTarget(blt,hyzGetPlayer(1),5);//朝向玩家，每帧最多转3度
@@ -156,6 +164,13 @@ hyz.level.script=function(){
                 this.resolve_move=0;
             }
         }*/
+    }
+
+    if(this.frame%6==1){
+        this._t1=this._t1||0;
+        this._t1++;
+        var a=stgCreateShotA1(50,50,3,90,"sXY",0,this._t1%8);
+        a.sid=1;
     }
 
     if(this.frame%60==1){
@@ -461,5 +476,23 @@ function hyzGetFramePos(sid,pos,outpos){
     }
 }
 
-
+function HyzMagicCircle(boss){
+    this.boss=boss;
+    this.base=new StgBase(boss,0,1);
+    renderCreateSpriteRender(this);
+    renderApply2DTemplate(this.render,"magic_circle",0);
+    this.layer=stg_const.LAYER_ENEMY-2;
+    //stgEnableMove(this);
+}
+HyzMagicCircle.prototype.on_move=function(){
+    this.pos[0]=this.boss.pos[0];
+    this.pos[1]=this.boss.pos[1];
+};
+HyzMagicCircle.prototype.init=function(){
+    this.self_rotate=0.5*PI180;
+};
+HyzMagicCircle.prototype.script=function(){
+    var f=this.frame*0.5*PI180;
+    renderSetSpriteScale(0.8+0.2*sin(f),1,this);
+};
 

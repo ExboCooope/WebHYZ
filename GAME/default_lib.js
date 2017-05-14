@@ -517,3 +517,94 @@ function playerSpellRefresh(player){
     }
     player.bombing=player.current_spell?player.current_spell.length:0;
 }
+
+function applyParticle(obj,i){
+    var a=obj;
+    renderCreateSpriteRender(a);
+    renderApply2DTemplate3(a.render,"particle",i);
+    a.layer=stg_const.LAYER_HINT-1;
+    renderSetObjectSpriteBlend(a,blend_add);
+    return a;
+}
+
+function GrazeParticle(x,y,dir){
+    this.x=x;
+    this.y=y;
+    this.dir=dir;
+}
+GrazeParticle.prototype.init=function(){
+    stgEnableMove(this);
+    stgSetPositionA1(this,this.x,this.y);
+    this.move.speed=3;
+    this.move.speed_angle=this.dir;
+    applyParticle(this,2);
+    stgSetRotate(stg_rand(0,360),this);
+    renderSetSpriteColor(255,255,255,300,this);
+    this.self_rotate=stg_rand(-3,3)*PI180;
+};
+GrazeParticle.prototype.script=function(){
+    var f=(30-this.frame)/30;
+    if(f<=0){
+        stgDeleteSelf();
+    }else {
+        renderSetSpriteScale(f, f, this);
+    }
+};
+
+function UnitAura1(boss,size,r,g,b){
+    this.base=new StgBase(boss,stg_const.BASE_COPY,1);
+    var a=this;
+    renderCreateSpriteRender(a);
+    renderApply2DTemplate3(a.render,"particle",0);
+    a.layer=stg_const.LAYER_ENEMY-1;
+    renderSetObjectSpriteBlend(a,blend_add);
+    renderSetSpriteColor(r,g,b,255,this);
+    var f=size/32;
+    renderSetSpriteScale(f,f,this);
+}
+
+function bossCast(boss,time){
+    var a={boss:boss,time:time,script:bossCast.script,init:bossCast.init};
+    stgAddObject(a);
+}
+bossCast.init=function(){
+    stgPlaySE("se_boss_cast");
+};
+bossCast.script=function(){
+    if(this.frame<this.time){
+        this.boss.cast=1;
+    }else{
+        this.boss.cast=0;
+        stgDeleteSelf();
+    }
+};
+
+function newBossTimeCircle(spell){
+    var a=new CircleObject(50,56,-90,270,96);
+    a.SetColor(255,255,255,255);
+    a.SetTexture("bossres",16,0,31,1280,1);
+    a.base=new StgBase(spell,stg_const.BASE_COPY,1);
+    a.spell=spell;
+    a.layer=stg_const.LAYER_ENEMY+1;
+    a.blend=blend_add;
+    a.script=newBossTimeCircle.script;
+    a.init=newBossTimeCircle.init;
+    return a;
+}
+newBossTimeCircle.init=function(){
+    this.max_time=this.spell.time;
+};
+
+newBossTimeCircle.script=function(){
+    var f=this.spell.frame;
+    var z=(f*2)%128;
+    var r=(this.max_time-f)/this.max_time*300;
+    if(r<0)r=0;
+    this.r0=r;
+    this.r1=r*1.1;
+    var d=r*0.1;
+    r=r*2.1*PI;
+    r=r/d*16;
+    this.SetTexture("bossres",16,z,32,r+z,1);
+
+};

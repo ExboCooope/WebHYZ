@@ -577,7 +577,7 @@ function hyzSetBattleStyle(style,changetype){
             hyzAddObject(hyz.full_screen_object,0);
             hyz.base[2][0]=320;
 
-            stg_display = ["drawBackground","drawFullBGFrame","drawFullFrame",
+            stg_display = ["drawMagicCircle","drawBackground","drawFullBGFrame","drawFullFrame",
                 "drawCombineFrame","drawUI"];
 
         }else if(style==0){
@@ -625,7 +625,7 @@ function hyzSetBattleStyle(style,changetype){
             stgDeleteObject(hyz.full_screen_object);
             hyzSetPositionA1(hyz.right_bg_object,0,0);
 
-            stg_display = ["drawBackground","drawBGFrame","drawLeftFrame",
+            stg_display = ["drawMagicCircle","drawBackground","drawBGFrame","drawLeftFrame",
                 "drawRightFrame","drawCombineFrame","drawUI"];
 
         }
@@ -682,7 +682,7 @@ function CircleObject(r0,r1,a0,a1,ptx){
 
 CircleObject.prototype.SetColor=function(r,g,b,a){
     var hd=0;
-    var ga=[r,g,b,a];
+    var ga=[r/255.0,g/255.0,b/255.0,a/255.0];
     var n=this._ptx*2;
     for (var i = 0; i < n; i++) {
         this.clist.buffer.set(ga,hd) ;
@@ -817,4 +817,14 @@ CircleObject.prototype.on_render=function(gl){
     if(this.blend!=blend_default){
         blend_default();
     }
+};
+
+hyz.magicCircle={};
+hyz.magicCircle.init=function(){
+    renderCreateSpriteRender(this);
+    renderApply2DTemplate(this.render,"mcircle",0);
+    this.layer=0;
+    this.sid=0;
+    this.self_rotate=1*PI180;
+    stgSetPositionA1(this,128,128);
 };

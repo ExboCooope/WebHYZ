@@ -155,3 +155,19 @@ function clamp(x1,x2,f){
 function extendlength(pos,dir,len){
     return [pos[0]+cos(dir)*len,pos[1]+sin(dir)*len];
 }
+
+var POW2={};
+POW2[1]=1;
+POW2[1<<1]=1;
+POW2[1<<2]=1;
+POW2[1<<3]=1;
+POW2[1<<4]=1;
+POW2[1<<5]=1;
+POW2[1<<6]=1;
+POW2[1<<7]=1;
+POW2[1<<8]=1;
+POW2[1<<9]=1;
+POW2[1<<10]=1;
+POW2[1<<11]=1;
+POW2[1<<12]=1;
+
