@@ -23,6 +23,7 @@ function stgCreateShotP1(x,y,speed,angle,bulletname,delay,color,damage,pene){
    var a=stgCreateShotA1(x,y,speed,angle,bulletname,delay,color);
     a.damage=damage||1;
     a.penetrate=pene||1;
+    a.layer=stg_const.LAYER_PLAYER_BULLET;
     return a;
 }
 

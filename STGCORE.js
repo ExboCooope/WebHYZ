@@ -1227,6 +1227,7 @@ function stgAddObject(oStgObject){
         }
     }
     stg_target=tmp;
+    stg_last=oStgObject;
 }
 
 function stgDeleteObject(oStgObject){
