@@ -49,6 +49,7 @@ hyz_loader.init=function(){
         stgCreateCanvas("frame_full_bg",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 
         stgCreateCanvas("frame_right",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+
         stg_main_canvas=stgCreateCanvas("ui",stg_width,stg_height,stg_const.TEX_CANVAS2D);
         stgCreateCanvas("back",stg_width,stg_height,stg_const.TEX_CANVAS2D);
         stgCreateCanvas("pause",stg_width,stg_height,stg_const.TEX_CANVAS2D);
@@ -77,6 +78,8 @@ hyz_loader.init=function(){
         stgCreateImageTexture("slz","slz.png");
         stgCreateImageTexture("bossres","res/boss.png");
         stgCreateImageTexture("mcircle","eff_magic_circle.png");
+        stgCreateImageTexture("white","white.png");
+        renderCreate2DTemplateA1("white","white",0,0,1,1,0,0,0,1);
 
         renderCreate2DTemplateA1("mcircle","mcircle",0,0,256,256,0,0,0,1);
         renderCreate2DTemplateA2("particle","particle",0,0,32,32,4,4,0,1);
@@ -91,6 +94,7 @@ hyz_loader.init=function(){
         stgCreateProcedure1("drawBackground","back",0,19,"testShader2","#DDD");
         stgCreateProcedure2("drawLeftFrame","frame_left",20,80,["sprite_shader","basic_shader"],"#000");
         stgCreateProcedure2("drawRightFrame","frame_right",20,80,["sprite_shader","basic_shader"],"#000");
+
         stgCreateProcedure1("drawFullFrame","frame_full",20,80,"sprite_shader","#000");
 
         stgCreateProcedure1("drawCombineFrame","frame",201,300,"sprite_shader","#000");
@@ -108,6 +112,7 @@ hyz_loader.init=function(){
         stg_procedures["drawRightFrame"].sid=2;
         stg_procedures["drawLeftFrame"].sid=1;
         stg_procedures["drawFullFrame"].sid=3;
+
 
         stg_procedures["drawCombineFrame"].transparent=1;
 
@@ -146,9 +151,12 @@ hyz_loader.init=function(){
         hyz.right_bg_object.layer=20;
         hyz.right_bg_object.sid=2;
         ApplyFullTexture(hyz.right_bg_object,"frame_bg");
+
         stgSetPositionA1(hyz.right_screen_object,320,0);
         hyz.right_screen_object.layer=202;
         ApplyFullTexture(hyz.right_screen_object,"frame_right");
+
+
 
         stgSetPositionA1(hyz.full_bg_object,0,0);
         hyz.full_bg_object.layer=20;
@@ -159,6 +167,17 @@ hyz_loader.init=function(){
         hyz.full_screen_object.layer=202;
         ApplyFullTexture(hyz.full_screen_object,"frame_full");
 
+/*
+        stgCreateCanvas("frame_right_smear",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateProcedure1("drawRightFrameSmear","frame_right_smear",10,80,"sprite_shader","#000");
+        stg_procedures["drawRightFrameSmear"].sid=2;
+      //  stg_procedures["drawRightFrameSmear"].transparent=1;
+        stg_procedures["drawRightFrameSmear"].smear=1;
+        stgSetPositionA1(hyz.right_screen_object_2,320,0);
+        hyz.right_screen_object_2.layer=201;
+        ApplyFullTexture(hyz.right_screen_object_2,"frame_right_smear");
+
+*/
 
 
         gLoadMenuSystem();

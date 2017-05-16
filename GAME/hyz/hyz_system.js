@@ -33,9 +33,26 @@ hyz.right_bg_object={};
 hyz.full_screen_object={};
 hyz.full_bg_object={};
 
+hyz.right_screen_object_2={};
 
 hyz.left_pool=[];
 hyz.right_pool=[];
+
+function SmearCleanUpObject(){
+
+}
+SmearCleanUpObject.prototype.init=function(){
+    renderCreateSpriteRender(this);
+    renderApply2DTemplate(this.render,"white",0);
+    renderSetSpriteColor(200,200,200,255);
+    this.render.smear=1;
+    this.layer=15;
+    //renderSetSpriteBlend(15,"white",blend_clear);
+};
+SmearCleanUpObject.prototype.script=function(){
+    renderSetSpriteScale(stg_frame_w,stg_frame_h,this);
+    stgSetPositionA1(this,stg_frame_w/2,stg_frame_h/2);
+};
 
 function hyzAddObject(object,side){
     if(side){
