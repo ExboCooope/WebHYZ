@@ -922,36 +922,43 @@ function _stgMainLoop_Engine(){
     if(stg_game_state==stg_const.GAME_RUNNING) {
         for (i = 0; i < stg_players_number; i++) {
             a = stg_players[i];
-            if (a.active && (!stg_super_pause_time|| a.ignore_super_pause)) {
-                a.slow = a.key[stg_const.KEY_SLOW];
-                a.last_x= a.pos[0];
-                a.last_y= a.pos[1];
-                if (!a.no_move && a.state==stg_const.PLAYER_NORMAL) {
-                    var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
-                    //  var x=a.key[10]-a.key[9];
-                    var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
-                    if (x || y) {
-                        var s = a.move_speed[a.slow];
-                        if (x && y) {
-                            s = s / 1.4142;
+            if(a.active){
+                if(a.on_ai){
+                    a.on_ai();
+                }else{
+                    if ((!stg_super_pause_time|| a.ignore_super_pause)) {
+                        a.slow = a.key[stg_const.KEY_SLOW];
+                        a.last_x= a.pos[0];
+                        a.last_y= a.pos[1];
+                        if (!a.no_move && a.state==stg_const.PLAYER_NORMAL) {
+                            var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
+                            //  var x=a.key[10]-a.key[9];
+                            var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
+                            if (x || y) {
+                                var s = a.move_speed[a.slow];
+                                if (x && y) {
+                                    s = s / 1.4142;
+                                }
+                                x = x * s;
+                                y = y * s;
+                                a.pos[0] += x;
+                                a.pos[1] += y;
+                            }
                         }
-                        x = x * s;
-                        y = y * s;
-                        a.pos[0] += x;
-                        a.pos[1] += y;
+                        if(a.state==stg_const.PLAYER_REBIRTH){
+                            a.pos[0]= a.rebirth_x;
+                            a.pos[1]= (stg_frame_height+50-a.rebirth_y)* a.invincible/ a.rebirth_time+a.rebirth_y;
+                        }else {
+                            if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
+                            if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
+                            if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
+                            if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
+                        }
+                        playerSpellRefresh(a);
                     }
                 }
-                if(a.state==stg_const.PLAYER_REBIRTH){
-                    a.pos[0]= a.rebirth_x;
-                    a.pos[1]= (stg_frame_height+50-a.rebirth_y)* a.invincible/ a.rebirth_time+a.rebirth_y;
-                }else {
-                    if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
-                    if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
-                    if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
-                    if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
-                }
-                playerSpellRefresh(a);
             }
+
 
         }
     }
@@ -1149,6 +1156,56 @@ function _stgMainLoop_Engine(){
             }
         }
     }
+    if(stg_game_state==stg_const.GAME_RUNNING) {
+        for (i = 0; i < stg_players_number; i++) {
+            a = stg_players[i];
+            if(a.active){
+                if(a.on_ai_after_move){
+                    a.on_ai_after_move();
+                    if (a.active && (!stg_super_pause_time|| a.ignore_super_pause)) {
+                        a.slow = a.key[stg_const.KEY_SLOW];
+                        a.last_x= a.pos[0];
+                        a.last_y= a.pos[1];
+                        if (!a.no_move && a.state==stg_const.PLAYER_NORMAL) {
+                            var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
+                            //  var x=a.key[10]-a.key[9];
+                            var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
+                            if (x || y) {
+                                var s = a.move_speed[a.slow];
+                                if (x && y) {
+                                    s = s / 1.4142;
+                                }
+                                x = x * s;
+                                y = y * s;
+                                a.pos[0] += x;
+                                a.pos[1] += y;
+                            }
+                        }
+                        if(a.state==stg_const.PLAYER_REBIRTH){
+                            a.pos[0]= a.rebirth_x;
+                            a.pos[1]= (stg_frame_height+50-a.rebirth_y)* a.invincible/ a.rebirth_time+a.rebirth_y;
+                        }else {
+                            if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
+                            if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
+                            if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
+                            if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
+                        }
+                        playerSpellRefresh(a);
+
+                        if(a.hitby && !a.ignore_hit){
+                            a.hitby.rpos[0]= a.pos[0]+ a.hitby.pos[0];
+                            a.hitby.rpos[1]= a.pos[1]+ a.hitby.pos[1];
+                        }
+                        if(a.hitdef && !a.ignore_hit && !a.invincible){
+                            a.hitdef.rpos[0]= a.pos[0]+ a.hitdef.pos[0];
+                            a.hitdef.rpos[1]= a.pos[1]+ a.hitdef.pos[1];
+                        }
+                    }
+                }
+            }
+       }
+    }
+
 }
 var _stg_no_input=0;
 function stgCreateRefresher(){
@@ -1227,6 +1284,7 @@ function stgAddObject(oStgObject){
         }
     }
     stg_target=tmp;
+    stg_last=oStgObject;
 }
 
 function stgDeleteObject(oStgObject){
@@ -1409,8 +1467,9 @@ function stgLookAtTarget(object,target,turnrate){
     object.look_at={target:target,turn_rate:turnrate};
 }
 
-function StgBase(target,type,auto_remove){
+function StgBase(target,type,auto_remove,clonesid){
     this.target=target;
     this.type=type;
     this.auto_remove=auto_remove||0;
+    this.sid=clonesid||0;
 }

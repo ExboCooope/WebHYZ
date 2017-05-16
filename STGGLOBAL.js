@@ -31,6 +31,7 @@ var stg_bullet_parser=null;
 
 // stg_target 在执行每个脚本的时候，都指向脚本所在对象自身
 var stg_target=null;
+var stg_last=null;
 
 // 所有的玩家数据对象
 var stg_players=[{}];

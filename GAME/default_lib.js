@@ -373,6 +373,7 @@ StgGrazer.prototype.script=function(){
 
 function renderSetSpriteBlend(layer,texturename,blendfunc){
     var shader=stg_shaders["sprite_shader"];
+    if(!shader.layer_blend)shader.layer_blend=[];
     if(!shader.layer_blend[layer]){
         shader.layer_blend[layer]={};
     }

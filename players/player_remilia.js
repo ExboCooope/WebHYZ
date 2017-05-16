@@ -44,6 +44,9 @@ Player_Remilia.prototype.init=function(){
     stgAddObject(this.options[1]);
     stgAddObject(this.options[2]);
     stgAddObject(this.options[3]);
+
+    var d=new esp.GodMagnet(b,0);
+    stgAddObject(d);
 };
 
 Player_Remilia.on_death=function(){
@@ -121,7 +124,7 @@ Player_Remilia.player_script=function(){
         spriteUseInviEffect();
     }
     if(this.state==stg_const.PLAYER_NORMAL){
-        Player_Remilia.shoot_function();
+        //Player_Remilia.shoot_function();
     }
 
 };

@@ -25,6 +25,8 @@ hyz.set_up_frame_object={
         stgAddObject(hyz.left_screen_object);
         stgAddObject(hyz.right_screen_object);
         stgAddObject(hyz.dot_pool);
+      //  hyzAddObject(new SmearCleanUpObject(),2);
+    //    hyzAddObject(hyz.right_screen_object_2);
         stgDeleteSelf();
     }
 };
@@ -84,7 +86,10 @@ hyz.level.init=function(){
 };
 hyz.level.script=function(){
    // this.f++;
-
+    if(this.frame==2){
+        var ai=new BasicAI(stg_players[1]);
+        stgAddObject(ai);
+    }
     if(this.frame==30){
         var a=new CircleObject(18,27,0,360,96);
         a.SetColor(255,255,255,200);
@@ -166,11 +171,19 @@ hyz.level.script=function(){
         }*/
     }
 
-    if(this.frame%6==1){
+    if(this.frame%12==1){
         this._t1=this._t1||0;
         this._t1++;
         var a=stgCreateShotA1(50,50,3,90,"sXY",0,this._t1%8);
         a.sid=1;
+        for(var i=0;i<1;i++){
+            this.sid=2;
+            stgCreateShotW2(stg_rand(stg_frame_w),stg_rand(100),3,stg_rand(360),"sXY",0,stg_rand_int(0,7),60,3,360,0);
+            //stgCreateShotA1(stg_rand(stg_frame_w),stg_rand(100),stg_rand(1,3),stg_rand(45,135),"sXY",0,stg_rand_int(7));
+            stg_last.sid=2;
+        }
+
+
     }
 
     if(this.frame%60==1){

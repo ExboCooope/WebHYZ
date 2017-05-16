@@ -295,6 +295,7 @@ var hyzSpriteShader={
                     this.dma_pool[i][j].frameStart();
                 }
             }
+            this.smear=pro.smear;
             if (pro.background) {
                 var c=getRgb(pro.background);
                 _gl.clearColor(c[0]/255,c[1]/255,c[2]/255,1-(pro.transparent||0));
@@ -335,6 +336,9 @@ var hyzSpriteShader={
             pool[l][render.texture].push(t);
         }else if(this.mode==1){
             if (!render.texture)return;
+            if(this.smear && !render.smear){
+                return;
+            }
             var t;
             var q=this.dma_pool[object.layer];
             if(!q) {
@@ -382,6 +386,9 @@ var hyzSpriteShader={
         }
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
     draw_layer:function(procedureName,layerid){
+
+
+
         if(stg_active_shader!=this){
             stg_active_shader=this;
             _gl.useProgram(this.program);
@@ -394,7 +401,9 @@ var hyzSpriteShader={
             // _gl.bindTexture(_gl.TEXTURE_2D, stg_textures[i].gltex);
             // _gl.activeTexture(_gl.TEXTURE0);
             _webGlUniformInput(this, "texture", stg_textures[i]);
-
+            if(this.smear){
+                this.smear=1;
+            }
             if(this.layer_blend[q] && this.layer_blend[q][i] ){
                 this.layer_blend[q][i]();
                 this.dma_pool[q][i].draw();
@@ -437,7 +446,7 @@ var hyzSpriteShader={
                 }
             }
         }else if(this.mode==1){
-            _gl.useProgram(this.program);
+             _gl.useProgram(this.program);
            // _gl.blendEquation(_gl.FUNC_ADD);
            // _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
             blend_default();
@@ -524,21 +533,26 @@ var blend_default=function(){
 var blend_add=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFunc(_gl.ONE,_gl.ONE);
-}
+};
 var blend_default=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
-}
+};
 var blend_test2=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
-}
+};
 var blend_test3=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.ZERO,_gl.SRC_COLOR,_gl.ZERO,_gl.ONE);
-}
+};
 
 var blend_xor1=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.ONE_MINUS_DST_COLOR,_gl.ONE_MINUS_SRC_COLOR,_gl.ZERO,_gl.ONE);
-}
+};
+
+var blend_clear=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.ZERO,_gl.ONE,_gl.ZERO,_gl.SRC_ALPHA);
+};
