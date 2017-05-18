@@ -317,6 +317,30 @@ function aiDist(p1,p2,res){
         return res[0];
     }else if(p1.type==1 && p2.type==1){
         return 100;
+    }else if(p1.type==0 && p2.type==2){
+        sqrt2d(p2.rpos[0]-p1.rpos[0],p2.rpos[1]-p1.rpos[1],res);
+        kdx=p1.rpos[0]-p2.rpos[0];
+        kdy=p1.rpos[1]-p2.rpos[1];
+        sinr=p2.sdir;
+        cosr=p2.cdir;
+        dl=kdx*cosr+kdy*sinr;
+        dd=kdy*cosr-kdx*sinr;
+        var a=(p2.rs+p1.range)*(p2.rs+p1.range);
+        var b=(p2.re+p1.range)*(p2.re+p1.range);
+        dl=dl*dl;
+        dd=dd*dd;
+        var dt=a*dl+b*dd-a*b;
+        var rr=dl+dd-a-b;
+        rate=(rr+sqrt(rr*rr+4*dt))/2;
+        res[0]=rate>=0?sqrt(rate):-sqrt(-rate);
+        return res[0];
+    }else if(p1.type==2){
+        aiDist(p2,p1,res);
+        ai_close_point[0]=p2.rpos[0];
+        ai_close_point[1]=p2.rpos[1];
+        res[1]=-res[1];
+        res[2]=-res[2];
+        return res[0];
     }
     return 100;
 }

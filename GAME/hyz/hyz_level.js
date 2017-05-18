@@ -134,6 +134,13 @@ hyz.level.script=function(){
            // a.a1+=1;
         }
 
+        stgCreateShotA1(120,120,0,0,"sMD",0,0);
+        stg_last.sid=1;
+        stg_last.self_rotate=2*PI180;
+        stg_last.move_rotate=-1;
+        bulletUseEllipse(stg_last);
+        stg_last.hitdef.setEllipse(0,0,0,10,4);
+        renderSetSpriteScale(10,1,stg_last);
 
         a=new BossSLZ();
         a.sid=1;
@@ -176,13 +183,14 @@ hyz.level.script=function(){
         this._t1++;
         var a=stgCreateShotA1(50,50,3,90,"sXY",0,this._t1%8);
         a.sid=1;
+        /*
         for(var i=0;i<1;i++){
             this.sid=2;
             stgCreateShotW2(stg_rand(stg_frame_w),stg_rand(100),3,stg_rand(360),"sXY",0,stg_rand_int(0,7),60,3,360,0);
             //stgCreateShotA1(stg_rand(stg_frame_w),stg_rand(100),stg_rand(1,3),stg_rand(45,135),"sXY",0,stg_rand_int(7));
             stg_last.sid=2;
         }
-
+*/
 
     }
 

@@ -845,3 +845,14 @@ hyz.magicCircle.init=function(){
     this.self_rotate=1*PI180;
     stgSetPositionA1(this,128,128);
 };
+function bulletUseEllipse(obj){
+    obj=obj||stg_target;
+    if(obj.hitdef){
+        obj.hitdef.toEllipse(0);
+    }
+}
+function hyzGetOtherPlayer(player){
+    player=player||stg_target;
+    if(stg_players[0]==player)return stg_players[1];
+    return stg_players[0];
+}
