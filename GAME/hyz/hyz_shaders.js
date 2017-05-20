@@ -289,12 +289,6 @@ var hyzSpriteShader={
             _webGlUniformInput(this,"uWindow",webgl2DMatrix(pro.o_width,pro.o_height));
             this.context= _gl;
             this.mode=1;
-            for(var i in this.dma_pool){
-                for(var j in this.dma_pool[i]) {
-                    this.dma_pool[i][j].clean();
-                    this.dma_pool[i][j].frameStart();
-                }
-            }
             this.smear=pro.smear;
             if (pro.background) {
                 var c=getRgb(pro.background);
@@ -302,11 +296,19 @@ var hyzSpriteShader={
                 _gl.clear(_gl.COLOR_BUFFER_BIT);
             }
         }
+        for(var j in this.dma_pool) {
+            this.dma_pool[j].clean();
+        }
 
     }, //每次渲染开始前，会调用，用来初始化该次渲染的数据，存入procedure_cache中
 
     post_layer:function(procedureName,layerid){
 
+        for(var j in this.dma_pool) {
+           // this.dma_pool[j].clean();
+            this.dma_pool[j].frameStart();
+        }
+        this.active_pool={};
     },
 
     object_frame:function(object,render,procedureName){
@@ -340,10 +342,10 @@ var hyzSpriteShader={
                 return;
             }
             var t;
-            var q=this.dma_pool[object.layer];
+            var q=this.dma_pool;
             if(!q) {
                 q = {};
-                this.dma_pool[object.layer]=q;
+                this.dma_pool=q;
             }
             if(!q[render.texture]){
                 t=new WebglDMA(this,1000);
@@ -355,6 +357,9 @@ var hyzSpriteShader={
             if(object.alpha!= object.last_alpha){
                 object.update=1;
                 object.last_alpha=object.alpha;
+            }
+            if(!this.active_pool[render.texture]){
+                this.active_pool[render.texture]=t;
             }
             if(!render.webgl || object.update){
                 render.webgl=1;
@@ -386,18 +391,14 @@ var hyzSpriteShader={
         }
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
     draw_layer:function(procedureName,layerid){
-
-
-
         if(stg_active_shader!=this){
             stg_active_shader=this;
             _gl.useProgram(this.program);
         }
-        _gl.blendEquation(_gl.FUNC_ADD);
-        _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+        blend_default();
         var p=stg_procedures[procedureName];
         var q=layerid;
-        for(var i in this.dma_pool[q]) {
+        for(var i in this.active_pool) {
             // _gl.bindTexture(_gl.TEXTURE_2D, stg_textures[i].gltex);
             // _gl.activeTexture(_gl.TEXTURE0);
             _webGlUniformInput(this, "texture", stg_textures[i]);
@@ -406,67 +407,17 @@ var hyzSpriteShader={
             }
             if(this.layer_blend[q] && this.layer_blend[q][i] ){
                 this.layer_blend[q][i]();
-                this.dma_pool[q][i].draw();
+                this.active_pool[i].draw();
                 blend_default();
             }else{
-                this.dma_pool[q][i].draw();
+                this.active_pool[i].draw();
             }
 
         }
     },
 
     draw_frame:function(procedureName){
-        return;
-        if(this.mode==0) {
-            var pool = this.pool;
-            var l;
-            var tn;
-            var obj;
-            var i;
-            var p=stg_procedures[procedureName];
-            var c = this.context;
-            var sx= c.canvas.width/p.o_width;
-            var sy= c.canvas.height/p.o_height;
-            for (l = 0; l < pool.length; l++) {
-                if (pool[l]) {
-                    for (tn in pool[l]) {
-                        var tex = stg_textures[tn];
-                        if (tex) {
-                            //if (tex)
-                            for (i = 0; i < pool[l][tn].length; i++) {
-                                var obj = pool[l][tn][i];
-                                c.globalAlpha=obj.alpha;
-                                c.setTransform(sx, 0, 0, sy, obj.cx*sx, obj.cy*sy);
 
-                                c.rotate(obj.r);
-                                c.drawImage(tex, obj.uvt[0], obj.uvt[1], obj.uvt[2], obj.uvt[3], obj.cmx*obj.scale[0], obj.cmy*obj.scale[1], obj.uvt[2]*obj.scale[0], obj.uvt[3]*obj.scale[1]);
-                            }
-                        }
-                    }
-                }
-            }
-        }else if(this.mode==1){
-             _gl.useProgram(this.program);
-           // _gl.blendEquation(_gl.FUNC_ADD);
-           // _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
-            blend_default();
-            var p=stg_procedures[procedureName];
-            for(var q in this.dma_pool){
-                for(var i in this.dma_pool[q]) {
-                    // _gl.bindTexture(_gl.TEXTURE_2D, stg_textures[i].gltex);
-                    // _gl.activeTexture(_gl.TEXTURE0);
-                    _webGlUniformInput(this, "texture", stg_textures[i]);
-
-                    if(this.layer_blend[q] && this.layer_blend[q][i]){
-                        this.layer_blend[q][i]();
-                        this.dma_pool[q][i].draw();
-                        blend_default();
-                    }else{
-                        this.dma_pool[q][i].draw();
-                    }
-                }
-            }
-        }
     }, //每次渲染结束时会调用，如果将物体聚类的话，可以在这里统一绘制
     shader_finalize_procedure:function(procedureName){
         this.pool=[];
@@ -510,7 +461,8 @@ var hyzSpriteShader={
         texture:[2,0]
     },
     layer_blend:[],
-    dma_pool:[]
+    dma_pool:{},
+    active_pool:{}
 };
 
 function NewHyzSpriteObject(obj,templatename,color){
