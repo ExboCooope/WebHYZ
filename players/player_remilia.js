@@ -1,10 +1,11 @@
 /**
  * Created by Exbo on 2017/1/8.
  */
-
 function Player_Remilia(iPosition){
     this.player_pos=iPosition;
 }
+
+stgRegisterPlayer("remilia",Player_Remilia);
 
 stg_player_templates["remilia"]=Player_Remilia;
 

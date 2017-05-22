@@ -9,6 +9,7 @@ var sqrt=Math.sqrt;
 var PI=Math.PI;
 var PI2=PI*2;
 var PI180=PI/180;
+var stg={};
 var atan2p=function(source,dest){
     return atan2(dest[1]-source[1],dest[0]-source[0]);
 };
@@ -724,6 +725,10 @@ function stgRefreshPosition(object) {
                 a.rotate[2] += a.base.target.rotate[2];
             }
         }
+
+        if(a.base.sid){
+            a.sid= a.base.target.sid;
+        }
     }
     if (a.orotate) {
         a.rotate[0] += a.orotate[0];
@@ -1116,6 +1121,12 @@ function _stgMainLoop_Engine(){
                         }
                     }
                 }
+                if(a.base.sid){
+                    if(!a.base.target){
+                        console.log(a);
+                    }
+                    a.sid= a.base.target.sid;
+                }
             }
             if(a.look_at){
                 if(a.look_at.turn_rate){
@@ -1186,7 +1197,7 @@ function _stgMainLoop_Engine(){
 
             if (a.type == stg_const.OBJ_BULLET || a.type == stg_const.OBJ_ENEMY || a.type == stg_const.OBJ_ITEM) {
                 if(!a.keep) {
-                    if (a.pos[0] > stg_frame_w +30 || a.pos[0] <  -30 ||a.pos[1] > stg_frame_h +30||a.pos[1] < -30){
+                    if (a.pos[0] > stg_frame_w +32 || a.pos[0] <  -32 ||a.pos[1] > stg_frame_h +32||a.pos[1] < -32){
                         stgDeleteObject(a);
                     }
                 }
@@ -1509,8 +1520,47 @@ function stgLookAtTarget(object,target,turnrate){
 }
 
 function StgBase(target,type,auto_remove,clonesid){
+    if(!target){
+        console.log("StgBase with out target!");
+    }
     this.target=target;
     this.type=type;
     this.auto_remove=auto_remove||0;
-    this.sid=clonesid||0;
+    this.sid=clonesid===undefined?1:clonesid;
+}
+
+var stg_module={};
+
+function stgLoadModule(sModuleName){
+    if(stg_module[sModuleName]){
+        if(!stg_module[sModuleName].loaded){
+            stg_module[sModuleName].loaded=true;
+        }else{
+            return true;
+        }
+        if(stg_module[sModuleName].pre_load){
+            stg_module[sModuleName].pre_load();
+        }
+        return true;
+    }
+    return false;
+}
+
+function stgLoadModuleObject(oModule){
+    if(!oModule.loaded){
+        oModule.loaded=true;
+    }else{
+        return true;
+    }
+    if(oModule.pre_load){
+        oModule.pre_load();
+    }
+}
+
+function stgRegisterModule(sModuleName,moduleobject){
+    stg_module[sModuleName]=moduleobject;
+    return true;
+}
+function stgRegisterPlayer(sPlayerName,nPlayerMaker){
+    stg_player_templates[sPlayerName]=nPlayerMaker;
 }

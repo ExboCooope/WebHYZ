@@ -50,7 +50,7 @@ hyz.level.init=function(){
 
     // var e1=new Hyz_enemy(0,0);
   //  hyzAddObject(e1,1);
-   // stgAddObject(hyz.enemy_maker);
+    stgAddObject(hyz.enemy_maker);
 
 /*
     var test2=new HeadedLaserA1(12,10+stg_rand(stg_frame_w-10),100,8);
@@ -145,6 +145,14 @@ hyz.level.script=function(){
         a=new BossSLZ();
         a.sid=1;
         stgAddObject(a);
+
+        a={};
+        stgApplyEnemy(a);
+        stgSetPositionA1(a,200,200);
+        var b=new EnemyFairyHolder(a,0,128,48,48);
+        hyzAddObject(a,2);
+        hyzAddObject(b,2);
+
 
 
      //   var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
@@ -332,6 +340,10 @@ Hyz_enemy.prototype.script=function(){
         stgAddObject(new Hyz_boom(this.pos[0],this.pos[1],1+this.enetype*0.2));
         stgAddObject(new HyzCrossEffect(this.sid-1,this.sid,this.pos,3-this.sid,[stg_rand(0,288),stg_rand(0,144)],60,1,0));
         gCreateItem(this.pos,stg_const.ITEM_SCORE,1,16);
+        for(var i=0;i<3;i++){
+            stgAddObject(new EnemyBreakParticle(this.pos[0],this.pos[1],stg_rand(360)));
+        }
+        stgPlaySE("se_enemy_dead");
     }
 };
 

@@ -356,6 +356,8 @@ hyz_system_script.script=function(){
         stg_replay_end=0;
     }
     this.fps_drawer.render.text="" + (stg_fps >> 0) + " FPS";
+
+    hyz.cross_function();
 };
 
 function loadHyzFont(){
@@ -856,3 +858,26 @@ function hyzGetOtherPlayer(player){
     if(stg_players[0]==player)return stg_players[1];
     return stg_players[0];
 }
+
+function hyzSetCross(cross,obj){
+    obj=obj||stg_target;
+    pbj.cross=cross;
+}
+
+//穿版
+hyz.cross_function=function(){
+    for(var i in _pool){
+        var a=_pool[i];
+        if(a.cross && a.active && a.move && !a.base){
+            if(hyz.battle_style==0){
+                if(a.sid==1 && a.pos[0]>stg_frame_w+16){
+                    a.sid=2;
+                    stgSetPositionA1(a,-16, a.pos[1]);
+                }else if(a.sid==2 && a.pos[0]<-16){
+                    a.sid=1;
+                    stgSetPositionA1(a,stg_frame_w+16, a.pos[1]);
+                }
+            }
+        }
+    }
+};

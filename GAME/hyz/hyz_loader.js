@@ -29,7 +29,8 @@ hyz_loader.init=function(){
         stgLoadSE("se_boss_cast","se/se_ch02.wav").ready=1;
         stgLoadSE("se_enemy_dead","se/se_enep00.wav").ready=1;
 
-        esp.pre_load();
+        stgLoadModule("enemy_system");
+        stgLoadModuleObject(esp);
 
         loadHyzFont();
         loadItemSystem();

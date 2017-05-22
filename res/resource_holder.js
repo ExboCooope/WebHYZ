@@ -9,8 +9,43 @@ function loadItemSystem(){
     stgLoadSE("se_item","se/se_item00.wav").ready=1;
 }
 
+stg.enemySystem={};
+stg.enemySystem.pre_load=function(){
+    stgCreateImageTexture("fairy_red", "res/fairy_red.png");
+    stgCreateImageTexture("fairy_circle","res/fairy_circle.png");
+    renderCreate2DTemplateA1("fairy_circle_w","fairy_circle",128,175,64,64,0,0,0,1);
 
-stgCreateImageTexture("fairy_red", "res/fairy_red.png");
+};
+stgRegisterModule("enemy_system",stg.enemySystem);
+
+function EnemyAppearEffect(enemysprite){
+    this.base=new StgBase(enemysprite,stg_const.BASE_MOVE,1);
+    stgEnableMove(this);
+
+    this.enemy=enemysprite;
+    this.self_rotate=5*PI180;
+}
+
+EnemyAppearEffect.prototype.init=function(){
+    stgSetPositionA1(this,0,0);
+    this.layer=stg_const.LAYER_ENEMY+1;
+    renderCreateSpriteRender(this);
+    renderSetSpriteColor(255,255,255,0,this.enemy);
+    renderSetSpriteColor(255,255,255,400,this);
+    renderApply2DTemplate(this.render,"fairy_circle_w",0);
+    renderSetObjectSpriteBlend(this,blend_add);
+};
+EnemyAppearEffect.prototype.script=function(){
+    var enemy=this.enemy;
+    var b=[1,1];
+    renderGetSpriteSize(b,enemy);
+    renderSetSpriteSize(2*b[0]*(40-this.frame)/40,2*b[0]*(40-this.frame)/40,this);
+    renderSetSpriteColor(255,255,255,255*(this.frame)/40,enemy);
+    if(this.frame>=40){
+        stgDeleteSelf();
+    }
+};
+
 
 
 function EnemyFairyHolder(base,tx,ty,tw,th){
@@ -28,6 +63,11 @@ function EnemyFairyHolder(base,tx,ty,tw,th){
     this.layer=stg_const.LAYER_ENEMY;
     this.pos= [base.pos[0],base.pos[1],0];
 }
+
+EnemyFairyHolder.prototype.init=function(){
+    this.effect1=new EnemyAppearEffect(this);
+    stgAddObject(this.effect1);
+};
 
 EnemyFairyHolder.prototype.script=function(){
     var e=this._enemy;
@@ -72,6 +112,9 @@ EnemyFairyHolder.prototype.script=function(){
         this._lastx=this.pos[0];
         this._lasty=this.pos[1];
         this._last_anime=a;
+    }
+    if(!this.effect1.remove) {
+        stgRefreshPosition(this.effect1);
     }
 };
 
@@ -121,4 +164,4 @@ DNHBossHolder.prototype.run=function(){
             renderApply2DTemplate2(this.render,this.tname,id);
         }
     }
-}
+};
