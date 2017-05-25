@@ -11,7 +11,7 @@ hyz.resolution={
             this.scale=q;
             this.w=w;
             this.h=h;
-            stgResizeCanvas("frame",(w-q*stg_width)/2+q*16,(h-q*stg_height)/2+q*16,0,0,608,stg_frame_h,q);
+            stgResizeCanvas("frame",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("ui",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("back",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("pause",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
@@ -878,6 +878,21 @@ hyz.cross_function=function(){
                     stgSetPositionA1(a,stg_frame_w+16, a.pos[1]);
                 }
             }
+        }
+    }
+};
+
+function hyzGetFrameObject(sid){
+    if(hyz.battle_style==0){
+        if(sid==1){
+            return hyz.left_screen_object;
+        }else if(sid==2){
+            return hyz.right_screen_object;
+        }
+        return 0;
+    }else{
+        if(sid==1 || sid==2){
+            return hyz.full_screen_object;
         }
     }
 };

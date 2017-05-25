@@ -89,6 +89,26 @@ hyz.level.script=function(){
     if(this.frame==2){
         var ai=new BasicAI(stg_players[1]);
         stgAddObject(ai);
+
+        stgAddObject(new RenderText(40,90,"20宋体"));
+        stg_last.render.font="20px 宋体";
+        stg_last.render.color="#FFF";
+        stgAddObject(new RenderText(40,110,"30宋体"));
+        stg_last.render.font="30px 宋体";
+        stg_last.render.color="#FFF";
+        stgAddObject(new RenderText(40,140,"20黑体"));
+        stg_last.render.font="20px 黑体";
+        stg_last.render.color="#FFF";
+        stgAddObject(new RenderText(40,160,"16思源宋体测试"));
+        stg_last.render.font="15px 思源宋体";
+        stg_last.render.color="#FFF";
+        stg_last.render.backcolor="#000";
+        stg_last.render.bold=true;
+
+
+
+
+
     }
     if(this.frame==30){
         var a=new CircleObject(18,27,0,360,96);
@@ -100,7 +120,7 @@ hyz.level.script=function(){
         a.script=function(){
             if(a.frame==1){luaMoveTo(stg_frame_w/2,stg_frame_h/2,60,1)}
             if(a.frame>60 && a.frame<120){a.r0+=3;a.r1+=3;}
-            if(a.frame==120){a.SetColor(255,255,255,255)};
+            if(a.frame==120){a.SetColor(255,255,255,255)}
             if(a.frame>120 && a.frame<140){a.r0-=4;a.r1+=4;}
         }
     }
@@ -145,6 +165,9 @@ hyz.level.script=function(){
         a=new BossSLZ();
         a.sid=1;
         stgAddObject(a);
+        stgAddObject(new BossSpellNameObject(a,a,"测试【符卡名】",25));
+
+
 
         a={};
         stgApplyEnemy(a);
@@ -500,12 +523,22 @@ HyzCrossEffect.prototype.script=function(){
     }
 }
 function hyzGetFramePos(sid,pos,outpos){
-    if(sid==0 || sid==1){
-        outpos[0]=pos[0];
-        outpos[1]=pos[1];
-    }else {
-        outpos[0] = pos[0] + 336;
-        outpos[1]=pos[1];
+    if(hyz.battle_style==0) {
+        if (sid == 0 || sid == 1) {
+            outpos[0] = pos[0];
+            outpos[1] = pos[1];
+        } else {
+            outpos[0] = pos[0] + 336;
+            outpos[1] = pos[1];
+        }
+    }else{
+        if (sid == 0 || sid == 1) {
+            outpos[0] = pos[0];
+            outpos[1] = pos[1];
+        } else {
+            outpos[0] = pos[0] + 336;
+            outpos[1] = pos[1];
+        }
     }
 }
 

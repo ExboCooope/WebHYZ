@@ -31,6 +31,7 @@ hyz_loader.init=function(){
 
         stgLoadModule("enemy_system");
         stgLoadModuleObject(esp);
+        stgLoadModule("boss_system");
 
         loadHyzFont();
         loadItemSystem();
@@ -43,11 +44,11 @@ hyz_loader.init=function(){
 
         var p=stgLoadData("render_type");
         p=0;
-        stgCreateCanvas("frame",608,stg_frame_h,stg_const.TEX_CANVAS3D);
+        stgCreateCanvas("frame",stg_width/*608*/,stg_height,stg_const.TEX_CANVAS3D);
         stgCreateCanvas("frame_bg",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
         stgCreateCanvas("frame_left",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_full",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_full_bg",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateCanvas("frame_full",stg_width/*608*/,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateCanvas("frame_full_bg",stg_width/*608*/,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 
         stgCreateCanvas("frame_right",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 
@@ -102,7 +103,7 @@ hyz_loader.init=function(){
         stgCreateProcedure1("drawBGFrame","frame_bg",101,200,"3d_shader","#FFF");
         stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"3d_shader","#FFF");
 
-        stgCreateProcedure1("drawUI","ui",81,100,"testShader2");
+        stgCreateProcedure1("drawUI","ui",81,100,"testShader2","#000");
 
         stgCreateProcedure1("drawMagicCircle","magic_circle",0,0,"sprite_shader","#000");
         stg_procedures["drawMagicCircle"].transparent=1;
@@ -116,7 +117,7 @@ hyz_loader.init=function(){
 
 
         stg_procedures["drawCombineFrame"].transparent=1;
-
+        stg_procedures["drawUI"].transparent=1;
         //创建绘制流程
         for(var i in stg_player_templates){
             if(stg_player_templates[i].pre_load){
@@ -145,7 +146,7 @@ hyz_loader.init=function(){
         hyz.left_bg_object.layer=20;
         hyz.left_bg_object.sid=1;
         ApplyFullTexture(hyz.left_bg_object,"frame_bg");
-        stgSetPositionA1(hyz.left_screen_object,0,0);
+        stgSetPositionA1(hyz.left_screen_object,16,16);
         hyz.left_screen_object.layer=202;
         ApplyFullTexture(hyz.left_screen_object,"frame_left");
         stgSetPositionA1(hyz.right_bg_object,0,0);
@@ -153,7 +154,7 @@ hyz_loader.init=function(){
         hyz.right_bg_object.sid=2;
         ApplyFullTexture(hyz.right_bg_object,"frame_bg");
 
-        stgSetPositionA1(hyz.right_screen_object,320,0);
+        stgSetPositionA1(hyz.right_screen_object,336,16);
         hyz.right_screen_object.layer=202;
         ApplyFullTexture(hyz.right_screen_object,"frame_right");
 
@@ -164,7 +165,7 @@ hyz_loader.init=function(){
         hyz.full_bg_object.sid=3;
         ApplyFullTexture(hyz.full_bg_object,"frame_full_bg");
 
-        stgSetPositionA1(hyz.full_screen_object,0,0);
+        stgSetPositionA1(hyz.full_screen_object,16,16);
         hyz.full_screen_object.layer=202;
         ApplyFullTexture(hyz.full_screen_object,"frame_full");
 
