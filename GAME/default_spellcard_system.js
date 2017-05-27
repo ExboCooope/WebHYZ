@@ -176,3 +176,74 @@ function stgBossStartNextSpell(boss){
 
     }
 }
+
+function BossDynamicAura(boss,size){
+    this.size=size;
+    this.boss=boss;
+}
+BossDynamicAura.prototype.init=function(){
+    this.vtx=new HyzPrimitive2DVertexList(4);
+    this.screen=WGLA.newBuffer(_gl,4,2,4,WGLConst.DATA_FLOAT);
+    var s=this.size;
+    this.screen.buffer.set([-s,-s,-s,s,s,s,s,-s]);
+    this.screen.uploadData();
+    this.tscreen=WGLA.newBuffer(_gl,4,2,4,WGLConst.DATA_FLOAT);
+    this.tscreen.buffer.set([0,0,0,1,1,1,1,0]);
+    this.tscreen.uploadData();
+
+    this.layer=24;
+    this.render=new StgRender("basic_shader");
+    this.target=0;
+    this.base=new StgBase(this.boss,stg_const.BASE_COPY,1);
+};
+BossDynamicAura.prototype.on_render=function(gl,target){
+    var s=this.size;
+ //   target.select(this);
+    var w=target.width;
+    var h=target.height;
+    if(!this.target||this.target.width!=w||this.target.height!=h){
+        if(this.target)this.target.release();
+        this.target=new WebglRenderTarget(w,h);
+        this.vtx.setVertexRaw(0,0,0,0,0,1,1,1,1);
+        this.vtx.setVertexRaw(1,0,h,0,1,1,1,1,1);
+        this.vtx.setVertexRaw(2,w,h,1,1,1,1,1,1);
+        this.vtx.setVertexRaw(3,w,0,1,0,1,1,1,1);
+        this.vtx.update(1,1,1);
+    }
+    this.target.use();
+    hyzSetPrimitiveOffset(0,0);
+    blend_copy();
+
+    this.vtx.use();
+    _webGlUniformInput(hyzPrimitive2DShader,"texture",target);
+    gl.drawArrays(gl.TRIANGLE_FAN,0,4);
+    gl.finish();
+    target.use();
+    hyzAuraShader.use();
+
+    var f=this.frame/3;
+    var u1=(this.pos[0]-s)/w;
+    var u2=(this.pos[0]+s)/w;
+    var v1=(this.pos[1]-s)/h;
+    var v2=(this.pos[1]+s)/h;
+    this.tscreen.buffer.set([u1,v1,u1,v2,u2,v2,u2,v1]);
+    this.tscreen.uploadData();
+    blend_default();
+    _webGlUniformInput(hyzAuraShader,"uWindow",webgl2DMatrix(w,h));
+    GlBufferInput(hyzAuraShader,"aPosition",this.screen);
+    GlBufferInput(hyzAuraShader,"aTexture",this.tscreen);
+    _webGlUniformInput(hyzAuraShader,"uColor",[1,1,1,0.8]);
+    _webGlUniformInput(hyzAuraShader,"uT",[f,-f,s]);
+    _webGlUniformInput(hyzAuraShader,"uSize",[w,h]);
+    _webGlUniformInput(hyzAuraShader,"uPosition",[this.pos[0],this.pos[1]]);
+    _webGlUniformInput(hyzAuraShader,"texture",this.target);
+    gl.drawArrays(gl.TRIANGLE_FAN,0,4);
+    gl.useProgram(hyzPrimitive2DShader.program);
+
+};
+BossDynamicAura.prototype.finalize=function(){
+    this.screen.clearContent();
+    this.tscreen.clearContent();
+    this.vtx.clear();
+    if(this.target)this.target.release();
+};

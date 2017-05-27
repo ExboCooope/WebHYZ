@@ -1008,6 +1008,16 @@ HyzPrimitive2DVertexList.prototype.setVertex=function(index,x,y,u,v,r,g,b,a){
     this.clist.buffer[index*4+2]=b/255.0;
     this.clist.buffer[index*4+3]=a/255.0;
 };
+HyzPrimitive2DVertexList.prototype.setVertexRaw=function(index,x,y,u,v,r,g,b,a){
+    this.plist.buffer[index*2]=x;
+    this.plist.buffer[index*2+1]=y;
+    this.tlist.buffer[index*2]=u;
+    this.tlist.buffer[index*2+1]=v;
+    this.clist.buffer[index*4]=r;
+    this.clist.buffer[index*4+1]=g;
+    this.clist.buffer[index*4+2]=b;
+    this.clist.buffer[index*4+3]=a;
+};
 HyzPrimitive2DVertexList.prototype.update=function(position,texture,color){
     if(position)this.plist.uploadData();
     if(texture)this.tlist.uploadData();

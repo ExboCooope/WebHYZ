@@ -3,6 +3,8 @@
  */
 
 
+
+
 function WebglRenderTarget(w,h){
     var gl=_gl;
     var t = gl.createTexture();
@@ -76,3 +78,28 @@ WebglRenderTarget.prototype.selfDraw=function(){
     this.gltex=t;
 };
 
+WebglRenderTarget.prototype.select=function(texture){
+    var gl=_gl;
+    if(!texture.gltex)texture.gltex=gl.createTexture();
+    var t=texture.gltex;
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    if(texture.width!=this.width || texture.height!=this.height){
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,this.width, this.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+        texture.width=this.width;
+        texture.height=this.height;
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, this.buffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.second_texture, 0);
+    return this;
+};
+
+function ReleaseTexture(texture){
+    if(texture.gltex){
+        _gl.deleteTexture(texture.gltex);
+        texture.gltex=0;
+    }
+}

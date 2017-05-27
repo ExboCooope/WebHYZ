@@ -30,6 +30,7 @@ var hyzPrimitive2DShader={
         this.sid=pro.sid||0;
         var tgt_n=pro.render_target;
         var tgt=stg_textures[tgt_n];
+        this.target=tgt;
         if(!tgt){
             return;
         }
@@ -86,8 +87,10 @@ var hyzPrimitive2DShader={
                 tex=stg_textures[render.texture];
             }
             if(!tex)return;
-            _webGlUniformInput(this,"texture",tex);
-            if(object.on_render)object.on_render(_gl);
+            if(tex!=this.target) {
+                _webGlUniformInput(this, "texture", tex);
+            }
+            if(object.on_render)object.on_render(_gl,this.target);
         }
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
     draw_frame:function(procedureName){
@@ -136,6 +139,7 @@ var hyzPrimitive2DShader={
     },
     layer_blend:[]
 };
+
 function hyzSetPrimitiveOffset(x,y){
     _webGlUniformInput(hyzPrimitive2DShader,"uPosition",[x,y]);
 }
@@ -486,6 +490,64 @@ function hyzChangeSprite(obj,templatename,color) {
     renderApply2DTemplate(obj.render,templatename,color||0);
     obj.update=1;
 }
+
+var hyzAuraShader={
+    active:0,
+    context:null,
+    glset:0,
+    use:function(){
+        if(!this.glset){
+            webglCompileShader(this);
+            this.glset=1;
+        }
+         _gl.useProgram(this.program);
+    }, //每次渲染开始前，会调用，用来初始化该次渲染的数据，存入procedure_cache中
+    vertex:"attribute vec2 aPosition;" +
+        "attribute vec2 aTexture;" +
+        "" +
+        "uniform vec2 uWindow;" +
+        "uniform vec2 uPosition;" +
+
+        "varying vec2 vTexture;" +
+        "varying vec2 vPosition;" +
+        "void main( void ){" +
+        "vTexture = aTexture;" +
+        "vPosition = aPosition;" +
+        "vec4 t = vec4( (aPosition+uPosition)*uWindow+vec2(-1.0,1.0) , 0.0 , 1.0 );" +
+        "gl_Position = t;" +
+        "}",
+    fragment:"precision mediump float;" +
+        "uniform sampler2D texture;" +
+        "varying vec2 vTexture;" +
+        "varying vec2 vPosition;" +
+        "uniform vec3 uT;" +
+        "uniform vec2 uSize;" +
+        "uniform vec4 uColor;" +
+        "void main(void){" +
+        "float d = 1.0-length(vPosition)/uT[2];" +
+        "if(d<0.0){discard;}" +
+        "vec2 p = (vec2(uT)+vPosition)/8.0;" +
+        "vec2 u = vec2(p[0]-p[1]);" +
+        "vec4 smpColor = texture2D(texture, vTexture+10.0*sin(u)*d/uSize);" +
+   //     "vec4 smpColor = texture2D(texture, vTexture);" +
+        // "gl_FragColor  = vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
+        "gl_FragColor  = uColor * vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3];" +
+        "}",
+    input:{
+        aPosition:[0,2,null,0,1,0],
+        aTexture:[0,2,null,0,0,1],
+        uWindow:[1,2],
+        uColor:[1,4],
+        uPosition:[1,2],
+        uT:[1,3],
+        uSize:[1,2],
+        texture:[2,0]
+    }
+};
+
+
+
+
 /*
  原始  R0*（1-A1A2） +  R1*R2*A1*A2，A0 *（1-A1A2）+ A1*A2
  */
@@ -515,7 +577,10 @@ var blend_xor1=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.ONE_MINUS_DST_COLOR,_gl.ONE_MINUS_SRC_COLOR,_gl.ZERO,_gl.ONE);
 };
-
+var blend_copy=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFunc(_gl.ONE,_gl.ZERO);
+};
 var blend_clear=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.ZERO,_gl.ONE,_gl.ZERO,_gl.SRC_ALPHA);

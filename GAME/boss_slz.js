@@ -15,6 +15,8 @@ BossSLZ.prototype.init=function(){
     this.current_phase=0;
     a=new UnitAura1(this,80,255,242,0);
     stgAddObject(a);
+    a=new BossDynamicAura(this,80);
+    stgAddObject(a);
     a=new HyzMagicCircle(this);
     stgAddObject(a);
     a=new BossLifeCircle(this);
@@ -72,10 +74,10 @@ BossSLZ.NonSpell1.prototype.script=function(){
         bossCast(this.boss,60);
     }
     if(this.frame%60==59){
-        var a=stgCreateShotW2(this.pos[0],this.pos[1],2.3,stg_rand(360),"sXD",0,stg_rand_int(0,7),48,3,360,0);
-        for(var b=0;b< a.length;b++){
-            hyzSetCross(true,a[b]);
-        }
+      //  var a=stgCreateShotW2(this.pos[0],this.pos[1],2.3,stg_rand(360),"sXD",0,stg_rand_int(0,7),48,3,360,0);
+      //  for(var b=0;b< a.length;b++){
+      //      hyzSetCross(true,a[b]);
+      //  }
     }
     if(this.life<0){
         stgDeleteSelf();
