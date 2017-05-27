@@ -395,6 +395,29 @@ function renderSetSpriteScale(x,y,obj){
     obj.render.scale[1]=y;
     obj.update=1;
 }
+function renderSetSpriteSize(x,y,obj){
+    obj=obj||stg_target;
+    if(!obj.render)return;
+    var w=obj.render.uvt[2];
+    var h=obj.render.uvt[3];
+    if(w<0)w=-w;
+    if(h<0)h=-h;
+    obj.render.scale[0]=x/w;
+    obj.render.scale[1]=y/h;
+    obj.update=1;
+}
+
+function renderGetSpriteSize(aSize,obj){
+    obj=obj||stg_target;
+    if(!obj.render)return;
+    var w=obj.render.uvt[2]*obj.render.scale[0];
+    var h=obj.render.uvt[3]*obj.render.scale[1];
+    if(w<0)w=-w;
+    if(h<0)h=-h;
+    aSize[0]=w;
+    aSize[1]=h;
+}
+
 function renderSetSpriteColor(r,g,b,a,obj) {
     if (!obj)obj = stg_target;
     if (!obj.render)return;
@@ -608,4 +631,30 @@ newBossTimeCircle.script=function(){
     r=r/d*16;
     this.SetTexture("bossres",16,z,32,r+z,1);
 
+};
+
+function EnemyBreakParticle(x,y,dir){
+    this.x=x;
+    this.y=y;
+    this.dir=dir;
+}
+EnemyBreakParticle.prototype.init=function(){
+    applyParticle(this,11);
+    stgSetRotate(this.dir,this);
+    renderSetSpriteColor(255,255,255,300,this);
+    renderSetSpriteScale(0.4,0.1,this);
+    this.self_rotate=stg_rand(-3,3)*PI180;
+};
+EnemyBreakParticle.prototype.script=function(){
+    var f=(this.frame)/12;
+    if(f>1){
+        f=(24-(this.frame-12))/24;
+        if(f<=0) {
+            stgDeleteSelf();
+        }else{
+            renderSetSpriteColor(255,255,255,300*f)
+        }
+    }else {
+        renderSetSpriteScale(4*f,1*f, this);
+    }
 };

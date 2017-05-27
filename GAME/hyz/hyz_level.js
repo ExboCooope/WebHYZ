@@ -50,7 +50,7 @@ hyz.level.init=function(){
 
     // var e1=new Hyz_enemy(0,0);
   //  hyzAddObject(e1,1);
-   // stgAddObject(hyz.enemy_maker);
+    stgAddObject(hyz.enemy_maker);
 
 /*
     var test2=new HeadedLaserA1(12,10+stg_rand(stg_frame_w-10),100,8);
@@ -89,6 +89,11 @@ hyz.level.script=function(){
     if(this.frame==2){
         var ai=new BasicAI(stg_players[1]);
         stgAddObject(ai);
+
+
+
+
+
     }
     if(this.frame==30){
         var a=new CircleObject(18,27,0,360,96);
@@ -100,7 +105,7 @@ hyz.level.script=function(){
         a.script=function(){
             if(a.frame==1){luaMoveTo(stg_frame_w/2,stg_frame_h/2,60,1)}
             if(a.frame>60 && a.frame<120){a.r0+=3;a.r1+=3;}
-            if(a.frame==120){a.SetColor(255,255,255,255)};
+            if(a.frame==120){a.SetColor(255,255,255,255)}
             if(a.frame>120 && a.frame<140){a.r0-=4;a.r1+=4;}
         }
     }
@@ -132,12 +137,30 @@ hyz.level.script=function(){
             a.SetTexture("cardbg2_c",0-x,0-x,1024-x,1024-x,0);
            // a.a0+=1;
            // a.a1+=1;
-        }
-
-
+        };
+/*
+        stgCreateShotA1(120,120,0,0,"sMD",0,0);
+        stg_last.sid=1;
+        stg_last.self_rotate=2*PI180;
+        stg_last.move_rotate=-1;
+        bulletUseEllipse(stg_last);
+        stg_last.hitdef.setEllipse(0,0,0,10,4);
+        renderSetSpriteScale(10,1,stg_last);
+*/
         a=new BossSLZ();
         a.sid=1;
         stgAddObject(a);
+
+
+
+
+        a={};
+        stgApplyEnemy(a);
+        stgSetPositionA1(a,200,200);
+        var b=new EnemyFairyHolder(a,0,128,48,48);
+        hyzAddObject(a,2);
+        hyzAddObject(b,2);
+
 
 
      //   var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
@@ -176,13 +199,14 @@ hyz.level.script=function(){
         this._t1++;
         var a=stgCreateShotA1(50,50,3,90,"sXY",0,this._t1%8);
         a.sid=1;
+        /*
         for(var i=0;i<1;i++){
             this.sid=2;
             stgCreateShotW2(stg_rand(stg_frame_w),stg_rand(100),3,stg_rand(360),"sXY",0,stg_rand_int(0,7),60,3,360,0);
             //stgCreateShotA1(stg_rand(stg_frame_w),stg_rand(100),stg_rand(1,3),stg_rand(45,135),"sXY",0,stg_rand_int(7));
             stg_last.sid=2;
         }
-
+*/
 
     }
 
@@ -324,6 +348,10 @@ Hyz_enemy.prototype.script=function(){
         stgAddObject(new Hyz_boom(this.pos[0],this.pos[1],1+this.enetype*0.2));
         stgAddObject(new HyzCrossEffect(this.sid-1,this.sid,this.pos,3-this.sid,[stg_rand(0,288),stg_rand(0,144)],60,1,0));
         gCreateItem(this.pos,stg_const.ITEM_SCORE,1,16);
+        for(var i=0;i<3;i++){
+            stgAddObject(new EnemyBreakParticle(this.pos[0],this.pos[1],stg_rand(360)));
+        }
+        stgPlaySE("se_enemy_dead");
     }
 };
 
@@ -480,12 +508,22 @@ HyzCrossEffect.prototype.script=function(){
     }
 }
 function hyzGetFramePos(sid,pos,outpos){
-    if(sid==0 || sid==1){
-        outpos[0]=pos[0];
-        outpos[1]=pos[1];
-    }else {
-        outpos[0] = pos[0] + 336;
-        outpos[1]=pos[1];
+    if(hyz.battle_style==0) {
+        if (sid == 0 || sid == 1) {
+            outpos[0] = pos[0];
+            outpos[1] = pos[1];
+        } else {
+            outpos[0] = pos[0] + 336;
+            outpos[1] = pos[1];
+        }
+    }else{
+        if (sid == 0 || sid == 1) {
+            outpos[0] = pos[0];
+            outpos[1] = pos[1];
+        } else {
+            outpos[0] = pos[0] + 336;
+            outpos[1] = pos[1];
+        }
     }
 }
 

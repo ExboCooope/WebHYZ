@@ -9,6 +9,7 @@ var sqrt=Math.sqrt;
 var PI=Math.PI;
 var PI2=PI*2;
 var PI180=PI/180;
+var stg={};
 var atan2p=function(source,dest){
     return atan2(dest[1]-source[1],dest[0]-source[0]);
 };
@@ -162,7 +163,7 @@ StgMove.prototype.resolve=function(pos){
     this.pos[0]=pos[0];
     this.pos[1]=pos[1];
 
-}
+};
 
 function StgHitDef(){
     this.type=0;
@@ -188,7 +189,7 @@ StgHitDef.prototype.setPointA1=function(x,y,r){
 StgHitDef.prototype.setLaserA1=function(x,y,dir,r1,l1,r2,l2){
     this.type=1;
     this.pos=[x,y];
-    this.rpos=[x,y]
+    this.rpos=[x,y];
     this.dir=dir;
     this.ls=l1;
     this.le=l2;
@@ -202,16 +203,64 @@ StgHitDef.prototype.setLaserA1=function(x,y,dir,r1,l1,r2,l2){
 StgHitDef.prototype.setLaserA2=function(x1,y1,r1,x2,y2,r2){
     this.type=1;
     this.pos=[x1,y1];
-    this.rpos=[x1,y1]
+    this.rpos=[x1,y1];
     this.dir=atan2(y2-y1,x2-x1);
     this.ls=0;
     this.le=sqrt2x(y2-y1,x2-x1);
     this.rs=r1;
     this.re=r2;
+    this.ls=r1;
+    this.le=r2;
     this.sdir=sin(this.dir);
     this.cdir=cos(this.dir);
     this.rdir=this.dir;
     return this;
+};
+StgHitDef.prototype.setEllipse=function(x,y,dir,r1,r2){
+    this.type=2;
+    this.pos=[x,y];
+    this.rpos=[x,y];
+    this.dir=dir;
+    this.sdir=sin(dir);
+    this.cdir=cos(dir);
+    this.rdir=dir;
+    this.rs=r1;
+    this.re=r2;
+    this.range=(r1+r2)/2;
+};
+StgHitDef.prototype.toEllipse=function(dir){
+    if(this.type==0){
+        this.dir=dir;
+        this.rdir=dir;
+        this.sdir=sin(dir);
+        this.cdir=cos(dir);
+        this.rs=this.range;
+        this.re=this.range;
+        this.ls=this.range;
+        this.le=this.range;
+        this.type=2;
+    }
+};
+StgHitDef.prototype.update=function(object){
+    object=object||stg_target;
+    var a=this;
+    a.rpos[0]= a.pos[0]+ object.pos[0];
+    a.rpos[1]= a.pos[1]+ object.pos[1];
+    a.rd= object.rotate[2];
+    a.rdir= a.dir+ object.rotate[2];
+    if(a.type==1){
+        a.sdir=sin(a.rdir);
+        a.cdir=cos(a.rdir);
+    }else if(a.type==2){
+        a.sdir=sin(a.rdir);
+        a.cdir=cos(a.rdir);
+        if(object.render){
+            if(object.render.scale){
+                a.rs= a.ls*object.render.scale[0];
+                a.re= a.le*object.render.scale[1];
+            }
+        }
+    }
 };
 
 var stg_wait_script=null;
@@ -219,7 +268,6 @@ var stg_wait_script=null;
 var stg_laser_dl=0;
 var stg_laser_dd=0;
 var stg_laser_close=[0,0];
-
 function stgDist(p1,p2){
     if(p1.type==0 && p2.type==0){
         return sqrt2(p1.rpos,p2.rpos)-p1.range-p2.range;
@@ -275,6 +323,28 @@ function stgDist(p1,p2){
         rate=(l2-p2.ls)/(p2.le-p2.ls);
         dd=(l1-p1.ls)/(p1.le-p1.ls);
         return -(rate*p2.rs+(1-rate)*p2.re+dd*p1.rs+(1-dd)*p1.re);
+    }else if(p1.type==0 && p2.type==2){
+        kdx=p1.rpos[0]-p2.rpos[0];
+        kdy=p1.rpos[1]-p2.rpos[1];
+        sinr=p2.sdir;
+        cosr=p2.cdir;
+        dl=kdx*cosr+kdy*sinr;
+        dd=kdy*cosr-kdx*sinr;
+        var a=(p2.rs+p1.range)*(p2.rs+p1.range);
+        var b=(p2.re+p1.range)*(p2.re+p1.range);
+        dl=dl*dl;
+        dd=dd*dd;
+        var dt=a*dl+b*dd-a*b;
+        var rr=dl+dd-a-b;
+        rate=(rr+sqrt(rr*rr+4*dt))/2;
+        return rate>=0?sqrt(rate):-sqrt(-rate);
+    }else if(p1.type==2){
+        return stgDist(p2,p1);
+    }else if(p1.type==1 && p2.type==2){
+        p2.type=0;
+        rate=stgDist(p1,p2);
+        p2.type=2;
+        return rate;
     }
     return 100;
 }
@@ -655,6 +725,10 @@ function stgRefreshPosition(object) {
                 a.rotate[2] += a.base.target.rotate[2];
             }
         }
+
+        if(a.base.sid){
+            a.sid= a.base.target.sid;
+        }
     }
     if (a.orotate) {
         a.rotate[0] += a.orotate[0];
@@ -662,25 +736,11 @@ function stgRefreshPosition(object) {
         a.rotate[2] += a.orotate[2];
     }
     if (a.hitby && !a.ignore_hit) {
-        a.hitby.rpos[0] = a.pos[0] + a.hitby.pos[0];
-        a.hitby.rpos[1] = a.pos[1] + a.hitby.pos[1];
-        a.hitby.rd = a.rotate[2];
-        a.hitby.rdir = a.hitby.dir + a.rotate[2];
-        if (a.hitby.type == 1) {
-            a.hitby.sdir = sin(a.hitby.rdir);
-            a.hitby.cdir = cos(a.hitby.rdir);
-        }
+        a.hitby.update(a);
         a.hit_by_list = [];
     }
     if (a.hitdef && !a.ignore_hit && !a.invincible) {
-        a.hitdef.rpos[0] = a.pos[0] + a.hitdef.pos[0];
-        a.hitdef.rpos[1] = a.pos[1] + a.hitdef.pos[1];
-        a.hitdef.rd = a.rotate[2];
-        a.hitdef.rdir = a.hitdef.dir + a.rotate[2];
-        if (a.hitdef.type == 1) {
-            a.hitdef.sdir = sin(a.hitdef.rdir);
-            a.hitdef.cdir = cos(a.hitdef.rdir);
-        }
+        a.hitdef.update(a);
         a.hit_list = [];
     }
     if (a.type == stg_const.OBJ_BULLET) {
@@ -1061,6 +1121,12 @@ function _stgMainLoop_Engine(){
                         }
                     }
                 }
+                if(a.base.sid){
+                    if(!a.base.target){
+                        console.log(a);
+                    }
+                    a.sid= a.base.target.sid;
+                }
             }
             if(a.look_at){
                 if(a.look_at.turn_rate){
@@ -1081,27 +1147,13 @@ function _stgMainLoop_Engine(){
                 a.rotate[2]+= a.orotate[2];
             }
             if(a.hitby && !a.ignore_hit){
-                a.hitby.rpos[0]= a.pos[0]+ a.hitby.pos[0];
-                a.hitby.rpos[1]= a.pos[1]+ a.hitby.pos[1];
-                a.hitby.rd= a.rotate[2];
-                a.hitby.rdir= a.hitby.dir+ a.rotate[2];
-                if(a.hitby.type==1){
-                    a.hitby.sdir=sin(a.hitby.rdir);
-                    a.hitby.cdir=cos(a.hitby.rdir);
-                }
+                a.hitby.update(a);
 
                 _hit_by_pool.push(a);
                 a.hit_by_list=[];
             }
             if(a.hitdef && !a.ignore_hit && !a.invincible){
-                a.hitdef.rpos[0]= a.pos[0]+ a.hitdef.pos[0];
-                a.hitdef.rpos[1]= a.pos[1]+ a.hitdef.pos[1];
-                a.hitdef.rd= a.rotate[2];
-                a.hitdef.rdir= a.hitdef.dir+ a.rotate[2];
-                if(a.hitdef.type==1){
-                    a.hitdef.sdir=sin(a.hitdef.rdir);
-                    a.hitdef.cdir=cos(a.hitdef.rdir);
-                }
+                a.hitdef.update(a);
                 _hit_pool.push(a);
                 a.hit_list=[];
             }
@@ -1145,7 +1197,7 @@ function _stgMainLoop_Engine(){
 
             if (a.type == stg_const.OBJ_BULLET || a.type == stg_const.OBJ_ENEMY || a.type == stg_const.OBJ_ITEM) {
                 if(!a.keep) {
-                    if (a.pos[0] > stg_frame_w +30 || a.pos[0] <  -30 ||a.pos[1] > stg_frame_h +30||a.pos[1] < -30){
+                    if (a.pos[0] > stg_frame_w +32 || a.pos[0] <  -32 ||a.pos[1] > stg_frame_h +32||a.pos[1] < -32){
                         stgDeleteObject(a);
                     }
                 }
@@ -1468,8 +1520,47 @@ function stgLookAtTarget(object,target,turnrate){
 }
 
 function StgBase(target,type,auto_remove,clonesid){
+    if(!target){
+        console.log("StgBase with out target!");
+    }
     this.target=target;
     this.type=type;
     this.auto_remove=auto_remove||0;
-    this.sid=clonesid||0;
+    this.sid=clonesid===undefined?1:clonesid;
+}
+
+var stg_module={};
+
+function stgLoadModule(sModuleName){
+    if(stg_module[sModuleName]){
+        if(!stg_module[sModuleName].loaded){
+            stg_module[sModuleName].loaded=true;
+        }else{
+            return true;
+        }
+        if(stg_module[sModuleName].pre_load){
+            stg_module[sModuleName].pre_load();
+        }
+        return true;
+    }
+    return false;
+}
+
+function stgLoadModuleObject(oModule){
+    if(!oModule.loaded){
+        oModule.loaded=true;
+    }else{
+        return true;
+    }
+    if(oModule.pre_load){
+        oModule.pre_load();
+    }
+}
+
+function stgRegisterModule(sModuleName,moduleobject){
+    stg_module[sModuleName]=moduleobject;
+    return true;
+}
+function stgRegisterPlayer(sPlayerName,nPlayerMaker){
+    stg_player_templates[sPlayerName]=nPlayerMaker;
 }

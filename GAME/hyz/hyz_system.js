@@ -11,7 +11,7 @@ hyz.resolution={
             this.scale=q;
             this.w=w;
             this.h=h;
-            stgResizeCanvas("frame",(w-q*stg_width)/2+q*16,(h-q*stg_height)/2+q*16,0,0,608,stg_frame_h,q);
+            stgResizeCanvas("frame",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("ui",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("back",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("pause",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
@@ -356,6 +356,8 @@ hyz_system_script.script=function(){
         stg_replay_end=0;
     }
     this.fps_drawer.render.text="" + (stg_fps >> 0) + " FPS";
+
+    hyz.cross_function();
 };
 
 function loadHyzFont(){
@@ -680,7 +682,8 @@ function spriteUseInviEffect(){
     }
 }
 
-function CircleObject(r0,r1,a0,a1,ptx){
+function CircleObject(r0,r1,a0,a1,ptx,mode){
+    mode=mode||0;
     ptx=ptx||(PI2*r1/6)>>0;
     if(ptx<8)ptx=8;
     ptx++;
@@ -689,12 +692,13 @@ function CircleObject(r0,r1,a0,a1,ptx){
     this.clist=WGLA.newBuffer(_gl,4,4,2*ptx,WGLConst.DATA_FLOAT);
     this.tlist=WGLA.newBuffer(_gl,4,2,2*ptx,WGLConst.DATA_FLOAT);
 
-    this.poscache=new Float32Array(4*ptx);
+    this.poscache=this.plist.buffer;//new Float32Array(4*ptx);
     this.anglecache=new Float32Array(2*ptx);
     this.r0=r0;
     this.r1=r1;
     this.a0=a0;
     this.a1=a1;
+    this.mode=mode;
 }
 
 CircleObject.prototype.SetColor=function(r,g,b,a){
@@ -808,20 +812,21 @@ CircleObject.prototype.on_render=function(gl){
         }
 
     }
-    if(this._x0 != this.pos[0] || this._x1!=this.pos[1] || flag){
+    if(/*this._x0 != this.pos[0] || this._x1!=this.pos[1] ||*/ flag){
         this._x0=this.pos[0];
         this._x1=this.pos[1];
         var x=this._x0;
         var y=this._x1;
         var t=this.plist.buffer;
-        var p=this.poscache;
-        j=0;k=0;
-        for(i=0;i<n;i++){
-            t[j++]=x+p[k++];
-            t[j++]=y+p[k++];
-            t[j++]=x+p[k++];
-            t[j++]=y+p[k++];
-        }
+     //   t.set(this.poscache);
+      //  var p=this.poscache;
+     //   j=0;k=0;
+     //   for(i=0;i<n;i++){
+     //       t[j++]=x+p[k++];
+     //       t[j++]=y+p[k++];
+     //       t[j++]=x+p[k++];
+     //       t[j++]=y+p[k++];
+     //   }
         this.plist.uploadData();
     }
     if(this.blend){
@@ -830,10 +835,18 @@ CircleObject.prototype.on_render=function(gl){
     GlBufferInput(hyzPrimitive2DShader, "aPosition",this.plist);
     GlBufferInput(hyzPrimitive2DShader, "aColor",this.clist);
     GlBufferInput(hyzPrimitive2DShader, "aTexture",this.tlist);
+    hyzSetPrimitiveOffset(this.pos[0],this.pos[1]);
     gl.drawArrays(gl.TRIANGLE_STRIP,0,n*2);
     if(this.blend!=blend_default){
         blend_default();
     }
+    hyzSetPrimitiveOffset(0,0);
+};
+
+CircleObject.prototype.finalize=function(){
+    this.plist.clearContent();
+    this.tlist.clearContent();
+    this.clist.clearContent();
 };
 
 hyz.magicCircle={};
@@ -845,3 +858,170 @@ hyz.magicCircle.init=function(){
     this.self_rotate=1*PI180;
     stgSetPositionA1(this,128,128);
 };
+function bulletUseEllipse(obj){
+    obj=obj||stg_target;
+    if(obj.hitdef){
+        obj.hitdef.toEllipse(0);
+    }
+}
+function hyzGetOtherPlayer(player){
+    player=player||stg_target;
+    if(stg_players[0]==player)return stg_players[1];
+    return stg_players[0];
+}
+
+function hyzSetCross(cross,obj){
+    obj=obj||stg_target;
+    obj.cross=cross;
+}
+
+//穿版
+hyz.cross_function=function(){
+    for(var i in _pool){
+        var a=_pool[i];
+        if(a.cross && a.active && a.move && !a.base){
+            if(hyz.battle_style==0){
+                if(a.sid==1 && a.pos[0]>stg_frame_w+16){
+                    a.sid=2;
+                    stgSetPositionA1(a,-16, a.pos[1]);
+                }else if(a.sid==2 && a.pos[0]<-16){
+                    a.sid=1;
+                    stgSetPositionA1(a,stg_frame_w+16, a.pos[1]);
+                }
+            }
+        }
+    }
+};
+
+function hyzGetFrameObject(sid){
+    if(hyz.battle_style==0){
+        if(sid==1){
+            return hyz.left_screen_object;
+        }else if(sid==2){
+            return hyz.right_screen_object;
+        }
+        return 0;
+    }else{
+        if(sid==1 || sid==2){
+            return hyz.full_screen_object;
+        }
+    }
+}
+
+function HyzPrimitive2DVertexList(n){
+    this.plist=WGLA.newBuffer(_gl,4,2,n,WGLConst.DATA_FLOAT);
+    this.clist=WGLA.newBuffer(_gl,4,4,n,WGLConst.DATA_FLOAT);
+    this.tlist=WGLA.newBuffer(_gl,4,2,n,WGLConst.DATA_FLOAT);
+    this.ptx=n;
+    this.setTextureName("white");
+}
+HyzPrimitive2DVertexList.prototype.setColor=function(r,g,b,a){
+    var hd=0;
+    var ga=[r/255.0,g/255.0,b/255.0,a/255.0];
+    var n=this.ptx;
+    for (var i = 0; i < n; i++) {
+        this.clist.buffer.set(ga,hd) ;
+        hd+=4;
+    }
+    this.clist.uploadData();
+};
+HyzPrimitive2DVertexList.prototype.setColorI=function(r,g,b,a,start,end,upload){
+    var hd=start*4;
+    var ga=[r/255.0,g/255.0,b/255.0,a/255.0];
+    var n=this.ptx;
+    end=end||start;
+    for (var i = start; i <= end; i++) {
+        this.clist.buffer.set(ga,hd) ;
+        hd+=4;
+    }
+    if(upload){
+        this.clist.uploadData(start,end-start+1);
+    }
+};
+HyzPrimitive2DVertexList.prototype.setTexture=function(texname,x,y){
+    var tex=texname?this.tex:stg_textures[texname];
+    var tw=tex.width;
+    var th=tex.height;
+    var hd=0;
+    x=x/tw;
+    y=y/th;
+    var ga=[x,y];
+    var n=this.ptx;
+    for (var i = 0; i < n; i++) {
+        this.tlist.buffer.set(ga,hd) ;
+        hd+=2;
+    }
+    this.tlist.uploadData();
+};
+HyzPrimitive2DVertexList.prototype.setTextureName=function(texname){
+    var tex=stg_textures[texname];
+    this.tex=tex;
+};
+HyzPrimitive2DVertexList.prototype.setTextureI=function(texname,x,y,start,end,upload){
+    var tex=texname?this.tex:stg_textures[texname];
+    var tw=tex.width;
+    var th=tex.height;
+    var hd=start*2;
+    end=end||start;
+    x=x/tw;
+    y=y/th;
+    var ga=[x,y];
+    var n=this.ptx;
+    for (var i = start; i <= end; i++) {
+        this.tlist.buffer.set(ga,hd) ;
+        hd+=2;
+    }
+    if(upload){
+        this.tlist.uploadData(start,end-start+1);
+    }
+};
+HyzPrimitive2DVertexList.prototype.setPosition=function(x,y){
+    var hd=0;
+    var ga=[x,y];
+    var n=this.ptx;
+    for (var i = 0; i < n; i++) {
+        this.plist.buffer.set(ga,hd) ;
+        hd+=2;
+    }
+    this.plist.uploadData();
+};
+HyzPrimitive2DVertexList.prototype.setPositionI=function(x,y,start,end,upload){
+    var hd=start*2;
+    var ga=[x,y];
+    var n=this.ptx;
+    end=end||start;
+    for (var i = start; i <= end; i++) {
+        this.plist.buffer.set(ga,hd) ;
+        hd+=2;
+    }
+    if(upload){
+        this.plist.uploadData(start,end-start+1);
+    }
+};
+HyzPrimitive2DVertexList.prototype.setVertex=function(index,x,y,u,v,r,g,b,a){
+    this.plist.buffer[index*2]=x;
+    this.plist.buffer[index*2+1]=y;
+    this.tlist.buffer[index*2]=u/this.tex.width;
+    this.tlist.buffer[index*2+1]=v/this.tex.height;
+    this.clist.buffer[index*4]=r/255.0;
+    this.clist.buffer[index*4+1]=g/255.0;
+    this.clist.buffer[index*4+2]=b/255.0;
+    this.clist.buffer[index*4+3]=a/255.0;
+};
+HyzPrimitive2DVertexList.prototype.update=function(position,texture,color){
+    if(position)this.plist.uploadData();
+    if(texture)this.tlist.uploadData();
+    if(color)this.clist.uploadData();
+};
+HyzPrimitive2DVertexList.prototype.clear=function(){
+    this.plist.clearContent();
+    this.tlist.clearContent();
+    this.clist.clearContent();
+};
+HyzPrimitive2DVertexList.prototype.use=function(){
+    GlBufferInput(hyzPrimitive2DShader, "aPosition",this.plist);
+    GlBufferInput(hyzPrimitive2DShader, "aColor",this.clist);
+    GlBufferInput(hyzPrimitive2DShader, "aTexture",this.tlist);
+};
+
+

@@ -232,6 +232,10 @@ function WebglDMA(shader,iDefaultCapability){
             gl.bufferData(gl.ARRAY_BUFFER, this.buffers[j], t[4] ? gl.STREAM_DRAW : gl.DYNAMIC_DRAW);
         }
     }
+       for(var j in this.lcnt){
+          var t= this.lcnt[j];
+           gl.enableVertexAttribArray(t[2]);
+      }
     this.objectParser=null;
 
 }
@@ -311,10 +315,10 @@ WebglDMA.prototype.deleteObject=function(oObject){
 
 WebglDMA.prototype.frameStart=function(){
     var gl=_gl;
-    for(j in this.lcnt){
-        var t= this.lcnt[j];
-        gl.enableVertexAttribArray(t[2]);
-    }
+ //   for(var j in this.lcnt){
+  //      var t= this.lcnt[j];
+ //       gl.enableVertexAttribArray(t[2]);
+  //  }
     this.indexn=0;
 };
 

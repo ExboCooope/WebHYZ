@@ -470,8 +470,12 @@ var default_2d_misc_shader={
             default_2d_misc_shader.active=1;
             default_2d_misc_shader.context.setTransform(1,0,0,1,0,0);
             if(pro.background){
-                default_2d_misc_shader.context.fillStyle=pro.background;
-                default_2d_misc_shader.context.fillRect(0,0,tgt.width,tgt.height);
+                if(pro.transparent){
+                    default_2d_misc_shader.context.clearRect(0, 0, tgt.width, tgt.height);
+                }else {
+                    default_2d_misc_shader.context.fillStyle = pro.background;
+                    default_2d_misc_shader.context.fillRect(0, 0, tgt.width, tgt.height);
+                }
             }
         }
 
@@ -515,14 +519,26 @@ var default_2d_misc_shader={
                         c.fillRect(obj.x+ obj.cx, obj.y+obj.cy,obj.w,obj.h);
                     }else if(obj.type==2){
                         c.font=obj.font||"20px 宋体";
-                        c.fillStyle=obj.color||"#000";
+                        if(obj.fontsize)c.font=""+obj.fontsize+ c.font;
+                        if(obj.bold)c.font="bold "+ c.font;
+
                         c.textAlign=obj.textAlign||"start";
                         c.textBaseline=obj.textBaseline||"top";
-                        if(obj.maxWidth){
-                            c.fillText(obj.text||"",obj.x+ obj.cx, obj.y+obj.cy,obj.maxWidth);
-                        }else{
-                            c.fillText(obj.text||"",obj.x+ obj.cx, obj.y+obj.cy);
+
+                        if(obj.backcolor){
+                            c.fillStyle=obj.backcolor||"#000";
+                            c.fillText(obj.text||"",obj.x+ obj.cx+0.8, obj.y+obj.cy+0.8,obj.maxWidth);
                         }
+                        c.fillStyle=obj.color||"#FFF";
+                        c.fillText(obj.text||"",obj.x+ obj.cx, obj.y+obj.cy,obj.maxWidth);
+                        if(obj.outcolor){
+                            c.beginPath();
+                            c.strokeStyle=obj.outcolor||"#000";
+                            c.strokeText(obj.text||"",obj.x+ obj.cx, obj.y+obj.cy,obj.maxWidth);
+                            c.stroke();
+                            c.closePath();
+                        }
+
                     }else if(obj.type==3){
                         if(stg_textures[obj.texture].type!=stg_const.TEX_CANVAS3D_TARGET){
                             c.drawImage(stg_textures[obj.texture],obj.x+ obj.cx, obj.y+obj.cy,obj.w,obj.h);
@@ -636,11 +652,11 @@ function renderApplyFullTexture(oRender,sTextureName){
 function RenderText(x,y,text){
     var ax = new StgObject;
     ax.render = new StgRender("testShader2");
-    miscApplyAttr(ax.render,{type:2,x:x,y:y,color:"#A00"});
+    miscApplyAttr(ax.render,{type:2,x:x,y:y,color:"#000"});
     ax.layer = 100;
     ax.render.text=text||"";
     stgAddObject(ax);
-
+    /*
     var ay = new StgObject;
     ay.render = new StgRender("testShader2");
 
@@ -652,6 +668,7 @@ function RenderText(x,y,text){
         stg_target.render.w=50+stg_target.base.target.render.text.length*15;
     };
     stgAddObject(ay);
+    */
     return ax;
 }
 RenderText.prototype.setText=function(text){
