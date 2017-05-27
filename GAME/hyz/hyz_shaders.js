@@ -79,8 +79,14 @@ var hyzPrimitive2DShader={
                 stg_active_shader=this;
                 _gl.useProgram(this.program);
             }
-            if (!render.texture)return;
-            _webGlUniformInput(this,"texture",stg_textures[render.texture]);
+            var tex=0;
+            if (!render.texture || !stg_textures[render.texture]){
+                tex=stg_textures["white"];
+            }else{
+                tex=stg_textures[render.texture];
+            }
+            if(!tex)return;
+            _webGlUniformInput(this,"texture",tex);
             if(object.on_render)object.on_render(_gl);
         }
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
@@ -102,12 +108,13 @@ var hyzPrimitive2DShader={
         "attribute vec4 aColor;" +
         "" +
         "uniform vec2 uWindow;" +
+        "uniform vec2 uPosition;" +
         "varying vec2 vTexture;" +
         "varying vec4 vColor;" +
         "void main( void ){" +
         "vTexture = aTexture;" +
         "vColor = aColor;" +
-        "vec4 t = vec4( aPosition*uWindow+vec2(-1.0,1.0) , 0.0 , 1.0 );" +
+        "vec4 t = vec4( (aPosition+uPosition)*uWindow+vec2(-1.0,1.0) , 0.0 , 1.0 );" +
         "gl_Position = t;" +
         "}",
     fragment:"precision mediump float;" +
@@ -124,10 +131,15 @@ var hyzPrimitive2DShader={
         aTexture:[0,2,null,0,0,1],
         aColor:[0,4,null,0,0,2],
         uWindow:[1,2],
+        uPosition:[1,2],
         texture:[2,0]
     },
     layer_blend:[]
 };
+function hyzSetPrimitiveOffset(x,y){
+    _webGlUniformInput(hyzPrimitive2DShader,"uPosition",[x,y]);
+}
+
 
 var hyz_2d_misc_shader={
     active:0,

@@ -78,7 +78,6 @@ hyz_loader.init=function(){
         stgCreateImageTexture("life","LifeGauge.png");
         stgCreateImageTexture("particle","particles.png");
         stgCreateImageTexture("slz","slz.png");
-        stgCreateImageTexture("bossres","res/boss.png");
         stgCreateImageTexture("mcircle","eff_magic_circle.png");
         stgCreateImageTexture("white","white.png");
         renderCreate2DTemplateA1("white","white",0,0,1,1,0,0,0,1);
@@ -97,7 +96,7 @@ hyz_loader.init=function(){
         stgCreateProcedure2("drawLeftFrame","frame_left",20,80,["sprite_shader","basic_shader"],"#000");
         stgCreateProcedure2("drawRightFrame","frame_right",20,80,["sprite_shader","basic_shader"],"#000");
 
-        stgCreateProcedure1("drawFullFrame","frame_full",20,80,"sprite_shader","#000");
+        stgCreateProcedure2("drawFullFrame","frame_full",20,80,["sprite_shader","basic_shader"],"#000");
 
         stgCreateProcedure1("drawCombineFrame","frame",201,300,"sprite_shader","#000");
         stgCreateProcedure1("drawBGFrame","frame_bg",101,200,"3d_shader","#FFF");

@@ -90,21 +90,6 @@ hyz.level.script=function(){
         var ai=new BasicAI(stg_players[1]);
         stgAddObject(ai);
 
-        stgAddObject(new RenderText(40,90,"20宋体"));
-        stg_last.render.font="20px 宋体";
-        stg_last.render.color="#FFF";
-        stgAddObject(new RenderText(40,110,"30宋体"));
-        stg_last.render.font="30px 宋体";
-        stg_last.render.color="#FFF";
-        stgAddObject(new RenderText(40,140,"20黑体"));
-        stg_last.render.font="20px 黑体";
-        stg_last.render.color="#FFF";
-        stgAddObject(new RenderText(40,160,"16思源宋体测试"));
-        stg_last.render.font="15px 思源宋体";
-        stg_last.render.color="#FFF";
-        stg_last.render.backcolor="#000";
-        stg_last.render.bold=true;
-
 
 
 
@@ -152,8 +137,8 @@ hyz.level.script=function(){
             a.SetTexture("cardbg2_c",0-x,0-x,1024-x,1024-x,0);
            // a.a0+=1;
            // a.a1+=1;
-        }
-
+        };
+/*
         stgCreateShotA1(120,120,0,0,"sMD",0,0);
         stg_last.sid=1;
         stg_last.self_rotate=2*PI180;
@@ -161,11 +146,11 @@ hyz.level.script=function(){
         bulletUseEllipse(stg_last);
         stg_last.hitdef.setEllipse(0,0,0,10,4);
         renderSetSpriteScale(10,1,stg_last);
-
+*/
         a=new BossSLZ();
         a.sid=1;
         stgAddObject(a);
-        stgAddObject(new BossSpellNameObject(a,a,"测试【符卡名】",25));
+
 
 
 
