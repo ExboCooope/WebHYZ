@@ -57,6 +57,13 @@ Player_Remilia.on_death=function(){
 };
 
 Player_Remilia.player_script=function(){
+
+    if(this.content.bomb){
+        this.bomb+=this.content.bomb;
+        this.content.bomb=0;
+        if(this.bomb>8)this.bomb=8;
+    }
+
     this.t=this.t||0;
     this._c=this._c||0;
     this._c1=this._c1||0;

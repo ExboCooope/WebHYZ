@@ -284,8 +284,10 @@ var hyz_system_script={};
 
 hyz_system_script.init=function(){
     this.fps_drawer=new RenderText(300, 464);
+    /*
     var a=new HyzHitChainShower();
     hyzAddObject(a,1);
+    */
     var b=new HyzUI(0,1);
     stgAddObject(b);
     var c=new HyzUI(1,2);
