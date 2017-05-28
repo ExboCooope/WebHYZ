@@ -79,7 +79,7 @@ hyz.level.init=function(){
     stgSetPositionA1(a,100,30);
     a.layer=24;
     a.sid=1;
-    hyzAddObject(a,1);
+   // hyzAddObject(a,1);
     this.chain1=a;
     this.f=0;
 
@@ -109,7 +109,7 @@ hyz.level.script=function(){
             if(a.frame>120 && a.frame<140){a.r0-=4;a.r1+=4;}
         }
     }
-    this.chain1.value=""+stg_common_data.current_hit[0];
+
     /*
     if(this.f%6==0) {
         var blt;
@@ -150,6 +150,10 @@ hyz.level.script=function(){
         a=new BossSLZ();
         a.sid=1;
         stgAddObject(a);
+       // a=new BossSLZ();
+      //  a.sid=2;
+     //   stgAddObject(a);
+
 
 
 

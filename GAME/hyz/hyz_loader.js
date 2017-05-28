@@ -47,8 +47,8 @@ hyz_loader.init=function(){
         stgCreateCanvas("frame",stg_width/*608*/,stg_height,stg_const.TEX_CANVAS3D);
         stgCreateCanvas("frame_bg",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
         stgCreateCanvas("frame_left",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_full",stg_width/*608*/,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_full_bg",stg_width/*608*/,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateCanvas("frame_full",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateCanvas("frame_full_bg",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 
         stgCreateCanvas("frame_right",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 

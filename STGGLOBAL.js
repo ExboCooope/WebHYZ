@@ -142,6 +142,7 @@ var stg_const={
     OBJ_ITEM:4,
 
     LAYER_MIN_FRAME:20,
+    LAYER_SPELL_BG:22,
     LAYER_ENEMY:30,
     LAYER_PLAYER:40,
     LAYER_ITEM:50,

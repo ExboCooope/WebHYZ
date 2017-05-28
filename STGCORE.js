@@ -361,6 +361,7 @@ function StgObject(){
 function stgApplyEnemy(e){
     e.on_hit_by=default_enemy_onhitby;
     e.type=stg_const.OBJ_ENEMY;
+    e.score=10;
     return e;
 }
 
