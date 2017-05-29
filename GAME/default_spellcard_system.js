@@ -7,10 +7,12 @@ stg.bossSystem.pre_load=function(){
     renderCreate2DTemplateA1("boss_spellname_bg","boss_ui",0,0,256,40,0,0,0,1);
     renderCreate2DTemplateA1("boss_indicator","boss_ui",0,64,48,16,0,0,0,1);
     renderCreate2DTemplateA1("boss_spells","boss_ui",72,72,16,16,0,0,0,1);
+    renderCreate2DTemplateA1("boss_leaf","pl_effect",64,176,32,32,32,0,0,1);
     stgCreateImageTexture("bossres","res/boss.png");
-    renderCreate2DTemplateA1("spell_card_attack","bossres")
+    renderCreate2DTemplateA1("spell_card_attack","bossres",6*16,0,16,128*7,0,0,0,1);
     stgLoadSE("se_time","se/se_timeout.wav").ready=1;
     stgLoadSE("se_fault","se/se_fault.wav").ready=1;
+
 };
 
 stgRegisterModule("boss_system",stg.bossSystem);
@@ -554,3 +556,48 @@ function bossWanderSingle(boss,toward_player,x_range,y_range,time){
     }
     luaMoveTo(x_range+boss.pos[0],y_range+boss.pos[1],time,1,boss);
 }
+
+function BossChargeLeaf(boss){
+    this.boss=boss;
+}
+BossChargeLeaf.prototype.init=function(){
+    renderCreateSpriteRender(this);
+    renderApply2DTemplate(this.render,"boss_leaf",0);
+    this.layer=stg_const.LAYER_ENEMY+1;
+    renderSetObjectSpriteBlend(this,blend_add);
+    this.angle=stg_rand(PI2);
+    var l=stg_rand(60,100);
+    stgEnableMove(this);
+    stgSetPositionA1(this,l*cos(this.angle)+this.boss.pos[0],l*sin(this.angle)+this.boss.pos[1]);
+    this.move.speed=2;
+    this.move.speed_angle=this.angle+PI;
+    this.k=stg_rand(PI2);
+    this.r=stg_rand(PI2);
+};
+BossChargeLeaf.prototype.script=function(){
+    var a=255;
+    if(a>255)a=255;
+    renderSetSpriteColor(100,100,100,a);
+    var s=80*(60-this.frame)/60;
+    renderSetSpriteSize(s*sin(this.k),s*sin(this.r));
+    this.k+=3*PI180;
+    this.r+=2.2*PI180;
+    this.rotate[2]+=0.5*PI180;
+    if(this.frame>=60){
+        stgDeleteSelf();
+    }
+};
+function BossCharge(boss){
+    this.boss=boss;
+}
+
+BossCharge.prototype.script=function(){
+    if(this.frame==1){
+        stgPlaySE("se_boss_cast");
+    }
+    if(this.frame<60){
+        stgAddObject(new BossChargeLeaf(this.boss));
+    }else{
+        stgDeleteSelf();
+    }
+};

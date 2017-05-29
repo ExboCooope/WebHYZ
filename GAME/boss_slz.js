@@ -34,8 +34,9 @@ BossSLZ.prototype.init=function(){
     this.phase=[];
     this.finished=false;
     stgBossClearPhase();
+    //stgBossAddPhase([new BossSLZ.Spell2(this)]);
     stgBossAddPhase([new BossSLZ.NonSpell1(this),new BossSLZ.Spell1(this)]);
-    stgBossAddPhase([new BossSLZ.NonSpell2(this),new BossSLZ.Spell1(this)]);
+    stgBossAddPhase([new BossSLZ.NonSpell2(this),new BossSLZ.Spell2(this)]);
 
     a=new BossSpellCount(this);
     stgAddObject(a);
@@ -69,7 +70,7 @@ BossSLZ.prototype.script=function(){
 };
 
 BossSLZ.NonSpell1=function(boss){
-    bossDefineNonSpellA(boss,this,5500,30*60);
+    bossDefineNonSpellA(boss,this,7500,30*60);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -140,12 +141,13 @@ BossSLZ.SpellBg1.prototype.script=function(){
     if(this.frame<=51){
         renderSetSpriteColor(255,255,255,5*this.frame,this.layer1);
     }
+
 };
 
 
 
 BossSLZ.Spell1=function(boss){
-    bossDefineSpellA(boss,this,"记忆【筑墙鬼幻想】",1800,30*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【筑墙鬼幻想】",2200,30*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -365,6 +367,145 @@ BossSLZ.NonSpell2.Phase2.prototype.script=function() {
         }
     }
 };
+
+BossSLZ.Spell2=function(boss){
+    bossDefineSpellA(boss,this,"记忆【妄执神闪斩】",2400,30*60,12500000,0.8);
+    this.hitby=new StgHitDef();
+    this.hitby.setPointA1(0,0,50);
+    this.hitdef=new StgHitDef();
+    this.hitdef.setPointA1(0,0,32);
+};
+BossSLZ.Spell2.prototype.init=function(){
+    this.invincible=300;
+    this.bg=new BossSLZ.SpellBg1(this);
+    luaMoveTo(stg_frame_w/2,80,60,1,this.boss);
+    stgAddObject(new BossSpellInitObject(this));
+    stgAddObject(this.bg);
+    stgPlaySE("se_cast");
+};
+BossSLZ.Spell2.prototype.script=function(){
+    var t2=this.frame%180;
+    if(this.frame%12==0){
+        if(t2>90)t2=180-t2;
+        t2=t2/90*90;
+        stgCreateShotA1(6,6,2.4,t2,"lDY",0,3).slzs2=1;
+        stgCreateShotA1(6,6,0.6,t2,"lDY",0,3).slzs2=1;
+        stgCreateShotA1(stg_frame_w-6,6,2.4,180-t2,"lDY",0,3).slzs2=1;
+        stgCreateShotA1(stg_frame_w-6,6,0.6,180-t2,"lDY",0,3).slzs2=1;
+    }
+
+
+    if(this.frame==60){
+        stgAddObject(new BossSLZ.Spell2.Phase(this));
+    }
+   // stgClipObject(32,stg_frame_w-32,32,stg_frame_h/2-32,this.boss);
+    if(stgDefaultFinishSpellCheck(120)){
+        gCreateItem(this.pos,stg_const.ITEM_SCORE,10,32);
+        gCreateItem(this.pos,stg_const.ITEM_POWER,10,32);
+        stgDeleteSubShot(this,this.get);
+    }
+};
+
+BossSLZ.Spell2.Phase=function(spell){
+    this.spell=spell;
+    this.base=new StgBase(spell,0,1);
+    this.target=stg_rand_int(0,1);
+};
+BossSLZ.Spell2.Phase.prototype.script=function(){
+
+    if(this.spell.remove){
+        stgDeleteSelf();return;
+    }
+
+    if(this.frame==60){
+        stgAddObject(new BossCharge(this.spell));
+        stgAddObject(new BossSLZ.Spell2.SlowEffect(this.spell,60));
+    }
+    if(this.frame==120){
+        var n=_pool.length;
+        x=this.spell.pos[0];
+        var y=this.spell.pos[1];
+        for(var i=0;i<n;i++){
+            var a=_pool[i];
+            if(a.slzs2){
+                var s1=1.5;
+                var sa1=0.02;
+                if(a.pos[0]<x+40 && a.pos[0]>x-40){
+                    stgDeleteObject(a);
+                    for(var j=0;j<1;j++) {
+                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 3);
+                        stg_last.move.setAccelerate2(sa1, s1);
+                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 4);
+                        stg_last.move.setAccelerate2(sa1, s1);
+                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "sXY", 30, 3);
+                        stg_last.move.setAccelerate2(sa1, s1);
+                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "sXY", 30, 4);
+                        stg_last.move.setAccelerate2(sa1, s1);
+                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 3);
+                        stg_last.move.setAccelerate2(sa1, s1);
+                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 4);
+                        stg_last.move.setAccelerate2(sa1, s1);
+                    }
+
+                }else if(a.pos[1]<y+70 && a.pos[1]>y-70){
+                    stgDeleteObject(a);
+                    for(var j=0;j<2;j++) {
+                        stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"mZY",30,0);
+                        stg_last.move.setAccelerate2(sa1,s1);
+                        stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"mZY",30,2);
+                        stg_last.move.setAccelerate2(sa1,s1);
+                        stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"sXY",30,0);
+                        stg_last.move.setAccelerate2(sa1,s1);
+                        stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"sXY",30,2);
+                        stg_last.move.setAccelerate2(sa1,s1);
+                        stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"tDD",30,0);
+                        stg_last.move.setAccelerate2(sa1,s1);
+                        stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"tDD",30,2);
+                        stg_last.move.setAccelerate2(sa1,s1);
+                    }
+                }
+            }
+        }
+    }
+    if(this.frame==160){
+        this.target=1-this.target;
+        var x=stg_players[this.target].pos[0];//+stg_players[1].pos[0];
+        x=x;
+        luaMoveTo(x,stg_frame_h/2-30,60,1,this.spell.boss);
+    }
+    if(this.frame>200){
+        this.frame=0;
+    }
+};
+BossSLZ.Spell2.SlowEffect=function(spell,time){
+    this.base=new StgBase(spell,0,1);
+    this.time=time;
+    this.spell=spell;
+};
+
+BossSLZ.Spell2.SlowEffect.prototype.init=function() {
+    stgPlaySE("se_boon01");
+    renderSetObjectSpriteBlend(this.spell.bg.layer1,blend_add);
+};
+BossSLZ.Spell2.SlowEffect.prototype.finalize=function() {
+    renderSetObjectSpriteBlend(this.spell.bg.layer1,0);
+};
+BossSLZ.Spell2.SlowEffect.prototype.script=function(){
+    if(this.frame<=this.time){
+        hyzSetSuperPauseTime(1);
+    }else{
+        stgPlaySE("se_shot0");
+        stgDeleteSelf();
+        renderSetObjectSpriteBlend(this.spell.bg.layer1,0);
+    }
+};
+BossSLZ.Spell2.dyCreate=function(blt,index){
+    blt.pool=blt.parent.pool;
+    blt.script=BossSLZ.Spell1.dyScript;
+};
+
+
+
 
 BossSLZ.prototype.spells.push(BossSLZ.NonSpell1);
 BossSLZ.prototype.spells.push(BossSLZ.Spell1);

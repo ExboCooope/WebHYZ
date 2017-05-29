@@ -548,7 +548,7 @@ function hyzGetSuperPauseTime(){
 }
 
 function hyzSetSuperPauseTime(time){
-    _stg_super_pause_time=time;
+    _stg_super_pause_time+=time;
 }
 function hyzObjSetIgnoreSuperPauseTime(obj,ignore){
     obj.ignore_super_pause=ignore;
