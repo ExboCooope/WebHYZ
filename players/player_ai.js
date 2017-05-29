@@ -107,6 +107,16 @@ BasicAI.prototype.scriptx=function(){
         d=this.ground_range-d;
         vy-=2*this.ground_range*this.ground_range/(d+1);
     }
+    this.key[stg_const.KEY_SHOT]=0;
+    for(var i=0;i<_hit_pool.length;i++){
+        var a=_hit_pool[i];
+        if(a.side==stg_const.SIDE_ENEMY && a.type==stg_const.OBJ_ENEMY){
+            vx+= a.pos[0]-x;
+            this.key[stg_const.KEY_SHOT]=1;
+        }
+    }
+
+
 
 /*
     this.key[stg_const.KEY_LEFT]=0;
@@ -129,6 +139,7 @@ BasicAI.prototype.scriptx=function(){
     k[right]=this.keydef(x2,k[right]);
     k[up]=this.keydef(y1,k[up]);
     k[down]=this.keydef(y2,k[down]);
+
    /* k[left]=x1;
     k[right]=x2;
     k[up]=y1;
@@ -269,6 +280,7 @@ BasicAI.prototype.scriptx=function(){
         this.key[stg_const.KEY_DOWN] = y > 0 ? 1 : 0;
         console.log("hit");
     }
+
 };
 
 var ai_close_point=[];

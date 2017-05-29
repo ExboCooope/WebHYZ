@@ -31,6 +31,7 @@ hyz_loader.init=function(){
         stgLoadSE("se_shot0","se/se_tan00.wav").ready=1;
         stgLoadSE("se_shot1","se/se_tan01.wav").ready=1;
         stgLoadSE("se_shot2","se/se_tan02.wav").ready=1;
+        stgLoadSE("se_boon01","se/se_boon01.wav").ready=1;
 
         stgLoadModule("enemy_system");
         stgLoadModuleObject(esp);

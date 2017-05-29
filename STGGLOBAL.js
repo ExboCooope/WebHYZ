@@ -25,7 +25,7 @@ var stg_wait_for_all_texture=1;
 var stg_refresher_type=0;
 
 var stg_super_pause_time;
-var _stg_super_pause_time;
+var _stg_super_pause_time=0;
 
 var stg_bullet_parser=null;
 

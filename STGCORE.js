@@ -148,6 +148,18 @@ StgMove.prototype.setAccelerate=function(acc,angle){
     this.acceleration=acc;
 };
 
+StgMove.prototype.setAccelerate2=function(acc,maxspeed,angle){
+    if(angle===undefined || angle===null){
+        this.acceleration_angle_default=true;
+    }else{
+        this.acceleration_angle_default=false;
+        this.acceleration_angle=angle;
+    }
+    this.max_speed=maxspeed;
+    this.acceleration=acc;
+};
+
+
 function stgSetRotate(angle,obj){
     obj=obj||stg_target;
     if(!obj.rotate)obj.rotate=[0,0,0];
