@@ -235,17 +235,18 @@ BossDynamicAura.prototype.on_render=function(gl,target){
     var v2=(this.pos[1]+s)/h;
     this.tscreen.buffer.set([u1,v1,u1,v2,u2,v2,u2,v1]);
     this.tscreen.uploadData();
-    blend_default();
+    blend_test1();
     _webGlUniformInput(hyzAuraShader,"uWindow",webgl2DMatrix(w,h));
     GlBufferInput(hyzAuraShader,"aPosition",this.screen);
     GlBufferInput(hyzAuraShader,"aTexture",this.tscreen);
-    _webGlUniformInput(hyzAuraShader,"uColor",[1,1,1,0.8]);
+    _webGlUniformInput(hyzAuraShader,"uColor",[1,1,1,1]);
     _webGlUniformInput(hyzAuraShader,"uT",[f,-f,s]);
     _webGlUniformInput(hyzAuraShader,"uSize",[w,h]);
     _webGlUniformInput(hyzAuraShader,"uPosition",[this.pos[0],this.pos[1]]);
     _webGlUniformInput(hyzAuraShader,"texture",this.target);
     gl.drawArrays(gl.TRIANGLE_FAN,0,4);
     gl.useProgram(hyzPrimitive2DShader.program);
+    blend_default();
 
 };
 BossDynamicAura.prototype.finalize=function(){
@@ -501,3 +502,55 @@ BossSpellInitObject.prototype.script=function(){
         stgDeleteSelf();
     }
 };
+
+function bossDefineNonSpellA(boss,spell,life,time){
+    stgApplyEnemy(spell);
+    spell.life=life;
+    spell.max_life=life;
+    spell.time=time;
+    spell.is_spell=false;
+    spell.keep=true;
+    spell.boss=boss;
+    spell.base=new StgBase(boss,stg_const.BASE_COPY,0);
+}
+
+
+function bossDefineSpellA(boss,spell,name,life,time,score,resistance){
+    stgApplyEnemy(spell);
+    spell.name=name;
+    spell.life=life;
+    spell.max_life=life;
+    spell.time=time;
+    spell.score=score;
+    spell.shot_resistance=resistance||0.8;
+    spell.is_spell=true;
+    spell.keep=true;
+    spell.boss=boss;
+    spell.base=new StgBase(boss,stg_const.BASE_COPY,0);
+}
+
+function bossWanderSingle(boss,toward_player,x_range,y_range,time){
+    if(toward_player){
+        var p=hyzGetRandomPlayer(boss.sid);
+        if(!p){
+            x_range=stg_rand(-x_range,x_range);
+        }else{
+            if(p.pos[0]<boss.pos[0]){
+                x_range=stg_rand(-x_range,0);
+            }else{
+                x_range=stg_rand(0,x_range);
+            }
+        }
+
+    }else{
+        x_range=stg_rand(-x_range,x_range);
+    }
+    y_range=stg_rand(-y_range,y_range);
+    if(x_range+boss.pos[0]<16){
+        x_range=-x_range;
+    }
+    if(x_range+boss.pos[0]>stg_frame_w-16){
+        x_range=-x_range;
+    }
+    luaMoveTo(x_range+boss.pos[0],y_range+boss.pos[1],time,1,boss);
+}

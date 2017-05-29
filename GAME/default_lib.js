@@ -658,3 +658,39 @@ EnemyBreakParticle.prototype.script=function(){
         renderSetSpriteScale(4*f,1*f, this);
     }
 };
+
+function stgIsParent(parent,object){
+    while(object.parent && object.parent!=object){
+        object=object.parent;
+        if(object==parent)return true;
+    }
+}
+
+function stgDeleteSubShot(parent,toitem){
+    for(var i=0;i<_pool.length;i++){
+        var a=_pool[i];
+        if(!a.remove && a.type==stg_const.OBJ_BULLET){
+            if(stgIsParent(parent,a)){
+                if(toitem) {
+                    deleteShotToItem(a);
+                }else{
+                    stgDeleteObject(a);
+                }
+            }
+        }
+    }
+}
+
+function stgClipObject(xmin,xmax,ymin,ymax,obj){
+    obj=obj||stg_target;
+    var x=obj.pos[0];
+    var y=obj.pos[1];
+    x=x<xmin?xmin:(x>xmax?xmax:x);
+    y=y<ymin?ymin:(y>ymax?ymax:y);
+    if(!obj.base || !obj.base.mode){
+        stgSetPositionA1(obj,x,y);
+    }else{
+        obj.pos[0]=x;
+        obj.pos[1]=y;
+    }
+}

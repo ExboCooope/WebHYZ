@@ -28,9 +28,13 @@ hyz_loader.init=function(){
         stgLoadSE("se_cast","se/se_cat00.wav").ready=1;
         stgLoadSE("se_boss_cast","se/se_ch02.wav").ready=1;
         stgLoadSE("se_enemy_dead","se/se_enep00.wav").ready=1;
+        stgLoadSE("se_shot0","se/se_tan00.wav").ready=1;
+        stgLoadSE("se_shot1","se/se_tan01.wav").ready=1;
+        stgLoadSE("se_shot2","se/se_tan02.wav").ready=1;
 
         stgLoadModule("enemy_system");
         stgLoadModuleObject(esp);
+        stgLoadModuleObject(BossSLZ);
         stgLoadModule("boss_system");
 
         loadHyzFont();
@@ -74,7 +78,6 @@ hyz_loader.init=function(){
         stgCreateImageTexture("3dTex2","bg/wall.png");
         stgCreateImageTexture("3dTex3","bg/floor.png");
         stgCreateImageTexture("laser1","laser.png");
-        stgCreateImageTexture("cardbg2_c","cardbg2_c.png");
         stgCreateImageTexture("life","LifeGauge.png");
         stgCreateImageTexture("particle","particles.png");
         stgCreateImageTexture("slz","slz.png");

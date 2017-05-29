@@ -126,7 +126,8 @@ var hyzPrimitive2DShader={
         "varying vec4 vColor;" +
         "void main(void){" +
         "vec4 smpColor = texture2D(texture, vTexture);" +
-        // "gl_FragColor  = vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
+//         "gl_FragColor  = vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
+      //  "gl_FragColor  = vec4(smpColor[3],0,0,1.0);" +
         "gl_FragColor  = vec4(vColor[0],vColor[1],vColor[2],1.0)*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3]*vColor[3];" +
         "}",
     input:{
@@ -463,8 +464,10 @@ var hyzSpriteShader={
         "void main(void){" +
         "vec4 smpColor = texture2D(texture, vTexture);" +
        // "gl_FragColor  = vec4(1.0,1.0,1.0,0.0) ;"+
+      //  "gl_FragColor  = smpColor*smpColor[3];" +
        //  "gl_FragColor  = smpColor * vColor ;"+//vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
-        "gl_FragColor  = vec4(vColor[0],vColor[1],vColor[2],1.0)*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3]*vColor[3];" +
+      //  "gl_FragColor  = vec4(vColor[0],vColor[1],vColor[2],1.0)*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3]*vColor[3];" +
+        "gl_FragColor  = vec4(vColor[0],vColor[1],vColor[2],1.0)*smpColor*smpColor[3]*vColor[3];" +
     //   "gl_FragColor  = vColor*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3];" +
         "}",
     input:{
@@ -531,7 +534,7 @@ var hyzAuraShader={
         "vec4 smpColor = texture2D(texture, vTexture+10.0*sin(u)*d/uSize);" +
    //     "vec4 smpColor = texture2D(texture, vTexture);" +
         // "gl_FragColor  = vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
-        "gl_FragColor  = uColor * vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3];" +
+        "gl_FragColor  = uColor * smpColor;" +//vec4(smpColor[0],smpColor[1],smpColor[2],smpColor[3]);" +
         "}",
     input:{
         aPosition:[0,2,null,0,1,0],
@@ -564,9 +567,14 @@ var blend_default=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
 };
+var blend_test1=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+};
 var blend_test2=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
-    _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+    //_gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+    _gl.blendFuncSeparate(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE_MINUS_DST_ALPHA,_gl.ONE);
 };
 var blend_test3=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
@@ -585,3 +593,5 @@ var blend_clear=function(){
     _gl.blendEquation(_gl.FUNC_ADD);
     _gl.blendFuncSeparate(_gl.ZERO,_gl.ONE,_gl.ZERO,_gl.SRC_ALPHA);
 };
+
+blend_default=blend_test2;
