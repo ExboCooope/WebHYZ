@@ -107,9 +107,10 @@ luastg.BossResourceHolder.prototype.script=function(){
     //获得当前动作
     var angle=this.move.speed?this.move.speed_angle/PI180:90;
     var ani=0;
-    if(angle>135 && angle<225){
+    if(angle<0)angle=angle+360;
+    if(angle>125 && angle<215){
         ani=2;
-    }else if(angle<45 || angle>315){
+    }else if(angle<55 || angle>305){
         ani=1;
     }
     if(this.boss.cast){

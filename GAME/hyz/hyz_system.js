@@ -560,6 +560,22 @@ function hyzGetPlayer(sid){
     sid=sid||stg_target.sid;
     return stg_players[sid-1];
 }
+function hyzGetRandomPlayer(sid){
+    sid=sid||stg_target.sid;
+    var i=stg_players_number;
+    var p=[];
+    for(var j=0;j<i;j++){
+        if(hyzIsInOneFrame(stg_players[j],{sid:sid})){
+            p.push(stg_players[j]);
+        }
+    }
+    if(p.length==0){
+        return null;
+    }else{
+        return p[stg_rand_int(0, p.length-1)];
+    }
+}
+
 hyz.battle_style=0;
 function hyzIsInOneFrame(obj1,obj2){
     if(hyz.battle_style==1){

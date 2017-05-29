@@ -372,6 +372,7 @@ function stgApplyBoss(e){
 }
 
 function default_enemy_onhitby(bullet){
+    if(stg_target.invincible)return;
     if(bullet.damage)stg_target.life-=bullet.damage*(1-(stg_target.shot_resistance||0));
 }
 
@@ -1153,7 +1154,7 @@ function _stgMainLoop_Engine(){
                 _hit_by_pool.push(a);
                 a.hit_by_list=[];
             }
-            if(a.hitdef && !a.ignore_hit && !a.invincible){
+            if(a.hitdef && !a.ignore_hit){
                 a.hitdef.update(a);
                 _hit_pool.push(a);
                 a.hit_list=[];

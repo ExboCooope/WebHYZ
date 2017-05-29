@@ -50,7 +50,7 @@ hyz.level.init=function(){
 
     // var e1=new Hyz_enemy(0,0);
   //  hyzAddObject(e1,1);
-    stgAddObject(hyz.enemy_maker);
+   // stgAddObject(hyz.enemy_maker);
 
 /*
     var test2=new HeadedLaserA1(12,10+stg_rand(stg_frame_w-10),100,8);
@@ -123,7 +123,9 @@ hyz.level.script=function(){
         blt.side=stg_const.SIDE_PLAYER;
     }*/
    // stg_players[1].key[stg_const.KEY_SHOT]=1;
-
+    if(this.frame==30){
+        hyzSetBattleStyle(1);
+    }
     if(this.frame==60){
         var a=new CircleObject(0,400,0,360,200);
        // hyzAddObject(a,1);
@@ -154,16 +156,6 @@ hyz.level.script=function(){
       //  a.sid=2;
      //   stgAddObject(a);
 
-
-
-
-
-        a={};
-        stgApplyEnemy(a);
-        stgSetPositionA1(a,200,200);
-        var b=new EnemyFairyHolder(a,0,128,48,48);
-        hyzAddObject(a,2);
-        hyzAddObject(b,2);
 
 
 
@@ -201,8 +193,8 @@ hyz.level.script=function(){
     if(this.frame%12==1){
         this._t1=this._t1||0;
         this._t1++;
-        var a=stgCreateShotA1(50,50,3,90,"sXY",0,this._t1%8);
-        a.sid=1;
+      //  var a=stgCreateShotA1(50,50,3,90,"sXY",0,this._t1%8);
+      //  a.sid=1;
         /*
         for(var i=0;i<1;i++){
             this.sid=2;

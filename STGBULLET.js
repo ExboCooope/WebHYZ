@@ -62,9 +62,10 @@ function stgStopWShot(){
     })
 }
 
-function stgCreateShotW1(x,y,speed,angle,bulletname,delay,color,n,speed_add,angle_add,delay_add){
+function stgCreateShotW1(x,y,speed,angle,bulletname,delay,color,n,speed_add,angle_add,delay_add,on_create){
     var blt=[];
     var time=0;
+    var i=0;
     var ShowW1Controller={
         f:0,
         script:function(){
@@ -73,7 +74,10 @@ function stgCreateShotW1(x,y,speed,angle,bulletname,delay,color,n,speed_add,angl
                 return;
             }
             while(this.f>=time) {
-                blt.push(stgCreateShotA1(x,y,speed,angle,bulletname,delay,color));
+                var a=stgCreateShotA1(x,y,speed,angle,bulletname,delay,color);
+                if(on_create)on_create(a,i);
+                i++;
+                blt.push(a);
                 speed+=speed_add;
                 angle+=angle_add;
                 time+=delay_add;
@@ -96,7 +100,7 @@ function stgCreateShotW1(x,y,speed,angle,bulletname,delay,color,n,speed_add,angl
 }
 
 
-function stgCreateShotW2(x,y,speed,angle_center,bulletname,delay,color,n,speed_max,angle_spread,delay_total){
+function stgCreateShotW2(x,y,speed,angle_center,bulletname,delay,color,n,speed_max,angle_spread,delay_total,on_create){
     var blt=[];
     var time=0;
     var angle_add=angle_spread/(n-1);
@@ -108,6 +112,7 @@ function stgCreateShotW2(x,y,speed,angle_center,bulletname,delay,color,n,speed_m
         speed_add=0;
         delay_add=0;
     }
+    var i=0;
     var ShowW1Controller={
         f:0,
         script:function(){
@@ -116,7 +121,10 @@ function stgCreateShotW2(x,y,speed,angle_center,bulletname,delay,color,n,speed_m
                 return;
             }
             while(this.f>=time) {
-                blt.push(stgCreateShotA1(x,y,speed,angle,bulletname,delay,color));
+                var a=stgCreateShotA1(x,y,speed,angle,bulletname,delay,color);
+                if(on_create)on_create(a,i);
+                i++;
+                blt.push(a);
                 speed+=speed_add;
                 angle+=angle_add;
                 time+=delay_add;
