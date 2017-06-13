@@ -643,10 +643,19 @@ function renderApply2DCenter(oRender,vaCenterXY){
 function renderApplyFullTexture(oRender,sTextureName){
     oRender.texture=sTextureName;
     var tex=stg_textures[sTextureName];
-    oRender.uvt=[0,tex.height,tex.width,-tex.height];
-    oRender.offset=[0,0];
-    oRender.rotate=0;
-    oRender.scale=[1,1];
+    if(tex.type==stg_const.TEX_IMG){
+        oRender.uvt=[0,0,tex.width,tex.height];
+        oRender.offset=[0,0];
+        oRender.rotate=0;
+        oRender.scale=[1,1];
+
+    }else{
+        oRender.uvt=[0,tex.height,tex.width,-tex.height];
+        oRender.offset=[0,0];
+        oRender.rotate=0;
+        oRender.scale=[1,1];
+
+    }
 }
 
 function RenderText(x,y,text){

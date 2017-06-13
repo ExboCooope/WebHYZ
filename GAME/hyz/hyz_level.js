@@ -90,10 +90,6 @@ hyz.level.script=function(){
         var ai=new BasicAI(stg_players[1]);
         stgAddObject(ai);
 
-
-
-
-
     }
     if(this.frame==30){
         var a=new CircleObject(18,27,0,360,96);
@@ -140,6 +136,7 @@ hyz.level.script=function(){
            // a.a0+=1;
            // a.a1+=1;
         };
+
 /*
         stgCreateShotA1(120,120,0,0,"sMD",0,0);
         stg_last.sid=1;
@@ -150,14 +147,17 @@ hyz.level.script=function(){
         renderSetSpriteScale(10,1,stg_last);
 */
         a=new BossSLZ();
-        a.sid=1;
-        stgAddObject(a);
-       // a=new BossSLZ();
-      //  a.sid=2;
+       a.sid=1;
+       stgAddObject(a);
+
+
+
+     //   a=new BossSLZ();
+     //   a.sid=2;
      //   stgAddObject(a);
 
-
-
+      //  stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 0, 0, "mGHD", 0, 0);
+       // stg_last.sid=1;
 
      //   var blt = stgCreateShotA1(stg_frame_w/2, stg_frame_h/2, 3, 0, "sLD", 0, 0);
      //   blt.sid = 1;

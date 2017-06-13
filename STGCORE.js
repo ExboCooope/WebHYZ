@@ -228,6 +228,17 @@ StgHitDef.prototype.setLaserA2=function(x1,y1,r1,x2,y2,r2){
     this.rdir=this.dir;
     return this;
 };
+
+StgHitDef.prototype.setCircleA1=function(x,y,rmin,rmax){
+    this.type=0;
+    this.pos=[x,y];
+    this.rpos=[x,y];
+    this.range=rmax;
+    this.rs=rmin;
+    this.re=rmax;
+    return this;
+}
+
 StgHitDef.prototype.setEllipse=function(x,y,dir,r1,r2){
     this.type=2;
     this.pos=[x,y];
@@ -357,6 +368,12 @@ function stgDist(p1,p2){
         rate=stgDist(p1,p2);
         p2.type=2;
         return rate;
+    }else if(p1.type==0 && p2.type==3){
+        var d = sqrt2(p1.rpos,p2.rpos)-(p2.rs+p2.re)/2;
+        if(d<0)d=-d;
+        return d-p1.range-(p2.re-p2.rs)/2;
+    }else if(p1.type==3 && p2.type==0){
+        return stgDist(p2,p1);
     }
     return 100;
 }
@@ -503,15 +520,24 @@ function _stgMainLoop_BeforeHit(){
 }
 
 function _stgMainLoop_RunScript(){
+    stg_local_player=stg_players[stg_local_player_pos];
     for(var i in _pool){
         if(_pool[i].active){
             if(_pool[i].script){
                 if(stg_super_pause_time && !_pool[i].ignore_super_pause){
                     continue;
                 }
-                stg_local_player=stg_players[stg_local_player_pos];
+
                 stg_target=_pool[i];
                 _pool[i].script();
+            }
+            if(_pool[i]._system){
+                if(stg_super_pause_time && !_pool[i].ignore_super_pause){
+                    continue;
+                }
+
+                stg_target=_pool[i];
+                _pool[i]._system();
             }
         }
     }
@@ -1081,7 +1107,7 @@ function _stgMainLoop_Engine(){
                     a.pos[0]= a.base.target.pos[0];
                     a.pos[1]= a.base.target.pos[1];
                     a.pos[2]= a.base.target.pos[2];
-                    if(a.rotate) {
+                    if(a.rotate && a.base.target.rotate) {
                         a.rotate[0] = a.base.target.rotate[0];
                         a.rotate[1] = a.base.target.rotate[1];
                         a.rotate[2] = a.base.target.rotate[2];
@@ -1094,7 +1120,7 @@ function _stgMainLoop_Engine(){
                     a.pos[0] += a.base.target.pos[0];
                     a.pos[1] += a.base.target.pos[1];
                     a.pos[2] += a.base.target.pos[2];
-                    if (a.rotate) {
+                    if (a.rotate && a.base.target.rotate) {
                         a.rotate[0] += a.base.target.rotate[0];
                         a.rotate[1] += a.base.target.rotate[1];
                         a.rotate[2] += a.base.target.rotate[2];
@@ -1114,7 +1140,7 @@ function _stgMainLoop_Engine(){
                     a.pos[0] =tmpx;
                     a.pos[1] =tmpy;
                     a.pos[2] += a.base.target.pos[2];
-                    if (a.rotate) {
+                    if (a.rotate && a.base.target.rotate) {
                         a.rotate[0] += a.base.target.rotate[0];
                         a.rotate[1] += a.base.target.rotate[1];
                         a.rotate[2] += a.base.target.rotate[2];
@@ -1317,7 +1343,7 @@ function stgAddObject(oStgObject){
         if(!(tmp.side===undefined)){
             oStgObject.side=tmp.side;
         }
-        if(!(tmp.sid===undefined)){
+        if(oStgObject.sid===undefined){
             oStgObject.sid=tmp.sid;
         }
         oStgObject.parent=tmp;

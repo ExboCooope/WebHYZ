@@ -302,27 +302,6 @@ function defaultShowBGM(sBGMName){
 }
 
 
-function BossHolder(){
-
-}
-
-BossHolder.prototype.init=function(){
-
-};
-
-BossHolder.prototype.script=function(){
-
-};
-
-function BossLifeBar(boss){
-    this.boss=boss;
-
-}
-
-BossLifeBar.prototype.init=function(){
-
-};
-
 function IsPC()
 {
     var userAgentInfo = navigator.userAgent;
@@ -694,3 +673,78 @@ function stgClipObject(xmin,xmax,ymin,ymax,obj){
         obj.pos[1]=y;
     }
 }
+
+function StraightLaser(l1,l2,head,tail,width,texwidth){
+    this._width=width;
+    this._texwidth=texwidth;
+    this.w=width;
+    this.l1=l1;
+    this.l2=l2;
+    this.head=head;
+    this.tail=tail;
+    this._invalid=1;
+}
+StraightLaser.prototype.setWidth=function(w){
+    this.w=w;
+};
+StraightLaser.prototype.init=function(){
+    this.vtx=new HyzPrimitive2DVertexList(8);
+    this.vtx.setColor(255,255,255,255);
+};
+StraightLaser.prototype.setTexture=function(textureName,tu1,tu2,tv1,tv2,tv3,mode){
+    var v=this.vtx;
+    v.setTextureName(textureName);
+    if(!mode) {
+        v.setTextureI(0,tu1,tv1,0);
+        v.setTextureI(0,tu2,tv1,1);
+        v.setTextureI(0,tu1,tv2,2);
+        v.setTextureI(0,tu2,tv2,3);
+        v.setTextureI(0,tu1,tv3,4);
+        v.setTextureI(0,tu2,tv3,5);
+    }else{
+        v.setTextureI(0,tv1,tu1,0);
+        v.setTextureI(0,tv1,tu2,1);
+        v.setTextureI(0,tv2,tu1,2);
+        v.setTextureI(0,tv2,tu2,3);
+        v.setTextureI(0,tv3,tu1,4);
+        v.setTextureI(0,tv3,tu2,5);
+    }
+    v.update(0,1,0);
+
+};
+StraightLaser.prototype._system=function(){
+    var x=this.pos[0];
+    var y=this.pos[1];
+    var r=this.rotate[3];
+    var s=sin(r);
+    var c=cos(r);
+    var tw=this._width?this.w*(this._texwidth/this._width):0;
+    tw=tw/2;
+    var w=this.w;
+    var v=this.vtx;
+    var l=this.l1-this.tail;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,0);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,1);
+    l=this.l1;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,2);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,3);
+    l=this.l2;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,4);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,5);
+    l=this.l2+this.head;
+    v.update(1,0,0);
+};
+StraightLaser.prototype.on_render=function(gl){
+    if(this.blend){
+        this.blend();
+    }
+    this.vtx.use();
+    hyzSetPrimitiveOffset(0,0);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,6);
+    if(this.blend){
+        blend_default();
+    }
+};
+StraightLaser.prototype.finalize=function(){
+    this.vtx.clear();
+};

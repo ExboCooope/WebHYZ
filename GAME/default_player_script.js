@@ -283,3 +283,48 @@ TestOption.prototype.script=function(){
         this.shotf--;
     }
 };
+
+function playerLoadAnimationTh(resname,resfile){
+    stgCreateImageTexture(resname,resfile);
+    renderCreate2DTemplateA1(resname+"_normal",resname,0,0,32,48,32,0,0,1);
+    renderCreate2DTemplateA1(resname+"_left",resname,0,48,32,48,32,0,0,1);
+    renderCreate2DTemplateA1(resname+"_right",resname,0,96,32,48,32,0,0,1);
+    renderCreate2DTemplateA1(resname+"_option",resname,64,144,16,16,16,0,0,1);
+}
+
+function playerAnimationTh(player,resholder,resname){
+    var b=player;
+    var a=resholder;
+    a.layer=stg_const.LAYER_PLAYER;
+    var ta= b.key[stg_const.KEY_LEFT]- b.key[stg_const.KEY_RIGHT];
+    if(!ta)ta=0;
+
+    a.aminef++;
+    if(a.aminef==4){
+        a.aminef=0;
+        a.amines++;
+        if( a.amines>7){
+            a.amines= (a.amine?4:0);
+        }
+    }
+    if(a.amine!=ta){
+        a.amine=ta;
+        a.amines=0;
+    }
+    b.update=1;
+    if(a.amine==0) {
+        renderApply2DTemplate(b.render, resname+"_normal", a.amines);
+    }else if(a.amine==-1) {
+        renderApply2DTemplate(b.render, resname+"_right", a.amines);
+    }else if(a.amine==1) {
+        renderApply2DTemplate(b.render,  resname+"_left", a.amines);
+    }
+}
+
+function playerAnimationInitTh(player){
+    var a=player;
+    a.amine=0;
+    a.aminef=0;
+    a.amines=0;
+    renderCreateSpriteRender(a);
+}

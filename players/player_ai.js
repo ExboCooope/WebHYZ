@@ -64,7 +64,7 @@ BasicAI.prototype.scriptx=function(){
     var pool=[];
     for(var i=0;i<n;i++){
         var a=_hit_pool[i];
-        if(a.side==stg_const.SIDE_ENEMY){
+        if(a.side==stg_const.SIDE_ENEMY && a.type!=stg_const.OBJ_ITEM){
             if(hyzIsInOneFrame(a,player)){
                 if(aiDist(a.hitdef,this.player.hitby,BasicAI.res)<this.aware_range){
                     if(res[0]<3)res[0]=3;

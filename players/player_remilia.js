@@ -15,7 +15,7 @@ Player_Remilia.prototype.init=function(){
     var b=new StgObject();
     _StgDefaultPlayer(b);
     b.hitby=new StgHitDef();
-    b.hitby.setPointA1(0,0,2);
+   b.hitby.setPointA1(0,0,0);
     b.on_death=Player_Remilia.on_death;
     b.on_collect=function(){
         stgPlaySE("se_item");

@@ -55,9 +55,7 @@ SmearCleanUpObject.prototype.script=function(){
 };
 
 function hyzAddObject(object,side){
-    if(side){
-        object.sid=side;
-    }
+    object.sid=side||0;
     stgAddObject(object);
 }
 
@@ -288,10 +286,12 @@ hyz_system_script.init=function(){
     var a=new HyzHitChainShower();
     hyzAddObject(a,1);
     */
-    var b=new HyzUI(0,1);
-    stgAddObject(b);
-    var c=new HyzUI(1,2);
-    stgAddObject(c);
+    for(var i=0;i<stg_players_number;i++) {
+        var b=new HyzUI(i,i+1);
+        stgAddObject(b);
+
+    }
+
 };
 
 hyz_system_script.playerintersect=function(){
@@ -610,7 +610,7 @@ function hyzSetBattleStyle(style,changetype){
             stgDeleteObject(hyz.right_bg_object);
             stgDeleteObject(hyz.left_screen_object);
             stgDeleteObject(hyz.right_screen_object);
-            hyzAddObject(hyz.full_bg_object,0);
+            hyzAddObject(hyz.full_bg_object,3);
             hyzAddObject(hyz.full_screen_object,0);
             hyz.base[2][0]=320;
 

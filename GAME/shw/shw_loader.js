@@ -2,13 +2,13 @@
  * Created by Exbo on 2017/1/2.
  */
 
-var hyz={};
+var shw={};
 
-var hyz_loader={
+var shw_loader={
     loaded:0
 };
 
-hyz_loader.init=function(){
+shw_loader.init=function(){
     stgPauseSE(null,"BGM");
     stg_in_replay=0;
     if(!this.loaded){
@@ -46,18 +46,18 @@ hyz_loader.init=function(){
         stg_height=480;
         stg_width=640;
 
-        stg_frame_w=288;
+        stg_frame_w=384;
         stg_frame_h=448;
 
         var p=stgLoadData("render_type");
         p=0;
         stgCreateCanvas("frame",stg_width/*608*/,stg_height,stg_const.TEX_CANVAS3D);
         stgCreateCanvas("frame_bg",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_left",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_full",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
-        stgCreateCanvas("frame_full_bg",608,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+    //    stgCreateCanvas("frame_left",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateCanvas("frame_full",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+        stgCreateCanvas("frame_full_bg",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 
-        stgCreateCanvas("frame_right",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
+    //    stgCreateCanvas("frame_right",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
 
         stg_main_canvas=stgCreateCanvas("ui",stg_width,stg_height,stg_const.TEX_CANVAS2D);
         stgCreateCanvas("back",stg_width,stg_height,stg_const.TEX_CANVAS2D);
@@ -69,7 +69,7 @@ hyz_loader.init=function(){
 
         //显示canvas
         stgShowCanvas("back", 0, 0, 0, 0, 0);
-        stgShowCanvas("frame", 0, 0, 0, 0, 1);
+        stgShowCanvas("frame", 0, 0, 0, 0, 5);
         stgShowCanvas("ui", 0, 0, 0, 0, 20);
         //载入渲染器
         stgAddShader("sprite_shader",hyzSpriteShader);
@@ -102,13 +102,13 @@ hyz_loader.init=function(){
 
 
         stgCreateProcedure1("drawBackground","back",0,19,"testShader2","#DDD");
-        stgCreateProcedure2("drawLeftFrame","frame_left",20,80,["sprite_shader","basic_shader"],"#000");
-        stgCreateProcedure2("drawRightFrame","frame_right",20,80,["sprite_shader","basic_shader"],"#000");
+    //    stgCreateProcedure2("drawLeftFrame","frame_left",20,80,["sprite_shader","basic_shader"],"#000");
+     //   stgCreateProcedure2("drawRightFrame","frame_right",20,80,["sprite_shader","basic_shader"],"#000");
 
         stgCreateProcedure2("drawFullFrame","frame_full",20,80,["sprite_shader","basic_shader"],"#000");
 
         stgCreateProcedure1("drawCombineFrame","frame",201,300,"sprite_shader","#000");
-        stgCreateProcedure1("drawBGFrame","frame_bg",101,200,"3d_shader","#FFF");
+    //    stgCreateProcedure1("drawBGFrame","frame_bg",101,200,"3d_shader","#FFF");
         stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"3d_shader","#FFF");
 
         stgCreateProcedure1("drawUI","ui",81,100,"testShader2","#000");
@@ -119,8 +119,8 @@ hyz_loader.init=function(){
 
         //stg_procedures["drawRightFrame"].transparent=1;
        // stg_procedures["drawLeftFrame"].transparent=1;
-        stg_procedures["drawRightFrame"].sid=2;
-        stg_procedures["drawLeftFrame"].sid=1;
+      //  stg_procedures["drawRightFrame"].sid=2;
+      //  stg_procedures["drawLeftFrame"].sid=1;
         stg_procedures["drawFullFrame"].sid=3;
 
 
@@ -134,9 +134,9 @@ hyz_loader.init=function(){
         }
 
         //设置只有一个玩家
-        stg_players_number=2;
+        stg_players_number=1;
         stg_local_player_pos=0;
-        stg_local_player_slot=[0,1];
+        stg_local_player_slot=[0];
         //创建输入设备
         stgCreateInput(0)//延迟为0
         //设置随机种子
@@ -150,31 +150,14 @@ hyz_loader.init=function(){
         stg_pause_script=hyz.pause_script;
         stg_system_script=hyz_system_script;
 
-        stgSetPositionA1(hyz.left_bg_object,0,0);
-        hyz.left_bg_object.layer=20;
-        hyz.left_bg_object.sid=1;
-        ApplyFullTexture(hyz.left_bg_object,"frame_bg");
-        stgSetPositionA1(hyz.left_screen_object,16,16);
-        hyz.left_screen_object.layer=202;
-        ApplyFullTexture(hyz.left_screen_object,"frame_left");
-        stgSetPositionA1(hyz.right_bg_object,0,0);
-        hyz.right_bg_object.layer=20;
-        hyz.right_bg_object.sid=2;
-        ApplyFullTexture(hyz.right_bg_object,"frame_bg");
-
-        stgSetPositionA1(hyz.right_screen_object,336,16);
-        hyz.right_screen_object.layer=202;
-        ApplyFullTexture(hyz.right_screen_object,"frame_right");
-
-
 
         stgSetPositionA1(hyz.full_bg_object,0,0);
         hyz.full_bg_object.layer=20;
         hyz.full_bg_object.sid=3;
         ApplyFullTexture(hyz.full_bg_object,"frame_full_bg");
 
-        stgSetPositionA1(hyz.full_screen_object,16,16);
-        hyz.full_screen_object.layer=202;
+        stgSetPositionA1(hyz.full_screen_object,36,16);
+        hyz.full_screen_object.layer=220;
         ApplyFullTexture(hyz.full_screen_object,"frame_full");
 
 /*
@@ -187,18 +170,24 @@ hyz_loader.init=function(){
         hyz.right_screen_object_2.layer=201;
         ApplyFullTexture(hyz.right_screen_object_2,"frame_right_smear");
 
-*/
+*/      stg_procedures["drawBGFrame"]={};
 
 
         gLoadMenuSystem();
 
         hyz.item_start.on_select={
             init:function(){
-                stgStartLevel("hyz_level",["remilia","player_byakuren"],{});
+                stgStartLevel("shw_level",["remilia"],{});
             }
         }
+
+        stgCreateImageTexture("game_frame_bg_img","GAME/shw/frame_bg.png");
+        stgSetPositionA1(shw.game_frame_bg,0,0);
+        shw.game_frame_bg.layer=201;
+
+
     }
-    stg_display = ["drawBackground","drawUI"];
+    stg_display = ["drawBackground","drawCombineFrame","drawUI"];
     stgAddObject(hyz.resolution);
     stgAddObject(hyz.main_menu);
     stgDeleteSelf();
@@ -208,15 +197,18 @@ hyz_loader.init=function(){
         hyz.item_playreplay.selectable=1;
         hyz.item_savereplay.selectable=1;
         hyz.main_menu.setColor("#88F","#880");
-        stgHideCanvas("frame");
+      //  stgHideCanvas("frame");
     }
     stgClearCanvas("ui");
 
 };
 
-hyz_loader.script=function(){
+shw_loader.script=function(){
     //
 };
+
+shw.game_frame_bg={};
+
 
 function ApplyFullTexture(obj,name){
     obj.render=new StgRender("sprite_shader");

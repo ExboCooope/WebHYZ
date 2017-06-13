@@ -14,14 +14,27 @@ function stgCreate2DBulletTemplateA1(sTemplateName,sTextureName,vX,vY,vW,vH,iCol
     };
 }
 
+function stgCreate2DBulletTemplateA2(sTemplateName,sTemplateNameList,delay){
+    var a=BULLET[sTemplateNameList[0]];
+    BULLET[sTemplateName]={
+        tex:a.tex,
+        data:a.data,
+        c: a.c,
+        hit: a.hit,
+        misc: a.misc,
+        anim: sTemplateNameList,
+        delay:delay
+    };
+}
+
 var LASER={};
 
 var _hit_box_tiny=new StgHitDef();
 _hit_box_tiny.range=1;
 var _hit_box_small=new StgHitDef();
-_hit_box_small.range=4;
+_hit_box_small.range=2;
 var _hit_box_medium=new StgHitDef();
-_hit_box_medium.range=7;
+_hit_box_medium.range=4;
 var _hit_box_large=new StgHitDef();
 _hit_box_large.range=14;
 var _hit_box_laser={};
@@ -59,12 +72,32 @@ function bullet00Assignment(){
     stgCreate2DBulletTemplateA1("plMainShot2","siki_body",192,144,64,16,0,0,0,1,_hit_box_large,{move_rotate:1,alpha:150});
     stgCreate2DBulletTemplateA1("plMainShot3","siki_body",0,144+32,64,16,0,0,0,1,_hit_box_large,{move_rotate:1,alpha:150});
 
+    stgCreate2DBulletTemplateA1("mGHD0","bullet",256,384,32,32,32,0,PIUP,1,_hit_box_medium,{move_rotate:1});
+    stgCreate2DBulletTemplateA1("mGHD1","bullet",256,384+32,32,32,32,0,PIUP,1,_hit_box_medium,{move_rotate:1});
+    stgCreate2DBulletTemplateA1("mGHD2","bullet",256,384+64,32,32,32,0,PIUP,1,_hit_box_medium,{move_rotate:1});
+    stgCreate2DBulletTemplateA1("mGHD3","bullet",256,384+96,32,32,32,0,PIUP,1,_hit_box_medium,{move_rotate:1});
+    stgCreate2DBulletTemplateA2("mGHD",["mGHD0","mGHD1","mGHD2","mGHD3"],6);
+
+
     stgAddShader("sprite_shader",default_2d_shader);
     stg_bullet_parser=render01BltParser;
 
     stgCreateImageTexture("break_circle","th14_BreakCircle.png");
     renderCreate2DTemplateA1("bcircle","break_circle",0,0,256,256,0,0,0,1);
 
+}
+
+function render01AnimeFunc(){
+    this._anim++;
+    if(this._anim>this._animt){
+        this._anim=0;
+        this._animi++;
+        if(this._animi>=this._anims.length){
+            this._animi=0;
+        }
+        _renderApply2DTemplate(this.render,BULLET[this._anims[this._animi]],this.color);
+        this.update=true;
+    }
 }
 
 function render01BltParser(object,name){
@@ -80,6 +113,14 @@ function render01BltParser(object,name){
     }
     if(name=="tDD"){
         hyz.dot_pool.add(object);
+    }
+    if(BULLET[name].anim){
+        object._anim=0;
+        object._animt=BULLET[name].delay;
+        object._animi=0;
+        object._anims=BULLET[name].anim;
+        object._system=render01AnimeFunc;
+
     }
 }
 

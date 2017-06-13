@@ -9,7 +9,10 @@ function BossSLZ(){
 BossSLZ.pre_load=function(){
     stgCreateImageTexture("cardbg2_c","cardbg2_c.png");
     stgCreateImageTexture("cardbg2_d","cardbg2_d.png");
+    stgCreateImageTexture("enemy1","res/enemy1.png");
     renderCreate2DTemplateA1("cardbg2_d","cardbg2_d",-256,-256,1024,1024,0,0,0,1);
+    renderCreate2DTemplateA1("slz_option1","enemy1",48*4,0,32,32,32,0,0,1);
+    renderCreate2DTemplateA1("slz_option2","enemy1",48*4,32,32,32,32,0,0,1);
 };
 
 BossSLZ.prototype.init=function(){
@@ -34,7 +37,7 @@ BossSLZ.prototype.init=function(){
     this.phase=[];
     this.finished=false;
     stgBossClearPhase();
-    //stgBossAddPhase([new BossSLZ.Spell2(this)]);
+    stgBossAddPhase([new BossSLZ.NonSpell5(this)]);
     stgBossAddPhase([new BossSLZ.NonSpell1(this),new BossSLZ.Spell1(this)]);
     stgBossAddPhase([new BossSLZ.NonSpell2(this),new BossSLZ.Spell2(this)]);
 
@@ -67,6 +70,27 @@ BossSLZ.prototype.script=function(){
         }
 
     }
+};
+
+
+BossSLZ.NonSpell0=function(boss){
+    bossDefineNonSpellA(boss,this,7500,30*60);
+    this.hitby=new StgHitDef();
+    this.hitby.setPointA1(0,0,50);
+    this.hitdef=new StgHitDef();
+    this.hitdef.setPointA1(0,0,32);
+};
+BossSLZ.NonSpell0.prototype.init=function(){
+    this.invincible=120;
+    luaMoveTo(stg_frame_w/2,80,60,1,this.boss);
+    stgAddObject(new BossSpellInitObject(this));
+};
+BossSLZ.NonSpell0.prototype.script=function(){
+
+    if(stgDefaultFinishSpellCheck(60)){
+        stgDeleteSubShot(this,true);
+    }
+    stgClipObject(32,stg_frame_w-32,32,stg_frame_h/2-32,this.boss);
 };
 
 BossSLZ.NonSpell1=function(boss){
@@ -504,7 +528,175 @@ BossSLZ.Spell2.dyCreate=function(blt,index){
     blt.script=BossSLZ.Spell1.dyScript;
 };
 
+BossSLZ.NonSpell3=function(boss){
+    bossDefineNonSpellA(boss,this,7500,30*60);
+    this.hitby=new StgHitDef();
+    this.hitby.setPointA1(0,0,50);
+    this.hitdef=new StgHitDef();
+    this.hitdef.setPointA1(0,0,32);
+};
+BossSLZ.NonSpell3.prototype.init=function(){
+    this.invincible=120;
+    luaMoveTo(stg_frame_w/2,80,60,1,this.boss);
+    stgAddObject(new BossSpellInitObject(this));
+};
+BossSLZ.NonSpell3.prototype.script=function(){
+    if(this.frame==60){
+        stgAddObject(new BossSLZ.NonSpell3.Phase(this));
+    }
+    if(stgDefaultFinishSpellCheck(60)){
+        stgDeleteSubShot(this,true);
+    }
+    stgClipObject(32,stg_frame_w-32,32,stg_frame_h/2-32,this.boss);
+};
 
+BossSLZ.NonSpell3.Phase=function(spell){
+    this.spell=spell;
+    this.c=0;
+};
+BossSLZ.NonSpell3.Phase.prototype.script=function(){
+    if(this.spell.remove){
+        stgDeleteSelf();return;
+    }
+   if(this.frame>660){
+       this.frame=1;
+   }
+
+    if(this.frame==10){
+       // bossWanderSingle(this.spell.boss,0,60,60,60);
+        for(var i=0;i<8;i++){
+            var a=360/8/2+i*360/8;
+            a=a*PI180;
+            var r=48;
+            stgAddObject(new BossSLZ.NonSpell3.Option(this.spell.boss,this.spell,r*sin(a),r*cos(a),i%2));
+        }
+    }
+    if(this.frame>220 && this.frame%90==30){
+        bossWanderSingle(this.spell.boss,true,32,24,30);
+    }
+};
+
+BossSLZ.NonSpell3.Option=function(boss,spell,x,y,mode,color){
+    this.boss=boss;
+    this.spell=spell;
+    this.base=new StgBase(boss,stg_const.BASE_MOVE,1);
+    this.move=new StgMove();
+    this.move.pos[0]=x;
+    this.move.pos[1]=y;
+    this.c=color||0;
+    this.last_slow=-1;
+    renderCreateSpriteRender(this);
+    this.layer=stg_const.LAYER_ENEMY;
+    stgApplyEnemy(this);
+    this.life=100;
+    this.invincible=30;
+    this.mode=mode;
+    this.a=90*PI180;
+};
+
+BossSLZ.NonSpell3.Option.prototype.script=function(){
+
+    var slow=0;
+    for(var i=0;i<2;i++){
+        var a=stg_players[i];
+        if(a.state!=stg_const.PLAYER_DEAD){
+            if(a.key[stg_const.KEY_SLOW]){
+                slow++;
+            }
+        }
+    }
+    slow=slow%2;
+    if(slow!=this.last_slow){
+        renderApply2DTemplate(this.render,slow?"slz_option2":"slz_option1",this.c);
+        this.update=true;
+        this.last_slow=slow;
+        if(slow){
+            this.hitby=0;
+            this.hitdef=0;
+        }else{
+            this.hitby=new StgHitDef();
+            this.hitby.setPointA1(0,0,10);
+            this.hitdef=new StgHitDef();
+            this.hitdef.setPointA1(0,0,8);
+        }
+        stgPlaySE("se_kira02");
+    }
+    if(this.frame>120){
+        if(this.frame%15==0){
+            stgPlaySE("se_shot0");
+            stgCreateShotW2(this.pos[0],this.pos[1],slow?2:4,this.a,"sXY",0,slow?3:5,9,slow?2:4,360,0);
+        }
+        var d=20;
+        if(this.frame>=210){
+            this.a+=this.mode?d*PI180:-d*PI180;
+        }
+
+    }
+    if(this.frame>600){
+        stgDeleteSelf();
+    }
+    if(this.life<0){
+        stgDeleteSelf();
+    }
+};
+
+//阿空非符
+BossSLZ.NonSpell5=function(boss){
+    bossDefineNonSpellA(boss,this,7500,30*60);
+    this.hitby=new StgHitDef();
+    this.hitby.setPointA1(0,0,50);
+    this.hitdef=new StgHitDef();
+    this.hitdef.setPointA1(0,0,32);
+};
+BossSLZ.NonSpell5.prototype.init=function(){
+    this.invincible=120;
+    luaMoveTo(stg_frame_w/2,80,60,1,this.boss);
+    stgAddObject(new BossSpellInitObject(this));
+    this.f=0;
+};
+BossSLZ.NonSpell5.prototype.script=function(){
+    if(this.f==60){
+        this.a1=stg_rand(360);
+    }
+    if(this.f>=60&& this.f<=180 && this.f%6==0){
+        stgCreateShotW2(this.pos[0],this.pos[1],1,this.a1,"mZY",0,4,60,1,360,0,BossSLZ.NonSpell5.wshot1);
+    }
+    if(this.f>=120&& this.f<=240 && this.f%8==0){
+        stgCreateShotW2(this.pos[0],this.pos[1],5,90,"mZY",0,3,60,5,360,0,BossSLZ.NonSpell5.wshot2);
+    }
+    if(this.f==360){
+        bossWanderSingle(this.boss,1,15,5,60);
+    }
+    if(this.f==400){
+        this.f=0;
+    }
+    if(stgDefaultFinishSpellCheck(60)){
+        stgDeleteSubShot(this,true);
+    }
+    this.f++;
+    stgClipObject(32,stg_frame_w-32,70,90,this.boss);
+};
+BossSLZ.NonSpell5.wshot1=function(a,i){
+    a.script=BossSLZ.NonSpell5.shotscript1;
+};
+BossSLZ.NonSpell5.shotscript1=function(){
+    if(this.frame==25){
+        this.move.setAccelerate2(0.2,8);
+        delete this.script;
+    }
+};
+BossSLZ.NonSpell5.wshot2=function(a,i){
+    a.script=BossSLZ.NonSpell5.shotscript2;
+    a.a=i%2;
+};
+BossSLZ.NonSpell5.shotscript2=function(){
+   // if(this.frame==25) {
+   //     this.move.setAccelerate2(0.2, 8);
+   // }
+    if(this.frame>25){
+        this.move.speed_angle+=(this.a?1:-1)*PI180*70/this.frame;
+    }
+};
 
 
 BossSLZ.prototype.spells.push(BossSLZ.NonSpell1);
