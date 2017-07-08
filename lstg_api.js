@@ -50,6 +50,7 @@ luastg.moveTo=function(){
     }
     a.lpos[0]=this.pos[0];
     a.lpos[1]=this.pos[1];
+
 };
 function beziern(target,poss,posl,f){
     var n=posl.length;
@@ -152,7 +153,7 @@ var luastg_runtime={};
 
 luastg._replace_function=function(v){
     return v.search(/\d/)?"luastg_runtime."+v:v;
-}
+};
 
 luastg._expressions={};
 
@@ -165,9 +166,188 @@ luastg.express=function(sexpr){
     eval(s);
     luastg._expressions[sexpr]=luastg._tempfunction;
     return luastg._tempfunction;
-}
+};
 
 function luaSetPosition(x,y,obj){
     obj=obj||stg_target;
     stgSetPositionA1(obj,x+stg_frame_w/2,stg_frame_h/2-y);
+}
+
+function LSTGTaskBase(){
+    this.yield=0;
+    this.ip=0;
+    this.ipa=0;
+    this.restart=0;
+    this.countip=0;
+    this.count=0;
+    this.break=0;
+    this.value={};
+    this.stack=[];
+}
+var _lstgtask={};
+var local=null;
+LSTGTaskBase.prototype.run=function(task){
+    var a=_lstgtask;
+
+    _lstgtask=this;
+    local= _lstgtask.value;
+    _lstgtask.restart=0;
+   // _lstgtask.yield=0;
+    this.countip=0;
+    task();
+    while(_lstgtask.restart){
+        _lstgtask.restart=0;
+        _lstgtask.countip=0;
+        task();
+    }
+    _lstgtask=a;
+    local= a.value;
+};
+LSTGTaskBase.prototype.start_function=function(ips){
+
+};
+
+var task={};
+task._start=function(ips){
+    ips=ips||1;
+    _lstgtask.countip+=ips;
+    if(_lstgtask.countip<=_lstgtask.ip+ips && _lstgtask.countip>_lstgtask.ip){
+        _lstgtask.ips=ips;
+        _lstgtask.ipa=_lstgtask.ip-_lstgtask.countip+ips;
+        _lstgtask.ip=_lstgtask.countip;
+        return true;
+    }else{
+        return false;
+    }
+};
+task._yield=function(count){
+    _lstgtask.yield++;
+    if(_lstgtask.yield>count){
+        _lstgtask.yield=0;
+        return false;
+    }else{
+        _lstgtask.ip-=_lstgtask.ips;
+        return true;
+    }
+};
+task._goto=function(ip){
+    if(ip>=_lstgtask.ip){
+        _lstgtask.ip=ip;
+    }else{
+        _lstgtask.ip=ip;
+        _lstgtask.restart=1;
+    }
+};
+task._begin_block=function(){
+    if(_lstgtask.break){
+        _lstgtask.break++;
+        return 0;
+    }
+    if(!task._start(3))return 0;
+    if(_lstgtask.ipa==0){//first enter
+        _lstgtask.stack.push([_lstgtask.countip-3]);
+        return 1;
+    }else if(_lstgtask.ipa==1){
+        return 2;
+    }else{
+        _lstgtask.stack.pop();
+        _lstgtask.break=1;
+        return 3;
+    }
+};
+
+task._break=function(){
+    _lstgtask.ip=-1;
+    _lstgtask.break=1;
+};
+task._getblock=function(){
+    return _lstgtask.stack[_lstgtask.stack.length-1];
+};
+
+task.wait=function(time){
+    if(!task._start(1))return;
+    task._yield(time);
+};
+task.repeat=function(times,interval){
+    var rt=task._begin_block();
+    if(!rt)return;
+    var n=arguments.length;
+    var i=2;
+    if(rt==1){
+        if(n>2){
+            for(i=2;i<n;i+=3){
+                local[arguments[i]]=arguments[i+1];
+            }
+        }
+        _lstgtask.stack[_lstgtask.stack.length-1][2]=0;
+    }else if(rt==2){
+        var p=_lstgtask.stack[_lstgtask.stack.length-1][2]++;
+
+        if(interval){
+            if(task._yield(interval)){
+                _lstgtask.stack[_lstgtask.stack.length-1][2]--;
+                _lstgtask.ip++;
+                return;
+            }
+        }
+        if(p>=times-1){
+            task._break();
+            return;
+        }
+        if(n>2){
+            for(i=2;i<n;i+=3){
+                local[arguments[i]]+=arguments[i+2];
+            }
+        }
+    }else if(rt==3){
+        task._break();
+        return;
+    }
+};
+
+task.end=function(){
+    if(task._start(1)){//正常运行至end
+        task._goto(task._getblock()[0]+1);
+    }else{
+        if(_lstgtask.break){
+            _lstgtask.break--;
+            if(_lstgtask.break==0){//接到了break
+                _lstgtask.ip=_lstgtask.countip;
+            }
+        }
+    }
+};
+task.code=function(code){
+    if(task._start()){
+        code();
+    }
+};
+task.jump=function(condition){
+    if(!task._start(1))return;
+    if(condition===undefined || condition===null || condition){
+        task._break();
+    }
+};
+
+
+function testTask1(){
+    task.wait(1);
+    task.repeat(100,1,'a',0,1);
+        task.jump(local.a==2);
+        task.code(testTask1.code1);
+    task.end();
+    task.code(testTask1.code2);
+}
+testTask1.code1=function(){
+    console.log(testTask1.a);
+};
+testTask1.code2=function(){
+    console.log("finished!");
+};
+testTask1.a=0;
+var testTask=new LSTGTaskBase();
+function testResume(){
+    testTask1.a++;
+    console.log("pass :"+testTask1.a);
+    testTask.run(testTask1);
 }

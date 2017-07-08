@@ -10,7 +10,8 @@ stg_const.ITEM_LIFE={tex:"item0",color:0,content:"life"};
 
 function deleteShotToItem(shot){
     stgDeleteObject(shot);
-    gCreateItem(shot.pos,stg_const.ITEM_BLT,1,0);
+    var a=gCreateItem(shot.pos,stg_const.ITEM_BLT,1,0);
+    a.attracter=stgGetRandomPlayer();
 }
 
 function deleteAllShot(ignore_resistance){
@@ -25,6 +26,7 @@ function deleteAllShot(ignore_resistance){
 }
 
 function gCreateItem(pos,type,count,range){
+    var a;
     for(var i=0;i<count;i++) {
         var a=new StgObject();
         a.type=stg_const.OBJ_ITEM;
@@ -44,6 +46,7 @@ function gCreateItem(pos,type,count,range){
         a.hitdef.range=4;
         a.layer=stg_const.LAYER_ITEM;
     }
+    return a;
 }
 
 

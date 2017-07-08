@@ -135,7 +135,11 @@ function StgMove(){
 
 StgMove.prototype.setSpeed=function(speed,angle) {
     this.speed=speed;
-    this.speed_angle=angle*PI180;
+    if(angle===undefined){
+
+    }else {
+        this.speed_angle = angle * PI180;
+    }
 };
 
 StgMove.prototype.setAccelerate=function(acc,angle){
@@ -201,15 +205,15 @@ StgHitDef.prototype.setPointA1=function(x,y,r){
 StgHitDef.prototype.setLaserA1=function(x,y,dir,r1,l1,r2,l2){
     this.type=1;
     this.pos=[x,y];
-    this.rpos=[x,y];
+  //  this.rpos=[x,y];
     this.dir=dir;
     this.ls=l1;
     this.le=l2;
     this.rs=r1;
     this.re=r2;
-    this.sdir=sin(dir);
-    this.cdir=cos(dir);
-    this.rdir=dir;
+ //   this.sdir=sin(dir);
+ //   this.cdir=cos(dir);
+  //  this.rdir=dir;
     return this;
 };
 StgHitDef.prototype.setLaserA2=function(x1,y1,r1,x2,y2,r2){
@@ -228,6 +232,28 @@ StgHitDef.prototype.setLaserA2=function(x1,y1,r1,x2,y2,r2){
     this.rdir=this.dir;
     return this;
 };
+
+StgHitDef.prototype.setCircleA1=function(x,y,rmin,rmax){
+    this.type=3;
+    this.pos=[x,y];
+    this.rpos=[x,y];
+    this.range=rmax;
+    this.rs=rmin;
+    this.re=rmax;
+    return this;
+};
+StgHitDef.prototype.setCircleA2=function(x,y,r,rw){
+    this.type=3;
+    this.pos=[x,y];
+    this.rpos=[x,y];
+    var rmax=r+rw/2;
+    var rmin=r-rw/2;
+    this.range=rmax;
+    this.rs=rmin;
+    this.re=rmax;
+    return this;
+};
+
 StgHitDef.prototype.setEllipse=function(x,y,dir,r1,r2){
     this.type=2;
     this.pos=[x,y];
@@ -258,8 +284,10 @@ StgHitDef.prototype.update=function(object){
     var a=this;
     a.rpos[0]= a.pos[0]+ object.pos[0];
     a.rpos[1]= a.pos[1]+ object.pos[1];
-    a.rd= object.rotate[2];
-    a.rdir= a.dir+ object.rotate[2];
+   // if(!a.type)return;
+
+    a.rd= object.rotate?object.rotate[2]:0;
+    a.rdir= a.dir+  a.rd;
     if(a.type==1){
         a.sdir=sin(a.rdir);
         a.cdir=cos(a.rdir);
@@ -357,6 +385,12 @@ function stgDist(p1,p2){
         rate=stgDist(p1,p2);
         p2.type=2;
         return rate;
+    }else if(p1.type==0 && p2.type==3){
+        var d = sqrt2(p1.rpos,p2.rpos)-(p2.rs+p2.re)/2;
+        if(d<0)d=-d;
+        return d-p1.range-(p2.re-p2.rs)/2;
+    }else if(p1.type==3 && p2.type==0){
+        return stgDist(p2,p1);
     }
     return 100;
 }
@@ -385,7 +419,7 @@ function stgApplyBoss(e){
 
 function default_enemy_onhitby(bullet){
     if(stg_target.invincible)return;
-    if(bullet.damage)stg_target.life-=bullet.damage*(1-(stg_target.shot_resistance||0));
+    if(bullet.damage)stg_target.life-=bullet.damage*(1-(stg_target.shot_resistance||0))*2/(1+stg_players_number);
 }
 
 function StgRender(sShaderName){
@@ -431,7 +465,10 @@ function _tickMove(stgMove){
         stgMove._speed[2]+=stgMove._acceleration[2];
     }
     stgMove.speed=sqrt( stgMove._speed[0]* stgMove._speed[0]+ stgMove._speed[1]* stgMove._speed[1]+ stgMove._speed[2]* stgMove._speed[2]);
-    if(stgMove.max_speed && stgMove.speed>stgMove.max_speed)stgMove.speed=stgMove.max_speed;
+    if(stgMove.max_speed && stgMove.acceleration>=0 &&  stgMove.speed>stgMove.max_speed)stgMove.speed=stgMove.max_speed;
+    if(stgMove.max_speed && stgMove.acceleration<0 &&  stgMove.speed<stgMove.max_speed){
+        stgMove.speed=stgMove.max_speed;
+    }
     stgMove.speed_angle=stgMove.speed?atan2(stgMove._speed[1],stgMove._speed[0]):stgMove.speed_angle;
 }
 
@@ -503,15 +540,24 @@ function _stgMainLoop_BeforeHit(){
 }
 
 function _stgMainLoop_RunScript(){
+    stg_local_player=stg_players[stg_local_player_pos];
     for(var i in _pool){
         if(_pool[i].active){
             if(_pool[i].script){
                 if(stg_super_pause_time && !_pool[i].ignore_super_pause){
                     continue;
                 }
-                stg_local_player=stg_players[stg_local_player_pos];
+
                 stg_target=_pool[i];
                 _pool[i].script();
+            }
+            if(_pool[i]._system){
+                if(stg_super_pause_time && !_pool[i].ignore_super_pause){
+                    continue;
+                }
+
+                stg_target=_pool[i];
+                _pool[i]._system();
             }
         }
     }
@@ -541,6 +587,7 @@ function _stgMainLoop_RemoveObjects(){
     _pool.length=j;
     */
     var pool=[];
+    var j=0;
     for(i=0;i<_pool.length;i++){
         if(_pool[i].remove){
             if(_pool[i].finalize){
@@ -549,12 +596,14 @@ function _stgMainLoop_RemoveObjects(){
             }
         }else{
             pool.push(_pool[i]);
+            _pool[i].uid=j++;
         }
     }
     _pool=pool;
 }
 
 function _stgMainLoop(){
+    _stgBgmLoop();
     if(!_stg_no_input){
         if(stg_wait_for_all_texture){
             if(stgCheckResources()){
@@ -799,12 +848,29 @@ function stgRefreshPosition(object) {
     }
 }
 
+function stgAddHitDef(object){
+    if(!object.hit_list){
+        object.hit_list=[];
+    }else{
+        object.hit_list.length=0;
+    }
+    _next_hit_pool.push(object);
+}
+function stgAddHitBy(object){
+    if(!object.hit_by_list){
+        object.hit_by_list=[];
+    }else{
+        object.hit_by_list.length=0;
+    }
+    _next_hitby_pool.push(object);
+}
+
 
 function _stgMainLoop_Hit(){
     var i;
     var j;
     if(stg_super_pause_time>0)return;
-    for(var i in _hit_by_pool){
+    for(var i=0;i<_hit_by_pool.length;i++){
         var a=_hit_by_pool[i];
         var s=a.side;
         if(a.type==stg_const.OBJ_PLAYER){
@@ -880,7 +946,7 @@ function _stgMainLoop_Hit(){
                 }
             }
         }else {
-            for (j in _hit_pool) {
+            for (var j=0;j<_hit_pool.length;j++) {
                 b = _hit_pool[j];
                 if(hyz.battle_style==0 && b.sid!= a.sid)continue;
                 if (stg_hit_check[s][b.side]) {
@@ -983,90 +1049,310 @@ function _stgMainLoop_PlayerState(){
         }
     }
 }
-function _stgMainLoop_Engine(){
+
+function _stgEnginePlayer(a){
+    if(a.active) {
+        if (a.on_ai) {
+            a.on_ai();
+        } else {
+            if ((!stg_super_pause_time || a.ignore_super_pause)) {
+                a.slow = a.key[stg_const.KEY_SLOW];
+                a.last_x = a.pos[0];
+                a.last_y = a.pos[1];
+                if (!a.no_move && a.state == stg_const.PLAYER_NORMAL) {
+                    var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
+                    //  var x=a.key[10]-a.key[9];
+                    var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
+                    if (x || y) {
+                        var s = a.move_speed[a.slow];
+                        if (x && y) {
+                            s = s / 1.4142;
+                        }
+                        x = x * s;
+                        y = y * s;
+                        a.pos[0] += x;
+                        a.pos[1] += y;
+                    }
+                }
+                if (a.state == stg_const.PLAYER_REBIRTH) {
+                    a.pos[0] = a.rebirth_x;
+                    a.pos[1] = (stg_frame_height + 50 - a.rebirth_y) * a.invincible / a.rebirth_time + a.rebirth_y;
+                } else {
+                    if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
+                    if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
+                    if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
+                    if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
+                }
+                playerSpellRefresh(a);
+            }
+        }
+    }
+}
+function _stgApplyObject(a){
+    a.pos= a.pos||[0,0,0];
+    a.rotate= a.rotate||[0,0,0];
+    a.move= a.move||null;
+    a.on_move=a.on_move||null;
+    a.after_move= a.after_move||null;
+    a.opos= a.opos||null;
+    a.base= a.base||null;
+    a.look_at= a.look_at||null;
+    a.self_rotate= a.self_rotate||null;
+    a.orotate= a.orotate||null;
+    a.ignore_hit= a.ignore_hit||null;
+    a.hitby= a.hitby||null;
+    a.hitdef= a.hitdef||null;
+    a.invincible= a.invincible||0;
+    a.fade_remove= a.fade_remove||null;
+    a.keep= a.keep||0;
+    a.hit_by_list=a.hit_by_list||null;
+    a.hit_list=a.hit_list||null;
+    a.clip= a.clip||null;
+}
+
+function _stgEngineObjInit(a){
+
+    if(!a.pos){
+        a.pos=[0,0,0];
+    }
+    if(!a.rotate){
+        a.rotate=[0,0,0];
+    }
+    if(a.on_move){
+        a.on_move();
+    }
+    if(a.hitby)a.hit_by_list=[];
+    if(a.hitdef)a.hit_list=[];
+
+
+
+}
+function _stgEngineObjMove(move,a){
+    if(a.move_rotate==-1){
+        move.speed_angle=a.rotate[2];
+    }
+    if(!a.resolve_move){
+        _tickMove(move);
+        a.pos[0]= move.pos[0];
+        a.pos[1]= move.pos[1];
+        a.pos[2]= move.pos[2];
+    }
+    if(a.resolve_move) {
+        move.resolve(a.pos);
+    }
+    if(a.move_rotate==1){
+        a.rotate[2]= move.speed_angle;
+    }
+
+}
+function _stgEngineObjBase(a,base,target){
+    if(base.type==stg_const.BASE_COPY){
+        a.pos[0]= target.pos[0];
+        a.pos[1]= target.pos[1];
+        a.pos[2]= target.pos[2];
+        if(a.rotate && target.rotate) {
+            a.rotate[0] = target.rotate[0];
+            a.rotate[1] = target.rotate[1];
+            a.rotate[2] = target.rotate[2];
+        }
+    }else if(base.type==stg_const.BASE_MOVE){
+        a.pos[0]+= target.pos[0];
+        a.pos[1]+= target.pos[1];
+        a.pos[2]+= target.pos[2];
+    }else if(base.type==stg_const.BASE_MOVE_ROTATE){
+        a.pos[0] += target.pos[0];
+        a.pos[1] += target.pos[1];
+        a.pos[2] += target.pos[2];
+        if (a.rotate && target.rotate) {
+            a.rotate[0] += target.rotate[0];
+            a.rotate[1] += target.rotate[1];
+            a.rotate[2] += target.rotate[2];
+        }
+    }else if(base.type==stg_const.BASE_ROTATE_MOVE){
+        var ang=target.rotate[2];
+        var tmpx= target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
+        var tmpy= target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
+        a.pos[0] =tmpx;
+        a.pos[1] =tmpy;
+        a.pos[2] += target.pos[2];
+
+    }else if(base.type==stg_const.BASE_ROTATE_MOVE_ROTATE){
+         ang=target.rotate[2];
+         tmpx= target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
+         tmpy= target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
+        a.pos[0] =tmpx;
+        a.pos[1] =tmpy;
+        a.pos[2] += target.pos[2];
+        if (a.rotate && target.rotate) {
+            a.rotate[0] += target.rotate[0];
+            a.rotate[1] += target.rotate[1];
+            a.rotate[2] += target.rotate[2];
+        }
+    }else if(base.type==stg_const.BASE_FOLLOW){
+        var b= target;
+        if(a.uid> b.uid){
+
+        }
+        a.pos[0]= target.pos[0];
+        a.pos[1]= target.pos[1];
+        a.pos[2]= target.pos[2];
+        if(a.rotate && target.rotate) {
+            a.rotate[0] = target.rotate[0];
+            a.rotate[1] = target.rotate[1];
+            a.rotate[2] = target.rotate[2];
+        }
+    }
+
+    if(base.auto_remove && target.remove){
+        if(!a._auto_remove) {
+            a._auto_remove=base.auto_remove;
+            a._auto_remove--;
+            if(a._auto_remove<=0) {
+                stgDeleteObject(a);
+            }
+        }else{
+            a._auto_remove--;
+            if(a._auto_remove<=0) {
+                stgDeleteObject(a);
+            }
+        }
+    }
+    if(base.sid){
+        if(!target){
+            console.log(a);
+        }
+        a.sid= target.sid;
+    }
+}
+
+function _stgEngineObjLookAt(a,look_at) {
+    if (look_at.turn_rate) {
+        var t = sArrowRotateTo(a.rotate[2], sLookAt(a.pos, look_at.target.pos));
+        if (t > look_at.turn_rate)t = look_at.turn_rate;
+        if (t < -look_at.turn_rate)t = -look_at.turn_rate;
+        a.rotate[2] += t;
+    } else {
+        a.rotate[2] = sLookAt(a.pos, look_at.target.pos);
+    }
+}
+function _stgEngineObjHit(a,hit,pool) {
+    hit.update(a);
+    pool.push(a);
+}
+
+function _stgEngineBulletEffect(a){
+    if(a.invincible && !a._shoted){
+        if(!a._shot_scale) {
+            a._shot_scale = [a.render.scale[0], a.render.scale[1]];
+            a._shot_alpha = a.alpha||255;
+        }
+        var ms= a.invincible/6+1;
+        if(ms>2)ms=2;
+        a.render.scale[0]= a._shot_scale[0]*ms;
+        a.render.scale[1]= a._shot_scale[1]*ms;
+        a.alpha= 100;
+        a.update=1;
+
+    }else{
+        if(a._shot_scale){
+            a.render.scale[0]= a._shot_scale[0];
+            a.render.scale[1]= a._shot_scale[1];
+            delete a._shot_scale;
+            a.alpha= a._shot_alpha;
+            delete a._shot_alpha;
+            a.update=1;
+        }else {
+            a._shoted = 1;
+            a.update=0;
+        }
+    }
+}
+function _stgEngineFade(a){
+    if(a.alpha===undefined){
+        a.alpha=255;
+    }
+    a.alpha-=a.fade_remove;
+    if(a.alpha<=0){
+        stgDeleteObject(a);
+    }
+}
+function _stgEngineAI(a){
+    a.on_ai_after_move();
+    if (a.active && (!stg_super_pause_time|| a.ignore_super_pause)) {
+        a.slow = a.key[stg_const.KEY_SLOW];
+        a.last_x= a.pos[0];
+        a.last_y= a.pos[1];
+        if (!a.no_move && a.state==stg_const.PLAYER_NORMAL) {
+            var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
+            //  var x=a.key[10]-a.key[9];
+            var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
+            if (x || y) {
+                var s = a.move_speed[a.slow];
+                if (x && y) {
+                    s = s / 1.4142;
+                }
+                x = x * s;
+                y = y * s;
+                a.pos[0] += x;
+                a.pos[1] += y;
+            }
+        }
+        if(a.state==stg_const.PLAYER_REBIRTH){
+            a.pos[0]= a.rebirth_x;
+            a.pos[1]= (stg_frame_height+50-a.rebirth_y)* a.invincible/ a.rebirth_time+a.rebirth_y;
+        }else {
+            if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
+            if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
+            if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
+            if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
+        }
+        playerSpellRefresh(a);
+
+        if(a.hitby && !a.ignore_hit){
+            a.hitby.rpos[0]= a.pos[0]+ a.hitby.pos[0];
+            a.hitby.rpos[1]= a.pos[1]+ a.hitby.pos[1];
+        }
+        if(a.hitdef && !a.ignore_hit && !a.invincible){
+            a.hitdef.rpos[0]= a.pos[0]+ a.hitdef.pos[0];
+            a.hitdef.rpos[1]= a.pos[1]+ a.hitdef.pos[1];
+        }
+    }
+}
+
+function _stgMainLoop_Engine0(){
     stg_super_pause_time=_stg_super_pause_time;
     if(_stg_super_pause_time>0)_stg_super_pause_time--;
 
+   _hit_by_pool.length=0;
+   _hit_pool.length=0;
 
-    _hit_by_pool=[];
-    _hit_pool=[];
-    stg_enemy=[];
-    var i;
-    var a;
+    var tmp=_hit_by_pool;
+    _hit_by_pool=_next_hitby_pool;
+    _next_hitby_pool=tmp;
+
+    tmp=_hit_pool;
+    _hit_pool=_next_hit_pool;
+    _next_hit_pool=tmp;
+
+    stg_enemy.length=0;
+}
+function _stgMainLoop_Engine1(){
     if(stg_game_state==stg_const.GAME_RUNNING) {
-        for (i = 0; i < stg_players_number; i++) {
-            a = stg_players[i];
-            if(a.active){
-                if(a.on_ai){
-                    a.on_ai();
-                }else{
-                    if ((!stg_super_pause_time|| a.ignore_super_pause)) {
-                        a.slow = a.key[stg_const.KEY_SLOW];
-                        a.last_x= a.pos[0];
-                        a.last_y= a.pos[1];
-                        if (!a.no_move && a.state==stg_const.PLAYER_NORMAL) {
-                            var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
-                            //  var x=a.key[10]-a.key[9];
-                            var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
-                            if (x || y) {
-                                var s = a.move_speed[a.slow];
-                                if (x && y) {
-                                    s = s / 1.4142;
-                                }
-                                x = x * s;
-                                y = y * s;
-                                a.pos[0] += x;
-                                a.pos[1] += y;
-                            }
-                        }
-                        if(a.state==stg_const.PLAYER_REBIRTH){
-                            a.pos[0]= a.rebirth_x;
-                            a.pos[1]= (stg_frame_height+50-a.rebirth_y)* a.invincible/ a.rebirth_time+a.rebirth_y;
-                        }else {
-                            if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
-                            if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
-                            if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
-                            if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
-                        }
-                        playerSpellRefresh(a);
-                    }
-                }
-            }
-
-
+        for (var i = 0; i < stg_players_number; i++) {
+           var  a = stg_players[i];
+            _stgEnginePlayer(a);
         }
     }
+}
+function _stgMainLoop_Engine2(){
+    var i,a;
     for(i=0;i<_pool.length;i++){
         if(_pool[i].active && (!stg_super_pause_time|| _pool[i].ignore_super_pause)){
             a=_pool[i];
-            _pool[i].frame++;
-            if(!a.pos){
-                a.pos=[0,0,0];
-            }
-            if(!a.rotate){
-                a.rotate=[0,0,0];
-            }
-            if(a.on_move){
-                a.on_move();
-            }
-            if(a.move && a.move_rotate==-1){
-                a.move.speed_angle=a.rotate[2];
-            }
-
-            if(a.move && !a.resolve_move){
-
-                _tickMove(a.move);
-                a.pos[0]= a.move.pos[0];
-                a.pos[1]= a.move.pos[1];
-                a.pos[2]= a.move.pos[2];
-
-            }
-
-            if(a.move && a.resolve_move) {
-                a.move.resolve(a.pos);
-            }
-            if(a.move && a.move_rotate==1){
-                a.rotate[2]= a.move.speed_angle;
+            a.frame++;
+            _stgEngineObjInit(a);
+            if(a.move){
+                _stgEngineObjMove(a.move,a);
             }
             if(a.after_move){
                 a.after_move();
@@ -1077,80 +1363,16 @@ function _stgMainLoop_Engine(){
                 a.pos[2]+= a.opos[2];
             }
             if(a.base){
-                if(a.base.type==stg_const.BASE_COPY){
-                    a.pos[0]= a.base.target.pos[0];
-                    a.pos[1]= a.base.target.pos[1];
-                    a.pos[2]= a.base.target.pos[2];
-                    if(a.rotate) {
-                        a.rotate[0] = a.base.target.rotate[0];
-                        a.rotate[1] = a.base.target.rotate[1];
-                        a.rotate[2] = a.base.target.rotate[2];
-                    }
-                }else if(a.base.type==stg_const.BASE_MOVE){
-                    a.pos[0]+= a.base.target.pos[0];
-                    a.pos[1]+= a.base.target.pos[1];
-                    a.pos[2]+= a.base.target.pos[2];
-                }else if(a.base.type==stg_const.BASE_MOVE_ROTATE){
-                    a.pos[0] += a.base.target.pos[0];
-                    a.pos[1] += a.base.target.pos[1];
-                    a.pos[2] += a.base.target.pos[2];
-                    if (a.rotate) {
-                        a.rotate[0] += a.base.target.rotate[0];
-                        a.rotate[1] += a.base.target.rotate[1];
-                        a.rotate[2] += a.base.target.rotate[2];
-                    }
-                }else if(a.base.type==stg_const.BASE_ROTATE_MOVE){
-                    var ang=a.base.target.rotate[2];
-                    var tmpx= a.base.target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
-                    var tmpy= a.base.target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
-                    a.pos[0] =tmpx;
-                    a.pos[1] =tmpy;
-                    a.pos[2] += a.base.target.pos[2];
-
-                }else if(a.base.type==stg_const.BASE_ROTATE_MOVE_ROTATE){
-                    var ang=a.base.target.rotate[2];
-                    var tmpx= a.base.target.pos[0] + a.pos[0]*cos(ang) - a.pos[1]*sin(ang);
-                    var tmpy= a.base.target.pos[1] + a.pos[0]*sin(ang) + a.pos[1]*cos(ang);
-                    a.pos[0] =tmpx;
-                    a.pos[1] =tmpy;
-                    a.pos[2] += a.base.target.pos[2];
-                    if (a.rotate) {
-                        a.rotate[0] += a.base.target.rotate[0];
-                        a.rotate[1] += a.base.target.rotate[1];
-                        a.rotate[2] += a.base.target.rotate[2];
-                    }
-                }
-
-                if(a.base.auto_remove && a.base.target.remove){
-                    if(!a._auto_remove) {
-                        a._auto_remove=a.base.auto_remove;
-                        a._auto_remove--;
-                        if(a._auto_remove<=0) {
-                            stgDeleteObject(a);
-                        }
-                    }else{
-                        a._auto_remove--;
-                        if(a._auto_remove<=0) {
-                            stgDeleteObject(a);
-                        }
-                    }
-                }
-                if(a.base.sid){
-                    if(!a.base.target){
-                        console.log(a);
-                    }
-                    a.sid= a.base.target.sid;
-                }
+                _stgEngineObjBase(a, a.base, a.base.target);
+            }
+            if(a.clip){
+                if(a.pos[0]<a.clip[0])a.pos[0]=a.clip[0];
+                if(a.pos[1]<a.clip[1])a.pos[1]=a.clip[1];
+                if(a.pos[0]>stg_frame_w-a.clip[2])a.pos[0]=stg_frame_w-a.clip[2];
+                if(a.pos[1]>stg_frame_h-a.clip[3])a.pos[1]=stg_frame_h-a.clip[3];
             }
             if(a.look_at){
-                if(a.look_at.turn_rate){
-                    var t=sArrowRotateTo(a.rotate[2],sLookAt(a.pos, a.look_at.target.pos));
-                    if(t>a.look_at.turn_rate)t=a.look_at.turn_rate;
-                    if(t<-a.look_at.turn_rate)t=-a.look_at.turn_rate;
-                    a.rotate[2]+=t;
-                }else{
-                    a.rotate[2]=sLookAt(a.pos, a.look_at.target.pos);
-                }
+                _stgEngineObjLookAt(a, a.look_at);
             }
             if(a.self_rotate){
                 a.rotate[2]+=a.self_rotate;
@@ -1161,52 +1383,17 @@ function _stgMainLoop_Engine(){
                 a.rotate[2]+= a.orotate[2];
             }
             if(a.hitby && !a.ignore_hit){
-                a.hitby.update(a);
-
-                _hit_by_pool.push(a);
-                a.hit_by_list=[];
+                _stgEngineObjHit(a, a.hitby,_hit_by_pool);
             }
             if(a.hitdef && !a.ignore_hit){
-                a.hitdef.update(a);
-                _hit_pool.push(a);
-                a.hit_list=[];
+                _stgEngineObjHit(a, a.hitdef,_hit_pool);
             }
             if(a.invincible)a.invincible--;
             if(a.type==stg_const.OBJ_BULLET && a.render){
-                if(a.invincible && !a._shoted){
-                    if(!a._shot_scale) {
-                        a._shot_scale = [a.render.scale[0], a.render.scale[1]];
-                        a._shot_alpha = a.alpha||255;
-                    }
-                        var ms= a.invincible/6+1;
-                        if(ms>2)ms=2;
-                        a.render.scale[0]= a._shot_scale[0]*ms;
-                        a.render.scale[1]= a._shot_scale[1]*ms;
-                        a.alpha= 100;
-                        a.update=1;
-
-                }else{
-                    if(a._shot_scale){
-                        a.render.scale[0]= a._shot_scale[0];
-                        a.render.scale[1]= a._shot_scale[1];
-                        delete a._shot_scale;
-                        a.alpha= a._shot_alpha;
-                        delete a._shot_alpha;
-                        a.update=1;
-                    }else {
-                        a._shoted = 1;
-                        a.update=0;
-                    }
-                }
+                _stgEngineBulletEffect(a);
             }
             if(a.fade_remove){
-                if(a.alpha===undefined){
-                    a.alpha=255;
-                }
-                a.alpha-=a.fade_remove;
-                if(a.alpha<=0){
-                    stgDeleteObject(a);
-                }
+                _stgEngineFade(a);
             }
 
             if (a.type == stg_const.OBJ_BULLET || a.type == stg_const.OBJ_ENEMY || a.type == stg_const.OBJ_ITEM) {
@@ -1222,56 +1409,23 @@ function _stgMainLoop_Engine(){
             }
         }
     }
+}
+function _stgMainLoop_Engine(){
+    _stgMainLoop_Engine0();
+    var i;
+    var a;
+    _stgMainLoop_Engine1();
+    _stgMainLoop_Engine2();
     if(stg_game_state==stg_const.GAME_RUNNING) {
         for (i = 0; i < stg_players_number; i++) {
             a = stg_players[i];
             if(a.active){
                 if(a.on_ai_after_move){
-                    a.on_ai_after_move();
-                    if (a.active && (!stg_super_pause_time|| a.ignore_super_pause)) {
-                        a.slow = a.key[stg_const.KEY_SLOW];
-                        a.last_x= a.pos[0];
-                        a.last_y= a.pos[1];
-                        if (!a.no_move && a.state==stg_const.PLAYER_NORMAL) {
-                            var x = a.key[stg_const.KEY_RIGHT] - a.key[stg_const.KEY_LEFT];
-                            //  var x=a.key[10]-a.key[9];
-                            var y = a.key[stg_const.KEY_DOWN] - a.key[stg_const.KEY_UP];
-                            if (x || y) {
-                                var s = a.move_speed[a.slow];
-                                if (x && y) {
-                                    s = s / 1.4142;
-                                }
-                                x = x * s;
-                                y = y * s;
-                                a.pos[0] += x;
-                                a.pos[1] += y;
-                            }
-                        }
-                        if(a.state==stg_const.PLAYER_REBIRTH){
-                            a.pos[0]= a.rebirth_x;
-                            a.pos[1]= (stg_frame_height+50-a.rebirth_y)* a.invincible/ a.rebirth_time+a.rebirth_y;
-                        }else {
-                            if (a.pos[0] > stg_frame_w - stg_clip)a.pos[0] = stg_frame_w - stg_clip;
-                            if (a.pos[0] < stg_clip)a.pos[0] = stg_clip;
-                            if (a.pos[1] > stg_frame_h - stg_clip)a.pos[1] = stg_frame_h - stg_clip;
-                            if (a.pos[1] < stg_clip)a.pos[1] = stg_clip;
-                        }
-                        playerSpellRefresh(a);
-
-                        if(a.hitby && !a.ignore_hit){
-                            a.hitby.rpos[0]= a.pos[0]+ a.hitby.pos[0];
-                            a.hitby.rpos[1]= a.pos[1]+ a.hitby.pos[1];
-                        }
-                        if(a.hitdef && !a.ignore_hit && !a.invincible){
-                            a.hitdef.rpos[0]= a.pos[0]+ a.hitdef.pos[0];
-                            a.hitdef.rpos[1]= a.pos[1]+ a.hitdef.pos[1];
-                        }
-                    }
+                    _stgEngineAI(a);
                 }
             }
        }
     }
-
 }
 var _stg_no_input=0;
 function stgCreateRefresher(){
@@ -1309,15 +1463,33 @@ function stgCreateRefresher(){
     e();
 }
 
-function stgAddObject(oStgObject){
+function stgFreezeObject(oStgObject){
+    for(var i=0;i<_pool.length;i++){
+        if(_pool[i]==oStgObject){
+            _pool[i]={remove:1};
+            return;
+        }
+    }
+};
+
+function stgReturnObject(oStgObject){
     if(!oStgObject)return;
     _pool.push(oStgObject);
+    oStgObject.uid=_pool.length;
+    stg_last=oStgObject;
+}
+
+function stgAddObject(oStgObject){
+    if(!oStgObject)return;
+
+    _pool.push(oStgObject);
+    oStgObject.uid=_pool.length;
     var tmp=stg_target;
     if(tmp){
         if(!(tmp.side===undefined)){
             oStgObject.side=tmp.side;
         }
-        if(!(tmp.sid===undefined)){
+        if(oStgObject.sid===undefined){
             oStgObject.sid=tmp.sid;
         }
         oStgObject.parent=tmp;
@@ -1326,6 +1498,7 @@ function stgAddObject(oStgObject){
     oStgObject.active=1;
     oStgObject.remove=0;
     oStgObject.frame=0;
+    _stgApplyObject(oStgObject);
     if(oStgObject.init){
         oStgObject.init();
     }
@@ -1410,14 +1583,16 @@ function _stgMainLoop_GameStateChanger(){
         _stg_next_game_state=undefined;
     }
 }
-
+var stg_to_load=0;
 function stgCheckResources(){
     var f=0;
+    stg_to_load=0;
     for(var i in stg_textures){
         if(stg_textures[i]){
             if(stg_textures[i].ready){
 
             }else{
+                if(stg_to_load==0)stg_to_load=i;
                 f++;
             }
         }

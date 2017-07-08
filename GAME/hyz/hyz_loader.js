@@ -32,11 +32,13 @@ hyz_loader.init=function(){
         stgLoadSE("se_shot1","se/se_tan01.wav").ready=1;
         stgLoadSE("se_shot2","se/se_tan02.wav").ready=1;
         stgLoadSE("se_boon01","se/se_boon01.wav").ready=1;
+        stgLoadSE("se_kira02","se/se_kira02.wav").ready=1;
 
         stgLoadModule("enemy_system");
         stgLoadModuleObject(esp);
         stgLoadModuleObject(BossSLZ);
         stgLoadModule("boss_system");
+        stgLoadModuleObject(stg_player_templates["player_byakuren"]);
 
         loadHyzFont();
         loadItemSystem();
@@ -74,6 +76,9 @@ hyz_loader.init=function(){
         stgAddShader("basic_shader",hyzPrimitive2DShader);
         stgAddShader("testShader2", default_2d_misc_shader);
         stgAddShader("3d_shader", default_3d_shader);
+
+        stgCreateImageTexture("remilia_boss","players/remilia_boss.png");
+        renderCreate2DTemplateA1("remilia_boss_image","remilia_boss",0,0,64,80,64,0,0,1);
 
         stgCreateImageTexture("3dTex1","bg/grass2.png");
         stgCreateImageTexture("3dTex2","bg/wall.png");
@@ -189,7 +194,7 @@ hyz_loader.init=function(){
 
         hyz.item_start.on_select={
             init:function(){
-                stgStartLevel("hyz_level",["remilia","siki"],{});
+                stgStartLevel("hyz_level",["remilia","player_byakuren"],{});
             }
         }
     }

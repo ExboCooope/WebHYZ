@@ -302,27 +302,6 @@ function defaultShowBGM(sBGMName){
 }
 
 
-function BossHolder(){
-
-}
-
-BossHolder.prototype.init=function(){
-
-};
-
-BossHolder.prototype.script=function(){
-
-};
-
-function BossLifeBar(boss){
-    this.boss=boss;
-
-}
-
-BossLifeBar.prototype.init=function(){
-
-};
-
 function IsPC()
 {
     var userAgentInfo = navigator.userAgent;
@@ -429,10 +408,15 @@ function renderCreateSpriteRender(object){
     object=object||stg_target;
     object.render=new StgRender("sprite_shader");
 }
+function renderCreatePrimitiveRender(object){
+    object=object||stg_target;
+    object.render=new StgRender("basic_shader");
+
+}
 
 function BossBreakCircleSingle(speed1,speed2,speed3){
     speed3=speed3||0.5;
-    this.layer=78;
+    this.layer=72;
     renderObjectApply2DTemplate(this,"bcircle",0);
     this.cspeed=speed1;
     this.cspeed3=speed3;
@@ -591,6 +575,7 @@ function bossCast(boss,time){
     var a={boss:boss,time:time,script:bossCast.script,init:bossCast.init};
     stgAddObject(a);
 }
+
 bossCast.init=function(){
     stgPlaySE("se_boss_cast");
 };
@@ -602,6 +587,10 @@ bossCast.script=function(){
         stgDeleteSelf();
     }
 };
+
+function bossCharge(boss,time){
+    stgAddObject(new BossCharge(boss,time));
+}
 
 function newBossTimeCircle(spell){
     var a=new CircleObject(50,56,-90,270,96);
@@ -665,6 +654,10 @@ function stgIsParent(parent,object){
         if(object==parent)return true;
     }
 }
+function stgIsInScreen(pos){
+    if(pos.pos)pos=pos.pos;
+    return pos[0]>0 && pos[0]<stg_frame_w && pos[1]>0 && pos[1]<stg_frame_h;
+}
 
 function stgDeleteSubShot(parent,toitem){
     for(var i=0;i<_pool.length;i++){
@@ -682,6 +675,16 @@ function stgDeleteSubShot(parent,toitem){
 }
 
 function stgClipObject(xmin,xmax,ymin,ymax,obj){
+    if(!obj.clip){
+        obj.clip=[0,0,0,0];
+    }
+    obj.clip[0]=xmin;
+    obj.clip[1]=ymin;
+    obj.clip[2]=stg_frame_w-xmax;
+    obj.clip[3]=stg_frame_h-ymax;
+
+
+    /*
     obj=obj||stg_target;
     var x=obj.pos[0];
     var y=obj.pos[1];
@@ -692,5 +695,188 @@ function stgClipObject(xmin,xmax,ymin,ymax,obj){
     }else{
         obj.pos[0]=x;
         obj.pos[1]=y;
+    }*/
+}
+
+function StraightLaser(l1,l2,head,tail,width,texwidth){
+    this._width=width;
+    this._texwidth=texwidth;
+    this.w=width;
+    this.l1=l1;
+    this.l2=l2;
+    this.head=head;
+    this.tail=tail;
+    this._invalid=1;
+    this.layer=stg_const.LAYER_BULLET-1;
+    this.state=0;//0 off 1 half-on 2 on
+    this.nextstate=0;
+    this.nextframe=0;
+    this.framecount=0;
+    this.alpha=0;
+    this._alpha=0;
+    this.type=stg_const.OBJ_BULLET;
+}
+StraightLaser.prototype.setWidth=function(w){
+    this.w=w;
+};
+StraightLaser.prototype.init=function(){
+    this.vtx=new HyzPrimitive2DVertexList(8);
+    this.vtx.setColor(255,255,255,255);
+    this.render=new StgRender("basic_shader");
+};
+StraightLaser.prototype.turnOn=function(time){
+    stgPlaySE("se_laser");
+    this.nextstate=2;
+    this.nextframe=time;
+    this.framecount=0;
+};
+StraightLaser.prototype.turnHalfOn=function(time){
+    this.nextstate=1;
+    this.nextframe=time;
+    this.framecount=0;
+};
+StraightLaser.prototype.turnOff=function(time){
+    this.nextstate=0;
+    this.nextframe=time;
+    this.framecount=0;
+};
+StraightLaser.prototype.setTexture=function(textureName,tu1,tu2,tv1,tv2,tv3,tv4,mode){
+    var v=this.vtx;
+    if(textureName){
+        v.setTextureName(textureName);
+        this.render.texture=textureName;
     }
+    if(!mode) {
+        v.setTextureI(0,tu1,tv1,0);
+        v.setTextureI(0,tu2,tv1,1);
+        v.setTextureI(0,tu1,tv2,2);
+        v.setTextureI(0,tu2,tv2,3);
+        v.setTextureI(0,tu1,tv3,4);
+        v.setTextureI(0,tu2,tv3,5);
+        v.setTextureI(0,tu1,tv4,6);
+        v.setTextureI(0,tu2,tv4,7);
+    }else{
+        v.setTextureI(0,tv1,tu1,0);
+        v.setTextureI(0,tv1,tu2,1);
+        v.setTextureI(0,tv2,tu1,2);
+        v.setTextureI(0,tv2,tu2,3);
+        v.setTextureI(0,tv3,tu1,4);
+        v.setTextureI(0,tv3,tu2,5);
+        v.setTextureI(0,tv4,tu1,6);
+        v.setTextureI(0,tv4,tu2,7);
+    }
+    v.update(0,1,0);
+
+};
+StraightLaser.prototype._system=function(){
+    var x=this.pos[0];
+    var y=this.pos[1];
+    var r=this.rotate[2];
+    var s=sin(r);
+    var c=cos(r);
+    var w=this.w;
+    var a=this.alpha;
+
+    if(this.state!=this.nextstate){
+        this.framecount++;
+
+        if(this.framecount>=this.nextframe){
+            this.framecount=0;
+            this.state=this.nextstate;
+        }
+
+    }
+
+    if(this.state==0){
+        if(this.nextstate==1) {
+            w = this.framecount / this.nextframe * w / 2;
+            a = this.framecount / this.nextframe * 128;
+        }else if(this.nextstate==2){
+            w = this.framecount / this.nextframe * w;
+            a = this.framecount / this.nextframe * 256;
+        }else{
+            w=0;
+            a=0;
+        }
+    }else if(this.state==1){
+        if(this.nextstate==0) {
+            w = (1-this.framecount / this.nextframe) * w / 2;
+            a = (1-this.framecount / this.nextframe) * 128;
+        }else if(this.nextstate==2){
+            w = this.framecount / this.nextframe * w /2 + w/2;
+            a = this.framecount / this.nextframe * 128+128;
+        }else{
+            w=w/2;
+            a=128;
+        }
+    }else if(this.state==2){
+        if(this.nextstate==0) {
+            w = (1-this.framecount / this.nextframe) * w;
+            a = (1-this.framecount / this.nextframe) * 256;
+        }else if(this.nextstate==1){
+            w = (1-this.framecount / this.nextframe) * w /2 + w/2;
+            a = (1-this.framecount / this.nextframe) * 128+ 128;
+        }else{
+            w=w;
+            a=256;
+        }
+    }
+
+    var tw=this._width?w*(this._texwidth/this._width):0;
+    tw=tw/2;
+
+    var v=this.vtx;
+    var l=this.l1-this.tail;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,0);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,1);
+    l=this.l1;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,2);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,3);
+    l=this.l2;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,4);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,5);
+    l=this.l2+this.head;
+    v.setPositionI(x+l*c-tw*s,y+l*s+tw*c,6);
+    v.setPositionI(x+l*c+tw*s,y+l*s-tw*c,7);
+    v.update(1,0,0);
+    this.alpha=a;
+    if(a!=this._alpha){
+        this._alpha=a;
+        v.setColor(255,255,255,a);
+    }
+    if(this.state==2 && this.nextstate==2){
+        if(!this.hitdef){
+            this.hitdef=new StgHitDef();
+        }
+        var l1=this.l2;
+        var l2=this.l1;
+        if(l1<l2){
+            l1=this.l1;
+            l2=this.l2;
+        }
+        this.hitdef.setLaserA1(0,0,0,w/2,l2,w/2,l1);
+    }else{
+        delete this.hitdef;
+    }
+};
+StraightLaser.prototype.on_render=function(gl){
+    if(!this.alpha)return;
+    if(this.blend){
+        this.blend();
+    }
+    this.vtx.use();
+    hyzSetPrimitiveOffset(0,0);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,8);
+    if(this.blend){
+        blend_default();
+    }
+};
+StraightLaser.prototype.finalize=function(){
+    this.vtx.clear();
+};
+function shotSE(){
+    stgPlaySE("se_shot0");
+}
+function smallSE(){
+    stgPlaySE("se_kira02");
 }

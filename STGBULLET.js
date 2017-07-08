@@ -157,3 +157,5 @@ function StgBullet(){
     this.penetrate=1;
     this.invincible=0;
 }
+
+

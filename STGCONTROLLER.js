@@ -226,11 +226,18 @@ function _stgMainLoop_GetInput(){
                 if(_stg_save_input){
                     _replay_pool[_replay_header][i]=_key_latency_pool[_key_bottom][i];
                 }
+                if(stg_ignore_input>=2){
+                    stg_players[i].key = _unpackInput(0);
+                }
             }
-            if(stg_players_number==0){
-                stg_system_input=_key_snapshot;
+            if(stg_ignore_input>=3){
+                stg_system_input = _unpackInput(0);
             }else {
-                stg_system_input = _unpackInput(t);
+                if (stg_players_number == 0) {
+                    stg_system_input = _key_snapshot;
+                } else {
+                    stg_system_input = _unpackInput(t);
+                }
             }
             var th=_key_sync_pool[(_key_bottom-1+_key_latency_pool.length)%_key_latency_pool.length];
             _key_sync_pool[_key_bottom]=th+1;
@@ -264,11 +271,16 @@ function _stgMainLoop_GetInput(){
             for (var i = 0; i < _replay_watchers; i++) {
                 t=t|_key_latency_pool[_key_bottom][i];
             }
-            if(_replay_watchers==0){
-                stg_system_input=_key_snapshot;
+            if(stg_ignore_input>=3){
+                stg_system_input = _unpackInput(0);
             }else {
-                stg_system_input = _unpackInput(t);
+                if(_replay_watchers==0){
+                    stg_system_input=_key_snapshot;
+                }else {
+                    stg_system_input = _unpackInput(t);
+                }
             }
+
             var th=_key_sync_pool[(_key_bottom-1+_key_latency_pool.length)%_key_latency_pool.length];
             _key_sync_pool[_key_bottom]=th+1;
             _key_bottom=(_key_bottom+1)%_key_latency_pool.length;
@@ -294,8 +306,11 @@ function _stgMainLoop_GetInput(){
                     stg_in_replay = 0;
                     stg_players_number=_replay_watchers;
                 }
-            }else{
-
+            }else if(stg_ignore_input>=2){
+                for (var k = 0; k < stg_players_number; k++) {
+                    if (!stg_players[k])stg_players[k] = {};
+                    stg_players[k].key = _unpackInput(0);
+                }
             }
         }else{
 

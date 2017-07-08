@@ -15,7 +15,7 @@ Player_Remilia.prototype.init=function(){
     var b=new StgObject();
     _StgDefaultPlayer(b);
     b.hitby=new StgHitDef();
-    b.hitby.setPointA1(0,0,2);
+   b.hitby.setPointA1(0,0,0);
     b.on_death=Player_Remilia.on_death;
     b.on_collect=function(){
         stgPlaySE("se_item");
@@ -51,7 +51,7 @@ Player_Remilia.prototype.init=function(){
 };
 
 Player_Remilia.on_death=function(){
-    var a=new BreakCircleEffect(90);
+    var a=new BreakCircleEffect(45);
     stgAddObject(a);
     stgSetPositionA1(a,this.pos[0],this.pos[1]);
 };
@@ -121,13 +121,15 @@ Player_Remilia.player_script=function(){
         }
     }
     this.last_anime=current_dir;
-   if(key[stg_const.KEY_SPELL]){
-       if(!this.bombing){
-           if(stgPlayerSpell(this,new Player_Remilia.Spell(this))){
-               this.invincible=330;
-           }
-       }
-   }
+    if(this.state==stg_const.PLAYER_NORMAL || this.state==stg_const.PLAYER_HIT) {
+        if (key[stg_const.KEY_SPELL]) {
+            if (!this.bombing) {
+                if (stgPlayerSpell(this, new Player_Remilia.Spell(this))) {
+                    this.invincible = 330;
+                }
+            }
+        }
+    }
     if(this.state==stg_const.PLAYER_NORMAL || this.state==stg_const.PLAYER_REBIRTH ){
         spriteUseInviEffect();
     }
