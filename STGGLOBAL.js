@@ -12,6 +12,10 @@ var _hit_pool2=[];
 var _hit_by_pool1=[];
 var _hit_by_pool2=[];
 
+//2017.7.7
+var _next_hit_pool=[];
+var _next_hitby_pool=[];
+
 
 var stg_game_state=0;
 var _stg_next_game_state=undefined;
@@ -107,6 +111,7 @@ var stg_const={
     BASE_ROTATE_MOVE:4,
     BASE_ROTATE_MOVE_ROTATE:5,
     BASE_COPY:6,
+    BASE_FOLLOW:7,
     BASE_NONE:0,
 
     TEX_IMG:1, //img标签的纹理，支持使用

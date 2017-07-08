@@ -225,6 +225,15 @@ function stgLoadSE(sName,sSource){
     };
     a.src=sSource;
     stg_textures[sName]=a;
+    a.ready=1;
+    return a;
+}
+
+function stgLoadBGM(sName,sSource,loopstart,looptime){
+    var a=stgLoadSE(sName,sSource);
+    a.loopstart=loopstart;
+    a.looptime=looptime;
+    a.loop=true;
     return a;
 }
 
@@ -266,6 +275,18 @@ function stgResumeSE(area){
     if(area){
         if(_stg_se_pool[area]){
             _stg_se_pool[area].play();
+        }
+    }
+}
+function _stgBgmLoop(){
+    return;
+    if(_stg_se_pool["BGM"]){
+        var a=_stg_se_pool["BGM"];
+        if(a.loopstart){
+            if(a.currentTime> a.loopstart){
+                a.fastSeek(a.currentTime-a.looptime);
+                //a.currentTime=a.currentTime-a.looptime;
+            }
         }
     }
 }

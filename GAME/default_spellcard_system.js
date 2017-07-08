@@ -207,9 +207,9 @@ BossDynamicAura.prototype.init=function(){
 };
 BossDynamicAura.prototype.on_render=function(gl,target){
     var s=this.size;
- //   target.select(this);
     var w=target.width;
     var h=target.height;
+    //新建或维护一个离屏缓存
     if(!this.target||this.target.width!=w||this.target.height!=h){
         if(this.target)this.target.release();
         this.target=new WebglRenderTarget(w,h);
@@ -219,17 +219,18 @@ BossDynamicAura.prototype.on_render=function(gl,target){
         this.vtx.setVertexRaw(3,w,0,1,0,1,1,1,1);
         this.vtx.update(1,1,1);
     }
+    //将当前屏幕拷贝至离屏缓存
     this.target.use();
     hyzSetPrimitiveOffset(0,0);
     blend_copy();
-
     this.vtx.use();
     _webGlUniformInput(hyzPrimitive2DShader,"texture",target);
     gl.drawArrays(gl.TRIANGLE_FAN,0,4);
     gl.finish();
+    //切换成波纹shader，并准备往屏幕上渲染
     target.use();
     hyzAuraShader.use();
-
+    //计算贴图位置
     var f=this.frame/3;
     var u1=(this.pos[0]-s)/w;
     var u2=(this.pos[0]+s)/w;
@@ -237,6 +238,7 @@ BossDynamicAura.prototype.on_render=function(gl,target){
     var v2=(this.pos[1]+s)/h;
     this.tscreen.buffer.set([u1,v1,u1,v2,u2,v2,u2,v1]);
     this.tscreen.uploadData();
+    //叠加渲染
     blend_test1();
     _webGlUniformInput(hyzAuraShader,"uWindow",webgl2DMatrix(w,h));
     GlBufferInput(hyzAuraShader,"aPosition",this.screen);
@@ -247,6 +249,7 @@ BossDynamicAura.prototype.on_render=function(gl,target){
     _webGlUniformInput(hyzAuraShader,"uPosition",[this.pos[0],this.pos[1]]);
     _webGlUniformInput(hyzAuraShader,"texture",this.target);
     gl.drawArrays(gl.TRIANGLE_FAN,0,4);
+    //还原
     gl.useProgram(hyzPrimitive2DShader.program);
     blend_default();
 
@@ -281,6 +284,7 @@ function BossNameObject(boss){
 BossNameObject.prototype.init=function() {
     this.text=new RenderText(0,0,"");
     this.text.sid=0;
+    this.text.base=new StgBase(this.boss,0,1);
     stgAddObject(this.text);
     stg_last.render.font="6px 黑体";
     stg_last.render.color="#6D8";
@@ -335,7 +339,7 @@ BossSpellSingleStar.prototype.init=function(){
     renderApply2DTemplate(this.render,"boss_spells",0);
     renderSetSpriteColor(0,255,0,255,this);
     renderSetSpriteScale(0.5,0.5,this);
-    this.layer=stg_const.LAYER_HINT;
+    this.layer=78;
     stgSetPositionA1(this,this.x,this.y);
 };
 BossSpellSingleStar.prototype.script=function(){
@@ -491,6 +495,7 @@ function BossSpellInitObject(spell){
 BossSpellInitObject.prototype.init=function(){
     stgAddObject(newBossTimeCircle(this.spell));
     stgAddObject(new BossTime(this.boss,this.spell,10));
+    this.boss.clip=null;
     if(this.spell.is_spell){
         stgAddObject(new BossSpellNameObject(this.spell,this.spell,this.spell.name,16));
     }
@@ -531,27 +536,35 @@ function bossDefineSpellA(boss,spell,name,life,time,score,resistance){
     spell.base=new StgBase(boss,stg_const.BASE_COPY,0);
 }
 
-function bossWanderSingle(boss,toward_player,x_range,y_range,time){
+function bossWanderSingle(boss,toward_player,x_range,y_range,time,min_x,min_y){
+    min_x=min_x||0;
+    min_y=min_y||0;
+    x_range=stg_rand(min_x,x_range);
     if(toward_player){
         var p=hyzGetRandomPlayer(boss.sid);
         if(!p){
-            x_range=stg_rand(-x_range,x_range);
+            x_range=stg_rand(1)>0.5?x_range:-x_range;
         }else{
             if(p.pos[0]<boss.pos[0]){
-                x_range=stg_rand(-x_range,0);
+                x_range=-x_range;
             }else{
-                x_range=stg_rand(0,x_range);
+                x_range=x_range;
             }
         }
 
     }else{
-        x_range=stg_rand(-x_range,x_range);
+        x_range=stg_rand(1)>0.5?x_range:-x_range;
     }
-    y_range=stg_rand(-y_range,y_range);
-    if(x_range+boss.pos[0]<16){
+    y_range=stg_rand(min_y,y_range);
+    y_range=stg_rand(1)>0.5?y_range:-y_range;
+    var dx=16;
+    if(boss.clip){
+        dx=boss.clip[0];
+    }
+    if(x_range+boss.pos[0]<dx){
         x_range=-x_range;
     }
-    if(x_range+boss.pos[0]>stg_frame_w-16){
+    if(x_range+boss.pos[0]>stg_frame_w-dx){
         x_range=-x_range;
     }
     luaMoveTo(x_range+boss.pos[0],y_range+boss.pos[1],time,1,boss);
@@ -587,15 +600,16 @@ BossChargeLeaf.prototype.script=function(){
         stgDeleteSelf();
     }
 };
-function BossCharge(boss){
+function BossCharge(boss,time){
     this.boss=boss;
+    this.time=time||60;
 }
 
 BossCharge.prototype.script=function(){
     if(this.frame==1){
         stgPlaySE("se_boss_cast");
     }
-    if(this.frame<60){
+    if(this.frame<this.time){
         stgAddObject(new BossChargeLeaf(this.boss));
     }else{
         stgDeleteSelf();

@@ -619,6 +619,7 @@ function renderObjectApply2DTemplate(object,sTemplate,iColor){
 
 function renderApply2DTemplate(oRender,sTemplate,iColor){
     oRender=oRender||stg_target.render;
+    if(oRender.render)oRender=oRender.render;
     var oTemplate=renderCreate2DTemplateA1[sTemplate];
     oRender.uvt=[oTemplate.data[0]+oTemplate.data[4]*iColor,oTemplate.data[1]+oTemplate.data[5]*iColor,oTemplate.data[2],oTemplate.data[3]];
     oRender.texture=oTemplate.tex;

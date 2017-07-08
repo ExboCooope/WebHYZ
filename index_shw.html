@@ -8,7 +8,7 @@
     </style>
     <title></title>
 </head>
-<body style="height: 100%;margin: 0">
+<body style="height: 100%;width:100%;margin: 0">
     <script src="STGCORE.js"></script>
     <script src="STGDISPLAY.js"></script>
     <script src="STGGLOBAL.js"></script>
@@ -47,6 +47,7 @@
     <script src="GAME/hyz/hyz_ui.js"></script>
     <script src="GAME/shw/shw_loader.js"></script>
     <script src="GAME/shw/shw_level.js"></script>
+    <script src="GAME/shw/shw_loading.js"></script>
     <script src="GAME/spell_test.js"></script>
     <script src="bg/game_background.js"></script>
     <script src="players/player_remilia.js"></script>
@@ -55,16 +56,19 @@
     <script src="players/player_byakuren.js"></script>
     <input class="rpy" id="1" type="file" />
 <script>
-    stg_menu_script=shw_loader;
+    stg_menu_script=shw.shell;
     stgStart();
 
     var q=document.getElementById("1");
     q.onchange=function(){
         upload(this.files[0]);
+       // hyz.item_playreplay.selectable=1;
+
+    };
+    var stg_replay_onload=function(){
         hyz.item_playreplay.selectable=1;
         hyz.main_menu.setColor("#88F","#880");
     };
-
     HTMLElement.prototype.setStatic=function(){
         this.addEventListener("selectstart",HTMLElement.preventSelectFunction,true);
         this.addEventListener("dragstart",HTMLElement.preventSelectFunction,true);

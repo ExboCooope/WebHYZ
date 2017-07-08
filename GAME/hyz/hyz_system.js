@@ -5,23 +5,25 @@ hyz.resolution={
     script:function(){
 
         var w=document.body.clientWidth;
-        var h=document.body.clientHeight-40;
+        var h=document.body.clientHeight;
         var q=w/640>h/480?h/480:w/640;
-        if(q!=this.scale || w!=this.w || h!=this.h){
+        if(q!=this.scale || w!=this.w || h!=this.h || this.invalidate){
             this.scale=q;
             this.w=w;
             this.h=h;
+            this.invalidate=0;
             stgResizeCanvas("frame",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("ui",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("back",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             stgResizeCanvas("pause",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
             var z=document.getElementById("1");
-            z.style.top=h+"px";
+            z.style.top=(h-40)+"px";
             z.style.left=((w-q*480)/2)+"px";
+            z.style.opacity="0";
         }
     },
     refresh:function(){
-        this.w=0;
+        this.invalidate=1;
         this.script();
     }
 };
@@ -233,13 +235,15 @@ hyz_pause_menu.pushItem(hyz_pause_menu.a2);
 hyz.pause_script={canvas:null,lock:0};
 hyz.pause_script.init=function(){
     MenuHolderA1.sellock=1;
+    stgPauseSE("BGM");
     if(!this.canvas){
         this.canvas=stgCreateCanvas("pause",640,480,stg_const.TEX_CANVAS2D);
     }
     stgAddObject(hyz.resolution);
     stgShowCanvas("pause",0,0,0,0,10);
     stgClearCanvas("pause");
-    hyz.resolution.scale=0;//refresh
+   // hyz.resolution.scale=0;//refresh
+    hyz.resolution.invalidate=1;
     // stgPauseSE("BGM");
     // stgHideCanvas("ui");
     // stgHideCanvas("back");
@@ -957,7 +961,7 @@ HyzPrimitive2DVertexList.prototype.setColorI=function(r,g,b,a,start,end,upload){
     }
 };
 HyzPrimitive2DVertexList.prototype.setTexture=function(texname,x,y){
-    var tex=texname?this.tex:stg_textures[texname];
+    var tex=!texname?this.tex:stg_textures[texname];
     var tw=tex.width;
     var th=tex.height;
     var hd=0;
@@ -976,7 +980,7 @@ HyzPrimitive2DVertexList.prototype.setTextureName=function(texname){
     this.tex=tex;
 };
 HyzPrimitive2DVertexList.prototype.setTextureI=function(texname,x,y,start,end,upload){
-    var tex=texname?this.tex:stg_textures[texname];
+    var tex=!texname?this.tex:stg_textures[texname];
     var tw=tex.width;
     var th=tex.height;
     var hd=start*2;
@@ -1050,6 +1054,12 @@ HyzPrimitive2DVertexList.prototype.use=function(){
     GlBufferInput(hyzPrimitive2DShader, "aPosition",this.plist);
     GlBufferInput(hyzPrimitive2DShader, "aColor",this.clist);
     GlBufferInput(hyzPrimitive2DShader, "aTexture",this.tlist);
+};
+
+HyzPrimitive2DVertexList.prototype.useLaser=function(){
+    GlBufferInput(hyzLaserShader, "aPosition",this.plist);
+    GlBufferInput(hyzLaserShader, "aColor",this.clist);
+    GlBufferInput(hyzLaserShader, "aTexture",this.tlist);
 };
 
 

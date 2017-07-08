@@ -3,13 +3,31 @@
  */
 
 var shw={};
+shw.shell={};
+shw.shell.init=function(){
+    stgLoadModuleObject(shw.loading);
+    stg_players_number=1;
+    stg_local_player_pos=0;
+    stg_local_player_slot=[0];
+    //创建输入设备
+    stgCreateInput(0)//延迟为0
+    stg_wait_for_all_texture=1;
+};
+shw.shell.script=function(){
+    if(this.frame>1){
+        stgAddObject(shw_loader);
+        stg_menu_script=shw_loader;
+        stgDeleteSelf();
+    }
+};
+
 
 var shw_loader={
     loaded:0
 };
 
 shw_loader.init=function(){
-    stgPauseSE(null,"BGM");
+    stgPauseSE("BGM");
     stg_in_replay=0;
     if(!this.loaded){
         //初始化环境
@@ -33,9 +51,11 @@ shw_loader.init=function(){
         stgLoadSE("se_shot2","se/se_tan02.wav").ready=1;
         stgLoadSE("se_boon01","se/se_boon01.wav").ready=1;
         stgLoadSE("se_kira02","se/se_kira02.wav").ready=1;
+        stgLoadSE("se_laser","se/se_laser00.wav").ready=1;
 
         stgLoadModule("enemy_system");
         stgLoadModuleObject(esp);
+        //stgLoadModuleObject(shw.loading);
         stgLoadModuleObject(BossSLZ);
         stgLoadModule("boss_system");
         stgLoadModuleObject(stg_player_templates["player_byakuren"]);
@@ -105,9 +125,9 @@ shw_loader.init=function(){
     //    stgCreateProcedure2("drawLeftFrame","frame_left",20,80,["sprite_shader","basic_shader"],"#000");
      //   stgCreateProcedure2("drawRightFrame","frame_right",20,80,["sprite_shader","basic_shader"],"#000");
 
-        stgCreateProcedure2("drawFullFrame","frame_full",20,80,["sprite_shader","basic_shader"],"#000");
+        stgCreateProcedure2("drawFullFrame","frame_full",20,80,["sprite_shader","basic_shader","laser_shader"],"#000");
 
-        stgCreateProcedure1("drawCombineFrame","frame",201,300,"sprite_shader","#000");
+        stgCreateProcedure2("drawCombineFrame","frame",201,300,["sprite_shader","basic_shader"],"#000");
     //    stgCreateProcedure1("drawBGFrame","frame_bg",101,200,"3d_shader","#FFF");
         stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"3d_shader","#FFF");
 
@@ -142,7 +162,8 @@ shw_loader.init=function(){
         //设置随机种子
         stg_rand_seed[0]=new Date().getTime();
         //等待资源下载完成
-        stg_wait_for_all_texture=1;
+        //stg_wait_for_all_texture=1;
+        stgAddObject(shw.loading);
 
         //初始化菜单
        // ifeGenerateMenu();
@@ -156,7 +177,7 @@ shw_loader.init=function(){
         hyz.full_bg_object.sid=3;
         ApplyFullTexture(hyz.full_bg_object,"frame_full_bg");
 
-        stgSetPositionA1(hyz.full_screen_object,36,16);
+        stgSetPositionA1(hyz.full_screen_object,/*36*/32,16);
         hyz.full_screen_object.layer=220;
         ApplyFullTexture(hyz.full_screen_object,"frame_full");
 
@@ -177,7 +198,8 @@ shw_loader.init=function(){
 
         hyz.item_start.on_select={
             init:function(){
-                stgStartLevel("shw_level",["remilia"],{});
+                //stgStartLevel("shw_level",["remilia"],{});
+                shw.startGame("shw_level");
             }
         }
 
@@ -214,3 +236,33 @@ function ApplyFullTexture(obj,name){
     obj.render=new StgRender("sprite_shader");
     renderApplyFullTexture(obj.render,name);
 }
+
+hyz.item_playreplay.on_select={
+    init:function(){
+        shw.game_start_up.level=0;
+        stgAddObject(shw.game_start_up);
+    }
+};
+
+shw.startGame=function(level){
+    shw.game_start_up.level=level;
+    stgAddObject(shw.game_start_up);
+}
+
+shw.game_start_up={};
+shw.game_start_up.init=function(){
+    stgAddObject(shw.loading);
+};
+shw.game_start_up.script=function(){
+    if(shw.loading.finish){
+        stgDeleteSelf();
+        stgFreezeObject(shw.loading);
+        stgFreezeObject(shw.loading.left_gate);
+        stgFreezeObject(shw.loading.right_gate);
+        if(this.level) {
+            stgStartLevel(this.level, ["remilia"], {});
+        }else{
+            replayStartLevel(0);
+        }
+    }
+};

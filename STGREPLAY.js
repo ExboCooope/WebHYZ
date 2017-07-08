@@ -40,6 +40,12 @@ function downloadFile(fileName, content){
     aLink.download = fileName;
     aLink.href = URL.createObjectURL(blob);
     aLink.dispatchEvent(evt);
+    document.body.appendChild(aLink);
+    aLink.innerText="点击此处下载Replay ： "+fileName;
+    aLink.style.zIndex=30;
+    aLink.onclick=function(){
+        document.body.removeChild(aLink);
+    }
 }
 
 function packReplay(){
@@ -81,6 +87,7 @@ function upload(file) {
         reader.onload = function() {
             _unpackReplay(this.result);
             console.log("Replay loaded.")
+            if(stg_replay_onload)stg_replay_onload();
         };
         reader.readAsArrayBuffer(file);
     }
@@ -104,6 +111,7 @@ function replay_test(){
 
         var files = e.target.files || e.dataTransfer.files;
         upload(files[0]);
+
     }
     document.body.addEventListener("dragover", dragOver, false);
     document.body.addEventListener("dragleave", dragOver, false);

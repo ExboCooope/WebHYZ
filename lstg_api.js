@@ -50,6 +50,7 @@ luastg.moveTo=function(){
     }
     a.lpos[0]=this.pos[0];
     a.lpos[1]=this.pos[1];
+
 };
 function beziern(target,poss,posl,f){
     var n=posl.length;

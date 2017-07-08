@@ -548,8 +548,202 @@ var hyzAuraShader={
     }
 };
 
+var hyzCircleBlendShader={
+    active:0,
+    context:null,
+    glset:0,
+    use:function(){
+        if(!this.glset){
+            webglCompileShader(this);
+            this.glset=1;
+        }
+        _gl.useProgram(this.program);
+    }, //每次渲染开始前，会调用，用来初始化该次渲染的数据，存入procedure_cache中
+    vertex:"attribute vec2 aPosition;" +
+        "attribute vec2 aTexture;" +
+        "" +
+        "uniform vec2 uWindow;" +
+        "uniform vec2 uPosition;" +
 
+        "varying vec2 vTexture;" +
+        "varying vec2 vPosition;" +
+        "void main( void ){" +
+        "vTexture = aTexture;" +
+        "vPosition = aPosition;" +
+        "vec4 t = vec4( (aPosition+uPosition)*uWindow+vec2(-1.0,1.0) , 0.0 , 1.0 );" +
+        "gl_Position = t;" +
+        "}",
+    fragment:"precision mediump float;" +
+        "uniform sampler2D texture;" +
+        "varying vec2 vTexture;" +
+        "varying vec2 vPosition;" +
+        "uniform vec2 uSize;" +
+        "uniform vec4 uColor;" +
+        "void main(void){" +
+        "float d = length(vPosition);" +
+        "vec4 smpColor = texture2D(texture, vTexture);" +
+        "float q = smoothstep(uSize[0],uSize[1],d);" +
+       "gl_FragColor  = uColor*q+(1.0-q)*smpColor;" +//vec4(smpColor[0],smpColor[1],smpColor[2],smpColor[3]);" +
+        "}",
+    input:{
+        aPosition:[0,2,null,0,1,0],
+        aTexture:[0,2,null,0,0,1],
+        uWindow:[1,2],
+        uColor:[1,4],
+        uPosition:[1,2],
+        uSize:[1,2],
+        texture:[2,0]
+    }
+};
 
+var hyzLaserShader={
+    active:0,
+    context:null,
+    glset:0,
+    mode:0,
+    sid:0,//场地id
+    shader_init:function(){
+        if(_gl) {
+            webglCompileShader(this);
+            _gl.enable(_gl.BLEND);
+            _gl.blendEquation(_gl.FUNC_ADD);
+            _gl.blendFunc(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA);
+        }
+    }, //shader初始化程序，在这里获得shader的入口地址等
+    shader_finalize:function(){}, //shader的结束程序，负责释放资源
+    post_frame:function(procedureName){
+        this.pool=[];
+        this.active=0;
+        var pro=stg_procedures[procedureName];
+        if(!pro){
+            console.log("Cannot initialize shader 2d: bad procedure name ["+procedureName+"]");
+            console.log(stg_procedures);
+            return;
+        }
+        this.pro=pro;
+        this.sid=pro.sid||0;
+        var tgt_n=pro.render_target;
+        var tgt=stg_textures[tgt_n];
+        this.target=tgt;
+        if(!tgt){
+            return;
+        }
+        pro.o_width=pro.o_width||tgt.width;
+        pro.o_height=pro.o_height||tgt.height;
+        if(tgt.type==stg_const.TEX_CANVAS2D) {
+            this.context = tgt.getContext("2d");
+            if (!this.context)return;
+            this.active = 1;
+            this.context.setTransform(1, 0, 0, 1, 0, 0);
+            this.context.globalAlpha=1;
+            if (pro.background) {
+
+                this.context.fillStyle = pro.background;
+                this.context.fillRect(0, 0, tgt.width, tgt.height);
+            }
+            this.mode=0;
+        }else if(tgt.type==stg_const.TEX_CANVAS3D || tgt.type==stg_const.TEX_CANVAS3D_TARGET){
+            _gl.disable(_gl.DEPTH_TEST);
+
+            if(!this.glset){
+                webglCompileShader(this);
+                this.glset=1;
+            }
+            stg_active_shader=this;
+            _gl.useProgram(this.program);
+            _webGlUniformInput(this,"uWindow",webgl2DMatrix(pro.o_width,pro.o_height));
+            this.context= _gl;
+            this.mode=1;
+        }
+
+    }, //每次渲染开始前，会调用，用来初始化该次渲染的数据，存入procedure_cache中
+
+    post_layer:function(procedureName,layerid){
+
+    },
+
+    object_frame:function(object,render,procedureName){
+
+        if(!object.sid)object.sid=0;
+        if(object.sid!=this.sid && this.sid!=3)return;
+        if(object.sid==0 && this.sid==3)return;
+        if(this.mode==0) {
+
+        }else if(this.mode==1){
+            if(stg_active_shader!=this){
+                stg_active_shader=this;
+                _gl.useProgram(this.program);
+            }
+            var tex=0;
+            if (!render.texture || !stg_textures[render.texture]){
+                tex=stg_textures["white"];
+            }else{
+                tex=stg_textures[render.texture];
+            }
+            if(!tex)return;
+            if(tex!=this.target) {
+                _webGlUniformInput(this, "texture", tex);
+            }
+            if(object.on_render)object.on_render(_gl,this.target);
+        }
+    }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
+    draw_frame:function(procedureName){
+
+    }, //每次渲染结束时会调用，如果将物体聚类的话，可以在这里统一绘制
+
+    draw_layer:function(procedureName,layerid){
+
+    },
+
+    shader_finalize_procedure:function(procedureName){
+        this.pool=[];
+    }, //移除procedure时会执行一次，用来释放资源
+    template:{},
+
+    vertex:"attribute vec2 aPosition;" +
+        "attribute vec2 aTexture;" +
+        "attribute vec2 aOffset;" +
+        "attribute vec4 aColor;" +
+        "" +
+        "uniform vec2 uWindow;" +
+        "varying vec2 vOffset;" +
+        "varying vec2 vTexture;" +
+        "varying vec4 vColor;" +
+        "void main( void ){" +
+        "vTexture = aTexture;" +
+        "vColor = aColor;" +
+        "vOffset = aOffset;" +
+        "vec4 t = vec4( (aPosition)*uWindow+vec2(-1.0,1.0) , 0.0 , 1.0 );" +
+        "gl_Position = t;" +
+        "}",
+    fragment:"precision mediump float;" +
+        "uniform sampler2D texture;" +
+        "uniform vec2 uTexture0;" +
+        "uniform vec2 uTexture1;" +
+        "varying vec2 vTexture;" +
+        "varying vec2 vOffset;" +
+        "varying vec4 vColor;" +
+        "void main(void){" +
+        "vec4 smpColor = texture2D(texture, vOffset/vTexture*uTexture1+uTexture0);" +
+//         "gl_FragColor  = vColor[3] * smpColor * vec4(vColor[0],vColor[1],vColor[2],1.0);" +
+      // "vec2 temp  = vOffset/vTexture;" +
+        // "gl_FragColor  = vec4(temp[1],0.0,-temp[1],1.0);" +
+        "gl_FragColor  = vec4(vColor[0],vColor[1],vColor[2],1.0)*vec4(smpColor[0],smpColor[1],smpColor[2],1.0)*smpColor[3]*vColor[3];" +
+        "}",
+    input:{
+        aPosition:[0,2,null,0,1,0],
+        aTexture:[0,2,null,0,0,1],
+        aOffset:[0,2,null,0,0,3],
+        aColor:[0,4,null,0,0,2],
+        uWindow:[1,2],
+        uTexture0:[1,2],
+        uTexture1:[1,2],
+        texture:[2,0]
+    },
+    layer_blend:[]
+};
+
+stgAddShader("laser_shader",hyzLaserShader);
 
 /*
  原始  R0*（1-A1A2） +  R1*R2*A1*A2，A0 *（1-A1A2）+ A1*A2
