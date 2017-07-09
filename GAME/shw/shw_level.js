@@ -63,7 +63,7 @@ shw.level.script=function(){
     if(this.frame>=60){
         if(this.boss.remove){
             this.counter++;
-            if(this.counter>stg_common_data.spell_practice?60:240){
+            if(this.counter>(stg_common_data.spell_practice?60:240)){
                 stgCloseLevel();
             }
         }
