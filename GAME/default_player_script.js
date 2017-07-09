@@ -138,6 +138,7 @@ Default_Player_Sikieiki.prototype.init=function(){
 };
 
 stg_player_templates.siki=Default_Player_Sikieiki;
+stg_player_templates.reimu=Default_Player_Sikieiki;
 
 function plshot01onhit(a){
     stg_target.move.speed=0;

@@ -44,16 +44,29 @@ shw.level.init=function(){
     stg_last.script=function(){
         this.render.text=(_pool.length)+" 物体 "+(((stg_fps)>>0)+" fps");
     };
-
+    this.counter=0;
 
 };
 shw.level.script=function(){
     if(stg_players_number==1){
         stg_players[1]=stg_players[0];
     }
-    if(this.frame==60)stgAddObject(new BossSLZ());
-    if(this.frame>=60 && this.frame<180){
-
+    if(this.frame==30){
+        if(stg_common_data.ai){
+            stgAddObject(new BasicAI(stg_players[1]));
+        }
+    }
+    if(this.frame==60){
+        this.boss=new BossSLZ();
+        stgAddObject(this.boss);
+    }
+    if(this.frame>=60){
+        if(this.boss.remove){
+            this.counter++;
+            if(this.counter>60){
+                stgCloseLevel();
+            }
+        }
 /*
         this.side=stg_const.SIDE_ENEMY;
         var l=new ComplexLaser(60);

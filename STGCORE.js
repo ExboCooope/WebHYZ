@@ -1526,9 +1526,26 @@ function stgAddObject(oStgObject){
     stg_last=oStgObject;
 }
 
-function stgDeleteObject(oStgObject){
-    oStgObject.remove=1;
-    oStgObject.active=0;
+function _stgDeleteDelay(obj,time){
+    this.obj=obj;
+    this.time=time;
+}
+_stgDeleteDelay.prototype.script=function(){
+    if(this.frame>=this.time){
+        if(this.obj.active){
+            stgDeleteObject(this.obj);
+        }
+        stgDeleteObject(this);
+    }
+};
+
+function stgDeleteObject(oStgObject,time){
+    if(!time) {
+        oStgObject.remove = 1;
+        oStgObject.active = 0;
+    }else{
+       stgAddObject(new _stgDeleteDelay(oStgObject,time));
+    }
 }
 var _temp_pool;
 function _stgMainLoop_Pause(){

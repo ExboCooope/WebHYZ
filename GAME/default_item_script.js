@@ -45,6 +45,7 @@ function gCreateItem(pos,type,count,range){
         a.hitdef=new StgHitDef();
         a.hitdef.range=4;
         a.layer=stg_const.LAYER_ITEM;
+        a.side=stg_const.SIDE_ENEMY;
     }
     return a;
 }

@@ -27,7 +27,17 @@ var shw_loader={
 };
 
 shw_loader.init=function(){
-    stgPauseSE("BGM");
+
+    if(stg_common_data.restart){
+        stgAddObject(shw.last_start_up);
+        stg_display = ["drawBackground","drawCombineFrame","drawUI"];
+        stgAddObject(hyz.full_bg_object);
+        stgAddObject(hyz.full_screen_object);
+        stgAddObject(hyz.resolution);
+        return;
+    }
+    stgPlayBGM();
+    //stgPauseSE("BGM");
     stg_in_replay=0;
     if(!this.loaded){
         //初始化环境
@@ -195,14 +205,15 @@ shw_loader.init=function(){
 
 
         gLoadMenuSystem();
-
+/*
         hyz.item_start.on_select={
             init:function(){
                 //stgStartLevel("shw_level",["remilia"],{});
                 shw.startGame("shw_level");
             }
         }
-
+*/
+        hyz.item_start.on_select=shw.mode_select_menu;
         stgCreateImageTexture("game_frame_bg_img","GAME/shw/frame_bg.png");
         stgSetPositionA1(shw.game_frame_bg,0,0);
         shw.game_frame_bg.layer=201;
@@ -249,8 +260,11 @@ shw.startGame=function(level){
     stgAddObject(shw.game_start_up);
 }
 
+shw.last_start_up=0;
+
 shw.game_start_up={};
 shw.game_start_up.init=function(){
+    shw.last_start_up=this;
     stgAddObject(shw.loading);
 };
 shw.game_start_up.script=function(){
@@ -260,7 +274,7 @@ shw.game_start_up.script=function(){
         stgFreezeObject(shw.loading.left_gate);
         stgFreezeObject(shw.loading.right_gate);
         if(this.level) {
-            stgStartLevel(this.level, ["remilia"], {});
+            stgStartLevel(this.level, this.players||["remilia"], this.commondata||{});
         }else{
             replayStartLevel(0);
         }

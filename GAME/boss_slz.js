@@ -17,6 +17,7 @@ BossSLZ.pre_load=function(){
     renderCreate2DTemplateA1("slz_option2","enemy1",48*4,32,32,32,32,0,0,1);
     stgCreateImageTexture("laser1","res/laser1.png");
     stgLoadBGM("slz_bgm","music/15-battle-for-the-last.mp3",130,109.5);
+   // stgLoadBGM("slz_bgm","se/se_cancel00.wav",130,109.5);
 
  //   stgLoadBGM("slz_bgm","music/15-battle-for-the-last.mp3",20,10);
 };
@@ -44,23 +45,32 @@ BossSLZ.prototype.init=function(){
     this.finished=false;
     stgBossClearPhase();
    // stgBossAddPhase([new BossSLZ.NonSpell3(this),new BossSLZ.Spell3(this)]);//永
-
-    stgBossAddPhase([new BossSLZ.NonSpell1(this),new BossSLZ.Spell1(this)]);//红
-    stgBossAddPhase([new BossSLZ.NonSpell2(this),new BossSLZ.Spell2(this)]);//妖
-    stgBossAddPhase([new BossSLZ.NonSpell3(this),new BossSLZ.Spell3(this)]);//永
-    stgBossAddPhase([new BossSLZ.NonSpell4(this),new BossSLZ.Spell4(this)]);//风
-    stgBossAddPhase([new BossSLZ.NonSpell5(this),new BossSLZ.Spell5(this)]);//殿
-    stgBossAddPhase([new BossSLZ.NonSpell6(this),new BossSLZ.Spell6(this)]);//船
-    stgBossAddPhase([new BossSLZ.NonSpell7(this),new BossSLZ.Spell7(this)]);//庙
-    stgBossAddPhase([new BossSLZ.NonSpell8(this),new BossSLZ.Spell8(this)]);//城
-    stgBossAddPhase([new BossSLZ.Spell9(this)]);//自制
-    stgBossAddPhase([new BossSLZ.Spell10(this)]);//绀
+    if(stg_common_data.spell_practice){
+        var i=stg_common_data.phase;
+        var p=BossSLZ.phases[i];
+        var q=[];
+        for(var j=0;j< p.length;j++){
+            q.push(new p[j](this));
+        }
+        stgBossAddPhase(q);
+    }else{
+        stgBossAddPhase([new BossSLZ.NonSpell1(this),new BossSLZ.Spell1(this)]);//红
+        stgBossAddPhase([new BossSLZ.NonSpell2(this),new BossSLZ.Spell2(this)]);//妖
+        stgBossAddPhase([new BossSLZ.NonSpell3(this),new BossSLZ.Spell3(this)]);//永
+        stgBossAddPhase([new BossSLZ.NonSpell4(this),new BossSLZ.Spell4(this)]);//风
+        stgBossAddPhase([new BossSLZ.NonSpell5(this),new BossSLZ.Spell5(this)]);//殿
+        stgBossAddPhase([new BossSLZ.NonSpell6(this),new BossSLZ.Spell6(this)]);//船
+        stgBossAddPhase([new BossSLZ.NonSpell7(this),new BossSLZ.Spell7(this)]);//庙
+        stgBossAddPhase([new BossSLZ.NonSpell8(this),new BossSLZ.Spell8(this)]);//城
+        stgBossAddPhase([new BossSLZ.Spell9(this)]);//自制
+        stgBossAddPhase([new BossSLZ.Spell10(this)]);//绀
+    }
     a=new BossSpellCount(this);
     stgAddObject(a);
     stgSetPositionA1(this,stg_frame_w/3,-50);
-    luaMoveTo(stg_frame_w/2,80,60,1,this.boss);
+    luaMoveTo(stg_frame_w/2,80,60,1);
     defaultShowBGM("battle-for-the-last (CAVE)");
-    stgPlaySE("slz_bgm","BGM");
+    stgPlayBGM("slz_bgm");
 };
 
 BossSLZ.prototype.spells=[];
@@ -77,10 +87,18 @@ BossSLZ.prototype.script=function(){
                 if(this.delay<=0){
                     stgBossStartNextSpell();
                     if(this.finished){
-                        var a=new BreakCircleEffect(45);
-                        stgAddObject(a);
-                        stgSetPositionA1(a,this.pos[0],this.pos[1]);
-                        stgDeleteSelf();
+                        if(stg_common_data.spell_practice){
+                            this.clip=0;
+                            luaMoveTo(0,-100,60,1);
+                            this.script=0;
+                            stgDeleteObject(this,60);
+                        }else{
+                            var a=new BreakCircleEffect(45);
+                            stgAddObject(a);
+                            stgSetPositionA1(a,this.pos[0],this.pos[1]);
+                            stgDeleteSelf();
+
+                        }
                     }
                 }else{
                     this.delay--;
@@ -2334,9 +2352,28 @@ BossSLZ.Spell10.hd=function(){
     }
 };
 
-BossSLZ.prototype.spells.push(BossSLZ.NonSpell1);
-BossSLZ.prototype.spells.push(BossSLZ.Spell1);
-BossSLZ.prototype.phases.push([BossSLZ.NonSpell1,BossSLZ.Spell1]);
+BossSLZ.spells=[];
+BossSLZ.phases=[];
+BossSLZ.spells.push(BossSLZ.Spell1);
+BossSLZ.spells.push(BossSLZ.Spell2);
+BossSLZ.spells.push(BossSLZ.Spell3);
+BossSLZ.spells.push(BossSLZ.Spell4);
+BossSLZ.spells.push(BossSLZ.Spell5);
+BossSLZ.spells.push(BossSLZ.Spell6);
+BossSLZ.spells.push(BossSLZ.Spell7);
+BossSLZ.spells.push(BossSLZ.Spell8);
+BossSLZ.spells.push(BossSLZ.Spell9);
+BossSLZ.spells.push(BossSLZ.Spell10);
+BossSLZ.phases.push([BossSLZ.NonSpell1,BossSLZ.Spell1]);
+BossSLZ.phases.push([BossSLZ.NonSpell2,BossSLZ.Spell2]);
+BossSLZ.phases.push([BossSLZ.NonSpell3,BossSLZ.Spell3]);
+BossSLZ.phases.push([BossSLZ.NonSpell4,BossSLZ.Spell4]);
+BossSLZ.phases.push([BossSLZ.NonSpell5,BossSLZ.Spell5]);
+BossSLZ.phases.push([BossSLZ.NonSpell6,BossSLZ.Spell6]);
+BossSLZ.phases.push([BossSLZ.NonSpell7,BossSLZ.Spell7]);
+BossSLZ.phases.push([BossSLZ.NonSpell8,BossSLZ.Spell8]);
+BossSLZ.phases.push([BossSLZ.Spell9]);
+BossSLZ.phases.push([BossSLZ.Spell10]);
 
 
 function NightEffect(boss,size1,size2){
