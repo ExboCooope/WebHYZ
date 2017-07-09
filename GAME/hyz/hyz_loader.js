@@ -9,6 +9,9 @@ var hyz_loader={
 };
 
 hyz_loader.init=function(){
+
+
+
     stgPauseSE(null,"BGM");
     stg_in_replay=0;
     if(!this.loaded){

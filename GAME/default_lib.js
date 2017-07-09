@@ -93,7 +93,7 @@ TextMenuItem.prototype.script=function(){
 TextMenuItem.sellock=0;
 TextMenuItem.backlock=0;
 
-function MenuHolderA1(vaPos,vaAddPos,oReturn){
+function MenuHolderA1(vaPos,vaAddPos,oReturn,is_submenu){
     this.menu_pool=[];
     this.select_id=0;
     this.menu_pos=vaPos;
@@ -101,6 +101,7 @@ function MenuHolderA1(vaPos,vaAddPos,oReturn){
     this.rolldir=0;
     this.rolllock=0;
     this.menu_return=oReturn;
+    this.is_sub=is_submenu;
 }
 MenuHolderA1.prototype.setColor=function(color1,color2){
     if(!color2)color2=color1;
@@ -128,6 +129,9 @@ MenuHolderA1.prototype.pushItems=function(){
 };
 
 MenuHolderA1.prototype.init=function(){
+    if(this.is_sub){
+        this.parent.active=0;
+    }
     var that=this;
     var pool=that.menu_pool;
 
@@ -256,7 +260,13 @@ MenuHolderA1.prototype.script=function(){
             }
             stgDeleteObject(this);
             TextMenuItem.backlock=1;
-            if(that.menu_return)stgAddObject(that.menu_return);
+            if(that.menu_return){
+                if(this.is_sub){
+                    this.parent.active=1;
+                }else {
+                    stgAddObject(that.menu_return);
+                }
+            }
             stgPlaySE("se_cancel");
         }
     }else{
@@ -715,6 +725,7 @@ function StraightLaser(l1,l2,head,tail,width,texwidth){
     this.alpha=0;
     this._alpha=0;
     this.type=stg_const.OBJ_BULLET;
+    this.slaser=1;
 }
 StraightLaser.prototype.setWidth=function(w){
     this.w=w;
@@ -856,6 +867,21 @@ StraightLaser.prototype._system=function(){
         }
         this.hitdef.setLaserA1(0,0,0,w/2,l2,w/2,l1);
     }else{
+        if(!this.aihitdef){
+            this.aihitdef={type:stg_const.OBJ_ENEMY,hitdef:new StgHitDef(),side:this.side,sid:this.sid};
+        }
+
+        if(this.nextstate==2){
+            var l1=this.l2;
+            var l2=this.l1;
+            if(l1<l2){
+                l1=this.l1;
+                l2=this.l2;
+            }
+            this.aihitdef.hitdef.setLaserA1(0,0,0,w/2,l2,w/2,l1);
+            this.aihitdef.hitdef.update(this);
+            aiAddWarning(this.aihitdef);
+        }
         delete this.hitdef;
     }
 };

@@ -181,12 +181,19 @@ Player_Remilia.Spell.prototype.script=function(){
             var blt;
             var p=this.player.pos;
             if(this.frame%6==0){
-                blt=stgCreateShotP1(p[0]-16,p[1]-8,12,270,"remilia_sht1",0,1,3,1);
+                blt=stgCreateShotP1(p[0]-16,p[1]-8,12,270,"remilia_sht1",0,1,3,2);
                 renderSetSpriteScale(2,4,blt);
-                blt=stgCreateShotP1(p[0]+16,p[1]-8,12,270,"remilia_sht1",0,1,3,1);
+                blt=stgCreateShotP1(p[0]+16,p[1]-8,12,270,"remilia_sht1",0,1,3,2);
                 renderSetSpriteScale(2,4,blt);
-                blt=stgCreateShotP1(p[0],p[1]-20,12,270,"remilia_sht1",0,1,3,1);
+                blt=stgCreateShotP1(p[0],p[1]-20,12,270,"remilia_sht1",0,1,3,2);
                 renderSetSpriteScale(2,4,blt);
+                playerSetSpellHitbox(blt,32);
+                blt=stgCreateShotP1(p[0],p[1],12,0,"remilia_sht1",0,1,3,2);
+                renderSetSpriteScale(2,4,blt);
+                playerSetSpellHitbox(blt,32);
+                blt=stgCreateShotP1(p[0],p[1],12,180,"remilia_sht1",0,1,3,2);
+                renderSetSpriteScale(2,4,blt);
+                playerSetSpellHitbox(blt,32);
             }
         }
     }
@@ -449,3 +456,28 @@ Player_Remilia.ChargeShooter2.prototype.script=function() {
         }
     }
 };
+
+function playerSetSpellHitbox(obj,size){
+    obj.hitby=new StgHitDef();
+    obj.hitby.setPointA1(0,0,size);
+    obj.on_hit_by=playerSpellHitby;
+}
+function playerSpellHitby(obj){
+    if(obj.type==stg_const.OBJ_BULLET){
+        if((obj.keep||0)<2 && !obj.remove){
+            if(obj.laser) {
+                if (obj.laser_active) {
+                    obj.laser_active = 0;
+                }
+            }else if(obj.slaser){
+                obj.l2=stg_laser_dl;
+                if(obj.l2<obj.l1){
+                    deleteShotToItem(obj);
+                }
+            }
+            else{
+                deleteShotToItem(obj);
+            }
+        }
+    }
+}

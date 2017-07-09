@@ -222,6 +222,14 @@ hyz_pause_menu.a1=new TextMenuItem("继续",1,1,{script:function(){   //stgHideC
     //default_ui_shader.procedure_1.pool[3].alpha=0;
     stgHideCanvas("pause");
 }},1);
+hyz_pause_menu.a3=new TextMenuItem("重新开始",1,1,{script:function(){
+    stg_common_data.restart=1;
+    stgCloseLevel();
+
+    stgDeleteSelf();
+    stgHideCanvas("pause");
+    //default_ui_shader.procedure_1.pool[3].alpha=0;
+}},1);
 hyz_pause_menu.a2=new TextMenuItem("结束游戏",1,1,{script:function(){
     stgCloseLevel();
     stgDeleteSelf();
@@ -229,13 +237,16 @@ hyz_pause_menu.a2=new TextMenuItem("结束游戏",1,1,{script:function(){
     //default_ui_shader.procedure_1.pool[3].alpha=0;
 }},1);
 
+
 hyz_pause_menu.pushItem(hyz_pause_menu.a1);
+hyz_pause_menu.pushItem(hyz_pause_menu.a3);
 hyz_pause_menu.pushItem(hyz_pause_menu.a2);
+
 
 hyz.pause_script={canvas:null,lock:0};
 hyz.pause_script.init=function(){
     MenuHolderA1.sellock=1;
-    stgPauseSE("BGM");
+    if(!stg_common_data.spell_practice)stgPauseSE("BGM");
     if(!this.canvas){
         this.canvas=stgCreateCanvas("pause",640,480,stg_const.TEX_CANVAS2D);
     }

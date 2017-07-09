@@ -372,7 +372,7 @@ ComplexLaser.prototype._system=function(){
     var p=this.objlist;
     var n0= p.length;
     if(!this.tail){
-        this.tail={laser_active:1,keep:1};
+        this.tail={laser_active:1,keep:1,laser:1,side:this.side,sid:this.sid};
         if(n0){
             stgSetPositionA1(this.tail,p[n0-1].pos[0],p[n0-1].pos[1]);
 
@@ -502,7 +502,7 @@ ComplexLaser.prototype._system=function(){
     }else{
         if(this.target_length>0){
             this.target_length--;
-            a={laser_active:1,type:stg_const.OBJ_BULLET,keep:1};
+            a={laser_active:1,type:stg_const.OBJ_BULLET,keep:1,laser:1,side:this.side,sid:this.sid};
             if(this.mode==0)stgAddObject(a);
             if(n%4!=0){
                 a.grazed=[1,1];

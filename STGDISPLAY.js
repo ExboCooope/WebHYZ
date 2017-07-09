@@ -231,8 +231,8 @@ function stgLoadSE(sName,sSource){
 
 function stgLoadBGM(sName,sSource,loopstart,looptime){
     var a=stgLoadSE(sName,sSource);
-    a.loopstart=loopstart;
-    a.looptime=looptime;
+  //  a.loopstart=loopstart;
+  //  a.looptime=looptime;
     a.loop=true;
     return a;
 }
@@ -257,6 +257,34 @@ function stgPlaySE(sName,area){
                 }
                 _stg_se_pool[area] = a;
             }
+            a.currentTime = 0;
+            a.play();
+        }
+    }
+    return a;
+}
+
+function stgPlayBGM(sName){
+    var a;
+    var area="BGM";
+    if(!sName || !(a=stg_textures[sName])){
+        if(_stg_se_pool[area]){
+            _stg_se_pool[area].pause();
+            delete _stg_se_pool[area];
+        }
+    }else {
+        if (a.type == stg_const.TEX_AUDIO) {
+
+            if(_stg_se_pool[area]==a){
+                a.play();
+                return;
+            }
+
+                if (_stg_se_pool[area]) {
+                    _stg_se_pool[area].pause();
+                }
+                _stg_se_pool[area] = a;
+
             a.currentTime = 0;
             a.play();
         }

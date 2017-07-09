@@ -29,12 +29,26 @@ BasicAI.prototype.init=function(){
     this.player.on_ai_after_move=this.ai_script2;
     this.base=new StgBase(this.player,stg_const.BASE_COPY,1);
     this.temp_hit=new StgHitDef();
+    stg_ai_warning=BasicAI.ai_warning;
+};
+
+BasicAI.prototype.finalize=function(){
+    stg_ai_warning=null;
 };
 
 BasicAI.res=[];
 
 BasicAI.emu=[0,0,0,-1,0,1,1,0,-1,0,0.707,0.707,0.707,-0.707,-0.707,0.707,-0.707,-0.707,0,0];
 
+BasicAI.ai_warning=[];
+
+var stg_ai_warning=null;
+
+function aiAddWarning(def){
+    if(stg_ai_warning){
+        stg_ai_warning.push(def);
+    }
+}
 
 BasicAI.prototype.keydef=function(okey,target){
     if(okey){
@@ -78,6 +92,10 @@ BasicAI.prototype.scriptx=function(){
             }
         }
     }
+    for(i=0;i<BasicAI.ai_warning.length;i++){
+        pool.push(BasicAI.ai_warning[i].hitdef);
+    }
+    BasicAI.ai_warning.length=0;
     if(cnt>this.objs){
         this.aware_range=25;//(this.aware_range/2)>>0;
         this.rangea=3;
@@ -316,8 +334,8 @@ function aiDist(p1,p2,res){
             ai_close_point[1] = p2.rpos[1] + dl * sinr;
             var rate = (dl - p2.ls) / (p2.le - p2.ls);
             res[0] = (dd < 0 ? -dd : dd) - p1.range - rate * p2.rs - (1 - rate) * p2.re;
-            res[1] = dd >= 0 ? -sinr : sinr;
-            res[2] = dd >= 0 ? cosr : -cosr;
+            res[1] = dd < 0 ? -sinr : sinr;
+            res[2] = dd < 0 ? cosr : -cosr;
             return res[0];
         }
     }else if(p1.type==1 && p2.type==0){
@@ -350,6 +368,25 @@ function aiDist(p1,p2,res){
         aiDist(p2,p1,res);
         ai_close_point[0]=p2.rpos[0];
         ai_close_point[1]=p2.rpos[1];
+        res[1]=-res[1];
+        res[2]=-res[2];
+        return res[0];
+    }else if(p1.type==0 && p2.type==3){
+        var d = sqrt2(p1.rpos,p2.rpos)-(p2.rs+p2.re)/2;
+        a=atan2p(p2.rpos,p1.rpos);
+        ai_close_point[0]=(p2.rs+p2.re)/2*cos(a);
+        ai_close_point[1]=(p2.rs+p2.re)/2*sin(a);
+        res[1]=-cos(a);
+        res[2]=-sin(a);
+        if(d<0){
+            d=-d;
+            res[1]=-res[1];
+            res[2]=-res[2];
+        }
+        res[0]=d-p1.range-(p2.re-p2.rs)/2;
+        return res[0]-2;
+    }else if(p1.type==3 && p2.type==0){
+        var a=aiDist(p2,p1,res);
         res[1]=-res[1];
         res[2]=-res[2];
         return res[0];
