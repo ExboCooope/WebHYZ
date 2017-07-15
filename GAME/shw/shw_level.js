@@ -56,14 +56,20 @@ shw.level.script=function(){
             stgAddObject(new BasicAI(stg_players[1]));
         }
     }
+
     if(this.frame==60){
+        if(stg_common_data.pressure_test){
+            stgAddObject(shw.pureSpriteTest);
+            stgDeleteSelf();
+            return;
+        }
         this.boss=new BossSLZ();
         stgAddObject(this.boss);
     }
     if(this.frame>=60){
         if(this.boss.remove){
             this.counter++;
-            if(this.counter>stg_common_data.spell_practice?60:240){
+            if(this.counter>(stg_common_data.spell_practice?60:240)){
                 stgCloseLevel();
             }
         }
@@ -110,6 +116,51 @@ shw.hello_laser_script=function(){
     if(this.frame==110){
         this.move.setSpeed(3);
         this.stop=0;
+    }
+};
+
+shw.pureSpriteTest={};
+shw.pureSpriteTest.init=function(){
+    for(var i=0;i<stg_players_number;i++){
+        stg_players[i]._zzhitby=stg_players[i].hitby;
+        stg_players[i].hitby=0;
+    }
+    this.rst=0;
+    this.bltcnt=0;
+};
+shw.pureSpriteTest.script=function(){
+    if(stg_players[0].key[stg_const.KEY_SHOT]){
+        stgCreateShotA1(50,50,3,stg_rand(360),"tDD",0,stg_rand_int(0,7)).script=shw.pureSpriteTest.bltscript;
+        stgCreateShotA1(50,50,3,stg_rand(360),"mMD",0,stg_rand_int(0,7)).script=shw.pureSpriteTest.bltscript;
+        stgCreateShotA1(50,50,3,stg_rand(360),"mDD",0,stg_rand_int(0,7)).script=shw.pureSpriteTest.bltscript;
+        stgCreateShotA1(50,50,3,stg_rand(360),"sXD",0,stg_rand_int(0,7)).script=shw.pureSpriteTest.bltscript;
+        shw.pureSpriteTest.bltcnt+=4;
+    }
+    if(stg_players[0].key[stg_const.KEY_CTRL]){
+        shw.pureSpriteTest.rst=4;
+    }
+};
+shw.pureSpriteTest.bltscript=function(){
+    if (stg_target.move.pos[0] > stg_frame_w) {
+        stg_target.move.pos[0] = stg_frame_w;
+        stg_target.move.speed_angle = PI - stg_target.move.speed_angle;
+    }
+    if (stg_target.move.pos[0] < 0) {
+        stg_target.move.pos[0] = 0;
+        stg_target.move.speed_angle = PI - stg_target.move.speed_angle;
+    }
+    if (stg_target.move.pos[1] > stg_frame_h) {
+        stg_target.move.pos[1] = stg_frame_h;
+        stg_target.move.speed_angle = -stg_target.move.speed_angle;
+    }
+    if (stg_target.move.pos[1] < 0) {
+        stg_target.move.pos[1] = 0;
+        stg_target.move.speed_angle = -stg_target.move.speed_angle;
+    }
+    if (shw.pureSpriteTest.rst >= 0) {
+        stgDeleteObject(stg_target);
+        shw.pureSpriteTest.rst--;
+        shw.pureSpriteTest.bltcnt--;
     }
 };
 

@@ -1,7 +1,7 @@
 /**
  * Created by Exbo on 2017/5/14.
  */
-
+var diff=0;
 function BossSLZ(){
     this.english_name="Sha Li Zi";
     this.delay=0;
@@ -23,6 +23,7 @@ BossSLZ.pre_load=function(){
 };
 
 BossSLZ.prototype.init=function(){
+    diff=stg_common_data.difficulty||0;
     var a=new luastg.BossResourceHolder("slz",8,4,[4,0],[6,3],[6,3],[8,0],this);
     stgAddObject(a);
     this.image=a;
@@ -157,17 +158,18 @@ BossSLZ.NonSpell1.Phase=function(spell){
     this.a=stg_rand(360);
     this.b=stg_rand(360);
     this.c=0;
+    this.d1=diff?24:12;
 };
 BossSLZ.NonSpell1.Phase.prototype.script=function(){
     if(this.frame>480 || this.spell.remove){
         stgDeleteSelf();return;
     }
-    if(this.frame%12==0){
+    if(this.frame%this.d1==0){
         var color=3;
         var x=this.spell.pos[0];
         var y=this.spell.pos[1];
         stgPlaySE("se_shot0");
-        stgCreateShotW2(x,y,3.5,this.a,"lDY",0,color,12,3.5,360,0);
+        stgCreateShotW2(x,y,3.5-diff,this.a,"lDY",0,color,12-diff*4,3.5-diff,360,0);
         stgCreateShotW2(x,y,2,this.b,"mZY",0,color,8,2,360,0);
         stgCreateShotW2(x,y,1.8,this.c,"sXY",0,color-1,4,1.8,16,0,BossSLZ.NonSpell1.on_create_cross);
         this.a+=23;
@@ -208,7 +210,7 @@ BossSLZ.SpellBg1.prototype.script=function(){
 
 
 BossSLZ.Spell1=function(boss){
-    bossDefineSpellA(boss,this,"记忆【筑墙鬼幻想】",2200,30*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【筑墙鬼幻想】"+(diff?"(Easy)":""),2200,30*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -276,7 +278,7 @@ BossSLZ.Spell1.Phase.prototype.script=function(){
     }
 };
 BossSLZ.Spell1.dyScript=function(){
-    if(this.frame<120 && this.frame%12==1){
+    if(this.frame<120 && this.frame%(12+diff*12)==1){
         if(this.pos[0]>0 && this.pos[0]<stg_frame_w && this.pos[1]>0 && this.pos[1]<stg_frame_h){
             this.pool.push(stgCreateShotA1(this.pos[0],this.pos[1],0,0,"sXY",30,3));
             stg_last.a=this.move.speed_angle;
@@ -346,7 +348,7 @@ BossSLZ.NonSpell2.Phase1.prototype.script=function(){
         var a1=this.t1+this.t;
         var x=this.spell.pos[0]+r*cos(a1*PI180);
         var y=this.spell.pos[1]+r*sin(a1*PI180);
-        stgCreateShotW2(x,y,1.5,this.t1,"sXY",12,6,this.a,1.5,this.s1,0);
+        stgCreateShotW2(x,y,1.5,this.t1,"sXY",12,6,this.a/(1+diff),1.5,this.s1,0);
         if(this.s1<180)this.s1+=8;
         this.a+=this.ai;
         if(this.a>20){
@@ -359,7 +361,7 @@ BossSLZ.NonSpell2.Phase1.prototype.script=function(){
         var a2=this.t2-this.t;
         var x=this.spell.pos[0]+r*cos(a2*PI180);
         var y=this.spell.pos[1]+r*sin(a2*PI180);
-        stgCreateShotW2(x,y,1.5,this.t2,"sXY",12,5,this.b,1.5,this.s2,0);
+        stgCreateShotW2(x,y,1.5,this.t2,"sXY",12,5,this.b/(1+diff),1.5,this.s2,0);
         if(this.s2<180)this.s2+=8;
         this.b+=this.bi;
         if(this.b>20){
@@ -414,7 +416,7 @@ BossSLZ.NonSpell2.Phase2.prototype.script=function() {
         var x=this.count%2?stg_frame_w/20*t:stg_frame_w-stg_frame_w/20*t;
         var y=this.spell.pos[1];
 
-        stgCreateShotW2(x,y,6,atan2pr([x,y], this.ps),"sKWD",7+this.count,this.count,5,6,120,0);
+        stgCreateShotW2(x,y,6-diff*3,atan2pr([x,y], this.ps),"sKWD",7+this.count,this.count,5,6-diff*3,120,0);
     }
     if(this.frame%60==21) {
         this.count++;
@@ -430,7 +432,7 @@ BossSLZ.NonSpell2.Phase2.prototype.script=function() {
 };
 
 BossSLZ.Spell2=function(boss){
-    bossDefineSpellA(boss,this,"记忆【妄执神闪斩】",1800,30*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【妄执神闪斩】"+(diff?"(Easy)":""),1800,30*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -447,6 +449,7 @@ BossSLZ.Spell2.prototype.init=function(){
 BossSLZ.Spell2.prototype.script=function(){
     var t2=this.frame%180;
     var z=stg_frame_w>400?12:18;
+    z=z+diff*5;
     if(this.frame%z==0){
         if(t2>90)t2=180-t2;
         t2=t2/90*90;
@@ -494,24 +497,33 @@ BossSLZ.Spell2.Phase.prototype.script=function(){
                 var sa1=0.02;
                 if(a.pos[0]<x+40 && a.pos[0]>x-40){
                     stgDeleteObject(a);
-                    for(var j=0;j<1;j++) {
-                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 3);
-                        stg_last.move.setAccelerate2(sa1, s1);
-                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 4);
-                        stg_last.move.setAccelerate2(sa1, s1);
-                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "sXY", 30, 3);
-                        stg_last.move.setAccelerate2(sa1, s1);
-                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "sXY", 30, 4);
-                        stg_last.move.setAccelerate2(sa1, s1);
-                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 3);
-                        stg_last.move.setAccelerate2(sa1, s1);
-                        stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 4);
-                        stg_last.move.setAccelerate2(sa1, s1);
+                    if(diff==0) {
+                        for (var j = 0; j < 1; j++) {
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 3);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 4);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "sXY", 30, 3);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "sXY", 30, 4);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 3);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 4);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                        }
+                    }else{
+                        for (var j = 0; j < 1; j++) {
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "mZY", 30, 3);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                            stgCreateShotA1(a.pos[0] + stg_rand(-10, 10), a.pos[1] + stg_rand(-10, 10), 0, stg_rand(70, 120), "tDD", 30, 4);
+                            stg_last.move.setAccelerate2(sa1, s1);
+                        }
                     }
 
                 }else if(a.pos[1]<y+70 && a.pos[1]>y-70){
                     stgDeleteObject(a);
-                    for(var j=0;j<2;j++) {
+                    for(var j=0;j<2-diff;j++) {
                         stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"mZY",30,0);
                         stg_last.move.setAccelerate2(sa1,s1);
                         stgCreateShotA1(a.pos[0]+stg_rand(-10,10),a.pos[1]+stg_rand(-10,10),0,stg_rand(360),"mZY",30,2);
@@ -590,10 +602,10 @@ BossSLZ.NonSpell3.prototype.script=function(){
             this.a=atan2pr(this.pos,stgGetRandomPlayer().pos)-60;
             bossWanderSingle(this.boss,1,90,12,60,70);
         }
-        if(this.f%2==0){
+        if(this.f%(2+diff*3)==0){
             shotSE();
             var a=this.a;
-            this.a+=6;
+            this.a+=6+diff*9;
             stgCreateShotW1(this.pos[0],this.pos[1],0.2,a,"sXY",0,1,5,0.8,0,0,BossSLZ.NonSpell3.blt_create);
             stgCreateShotW1(this.pos[0],this.pos[1],0.2,a+2,"sXY",0,1,5,0.8,0,0,BossSLZ.NonSpell3.blt_create);
         }
@@ -603,10 +615,10 @@ BossSLZ.NonSpell3.prototype.script=function(){
             this.a=atan2pr(this.pos,stgGetRandomPlayer().pos)+60;
             bossWanderSingle(this.boss,1,90,12,60,70);
         }
-        if(this.f%2==0){
+        if(this.f%(2+diff*3)==0){
             shotSE();
             var a=this.a;
-            this.a-=6;
+            this.a-=6+diff*9;
             stgCreateShotW1(this.pos[0],this.pos[1],0.2,a,"sXY",0,1,5,0.8,0,6,BossSLZ.NonSpell3.blt_create);
             stgCreateShotW1(this.pos[0],this.pos[1],0.2,a+2,"sXY",0,1,5,0.8,0,6,BossSLZ.NonSpell3.blt_create);
         }
@@ -643,7 +655,7 @@ BossSLZ.NonSpell3.blt_func=function(){
         this.move.speed=0;
     }
     if(this.frame==90){
-        if(stg_rand(1)>0.8){
+        if(stg_rand(1)>0.8+diff){
             stgCreateShotA1(this.pos[0],this.pos[1],0.1,stg_rand(360),"sLD",0,0);
             stg_last.move.setAccelerate2(0.1,3);
             this.fade_remove=12;
@@ -713,14 +725,14 @@ BossSLZ.NonSpell3.Option.prototype.script=function(){
     }
     if(this.mode==0) {
         if (this.frame > 30) {
-            if (this.frame % 24 == 0) {
+            if (this.frame % (24+diff*24) == 0) {
                 stgPlaySE("se_shot0");
                 stgCreateShotW2(this.pos[0], this.pos[1], slow ? 0.5 : 1.5, this.a, "mZY", 0, slow ? 3 : 5, 5, slow ? 0.5 : 1.5, 270, 0);
             }
         }
     }else if(this.mode==1) {
         if (this.frame > 30) {
-            if (this.frame % 12 == 0) {
+            if (this.frame % (12+diff*12) == 0) {
                 for(var i=0;i<stg_players_number;i++){
                     var p=stg_players[i];
                     if(sqrt2(p.pos,this.pos)<18)return;
@@ -736,7 +748,7 @@ BossSLZ.NonSpell3.Option.prototype.script=function(){
 
 };
 BossSLZ.Spell3=function(boss){
-    bossDefineSpellA(boss,this,"记忆【夜盲之歌】",2400,60*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【夜盲之歌】"+(diff?"(Easy)":""),2400,60*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -755,7 +767,7 @@ BossSLZ.Spell3.prototype.script=function(){
         stgAddObject(new NightEffect(this,30,120));
     }
     if(this.frame>0){
-        if(this.frame%18==0){
+        if(this.frame%(18+diff*18)==0){
             shotSE();
             stgCreateShotW1(this.pos[0],this.pos[1],1,this.frame*3,"sXY",0,1,6,0.2,0,0);
             stgCreateShotW1(this.pos[0],this.pos[1],1,this.frame*3+120,"sXY",0,1,6,0.2,0,0);
@@ -782,7 +794,7 @@ BossSLZ.Spell3.prototype.script=function(){
     }
 };
 BossSLZ.Spell4=function(boss){
-    bossDefineSpellA(boss,this,"记忆【无限之柱】",3200,60*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【无限之柱】"+(diff?"(Easy)":""),3200,60*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -803,7 +815,7 @@ BossSLZ.Spell4.prototype.script=function(){
     if(this.frame>60){
         if(this.frame%45==0){
             shotSE();
-            stgCreateShotW2(this.pos[0],this.pos[1],4,stg_rand(360),"sZD",0,6,15,4,360,0,BossSLZ.Spell4.zdCreate);
+            stgCreateShotW2(this.pos[0],this.pos[1],4,stg_rand(360),"sZD",0,6,15-diff*10,4,360,0,BossSLZ.Spell4.zdCreate);
         }
     }
     stgClipObject(32,stg_frame_w-32,32,stg_frame_h/2-32,this.boss);
@@ -829,7 +841,7 @@ BossSLZ.Spell4.Phase.prototype.script=function(){
         var a=new StraightLaser(-64,-300-64,-64,-64,8,16);
         stgAddObject(a);
         stgEnableMove(a);
-        a.setWidth(20);
+        a.setWidth(20-diff*15);
         stgSetPositionA1(a,this.a,0);
         a.setTexture("laser1",0,16,0,64,192,256,1);
         a.turnOn(0);
@@ -843,7 +855,7 @@ BossSLZ.Spell4.Phase.prototype.script=function(){
         stgSetPositionA1(a,stg_frame_w-this.a,0);
         a.setTexture("laser1",0,16,0,64,192,256,1);
         a.turnOn(0);
-        a.setWidth(20);
+        a.setWidth(20-diff*15);
         a.script=BossSLZ.Spell4.laserScript;
         a.move.setSpeed(6,90);
         a.keep=1;
@@ -904,12 +916,12 @@ BossSLZ.NonSpell5.prototype.script=function(){
         this.a1=stg_rand(360);
     }
     if(this.f>=60&& this.f<=180 && this.f%6==0){
-        stgCreateShotW2(this.pos[0],this.pos[1],1,this.a1,"mZY",0,4,60,1,360,0,BossSLZ.NonSpell5.wshot1);
+        stgCreateShotW2(this.pos[0],this.pos[1],1,this.a1,"mZY",0,4,60-diff*20,1,360,0,BossSLZ.NonSpell5.wshot1);
     }
     if(this.f>=120&& this.f<=240 && this.f%8==0)
     {
         shotSE();
-        stgCreateShotW2(this.pos[0],this.pos[1],5,90,"mZY",0,3,60,5,360,0,BossSLZ.NonSpell5.wshot2);
+        stgCreateShotW2(this.pos[0],this.pos[1],5,90,"mZY",0,3,60-diff*20,5,360,0,BossSLZ.NonSpell5.wshot2);
     }
     if(this.f==360){
         bossWanderSingle(this.boss,1,15,5,60);
@@ -981,13 +993,13 @@ BossSLZ.Spell5.prototype.script=function(){
                 a.hitdef.setCircleA2(0,0, (a.r0+ a.r1)*0.5,(a.r1- a.r0)*0.45);
             }
             if(a.frame>120 && a.frame<140){
-                a.r0-=4;a.r1+=4;
+                a.r0-=4-diff*2;a.r1+=4-diff*2;
                 a.hitdef.setCircleA2(0,0, (a.r0+ a.r1)*0.5,(a.r1- a.r0)*0.45);
                 a.a=0;
                 a.b=0;
             }
             if(a.frame>180){
-                if(a.frame%8==0){
+                if(a.frame%(8+diff*4)==0){
                     shotSE();
                     stgCreateShotA1(a.pos[0],a.pos[1],0.7, a.a,"sXY",6,3).layer--;
                     stgCreateShotA1(a.pos[0],a.pos[1],0.7, a.a+120,"sXY",6,3).layer--;
@@ -1008,7 +1020,7 @@ BossSLZ.Spell5.prototype.script=function(){
                         }
                     }
                 }
-                if(a.frame>240 && a.frame%3==0){
+                if(a.frame>240 && a.frame%(3+diff*3)==0){
 
                     stgCreateShotR1(a.pos[0],a.pos[1],0.7, a.b,"tDD",6,0,(a.r0+ a.r1)*0.5,stg_rand(177,183)).layer++;
                     a.b+=90.7;
@@ -1045,7 +1057,7 @@ BossSLZ.NonSpell4.prototype.init=function(){
     this.f=1;
 };
 BossSLZ.NonSpell4.prototype.script=function(){
-    if(this.f%15==0){
+    if(this.f%(15+diff*15)==0){
         var a=stg_rand(1);
         var b=stg_rand(360);
         var pos=[this.pos[0]+(stg_rand(1)>0.5?45:-45),this.pos[1]-20];
@@ -1053,7 +1065,7 @@ BossSLZ.NonSpell4.prototype.script=function(){
             b=atan2pr(pos,stgGetRandomPlayer().pos);
         }
         shotSE();
-        stgCreateShotW2(pos[0],pos[1],3.3,b,"sMD",0,stg_rand_int(15),59,3.3,360,0);
+        stgCreateShotW2(pos[0],pos[1],3.3,b,"sMD",0,stg_rand_int(15),59-diff*18,3.3,360,0);
     }/*else if(this.f%30==15){
         var a=stg_rand(1);
         var b=stg_rand(360);
@@ -1087,7 +1099,8 @@ BossSLZ.NonSpell6.prototype.init=function(){
 BossSLZ.NonSpell6.prototype.script=function(){
     if(this.f==60){
         var a=stg_rand(360);
-        for(var i=0;i<16;i++){
+        var w=16-diff*8;
+        for(var i=0;i<w;i++){
             var l=new ComplexLaser(60,1);
             stgAddObject(l);
             l.target_length=50;
@@ -1097,14 +1110,15 @@ BossSLZ.NonSpell6.prototype.script=function(){
             // l.setTexture("white",286,128,286,192,0);
             l.texture_width=10;
             stgSetPositionA1(l,this.pos[0],this.pos[1]);
-            l.move.setSpeed(3,i/16*360+a);
+            l.move.setSpeed(3,i/w*360+a);
             l.script=BossSLZ.NonSpell6.laserMovement1;
             l.blend=blend_add;
         }
     }
     if(this.f==70){
         var a=stg_rand(360);
-        for(var i=0;i<16;i++){
+        var w=16-diff*8;
+        for(var i=0;i<w;i++){
             var l=new ComplexLaser(60,1);
             stgAddObject(l);
             l.target_length=50;
@@ -1114,14 +1128,15 @@ BossSLZ.NonSpell6.prototype.script=function(){
             // l.setTexture("white",286,128,286,192,0);
             l.texture_width=10;
             stgSetPositionA1(l,this.pos[0],this.pos[1]);
-            l.move.setSpeed(4,i/16*360+a);
+            l.move.setSpeed(4,i/w*360+a);
             l.script=BossSLZ.NonSpell6.laserMovement2;
             l.blend=blend_add;
         }
     }
     if(this.f==80){
         var a=stg_rand(360);
-        for(var i=0;i<16;i++){
+        var w=16-diff*8;
+        for(var i=0;i<w;i++){
             var l=new ComplexLaser(60,1);
             stgAddObject(l);
             l.target_length=50;
@@ -1131,7 +1146,7 @@ BossSLZ.NonSpell6.prototype.script=function(){
             // l.setTexture("white",286,128,286,192,0);
             l.texture_width=10;
             stgSetPositionA1(l,this.pos[0],this.pos[1]);
-            l.move.setSpeed(2.8,i/16*360+a);
+            l.move.setSpeed(2.8,i/w*360+a);
             l.script=BossSLZ.NonSpell6.laserMovement3;
             l.blend=blend_add;
         }
@@ -1139,8 +1154,9 @@ BossSLZ.NonSpell6.prototype.script=function(){
     if(this.f==200 ||this.f==210 || this.f==220 || this.f==230 || this.f==240 || this.f==250) {
         var a=stg_rand(360);
         shotSE();
-        for(var i=0;i<48;i++){
-            stgCreateShotA1(this.pos[0],this.pos[1],4,i/48*360+a,"mZY",0,7);
+        var w=48-diff*24;
+        for(var i=0;i<w;i++){
+            stgCreateShotA1(this.pos[0],this.pos[1],4,i/w*360+a,"mZY",0,7);
         }
     }
 
@@ -1151,8 +1167,9 @@ BossSLZ.NonSpell6.prototype.script=function(){
         var b=1+(((this.f-280)/20)>>0);
         if(b>=4)b=3;
         shotSE();
-        for(var i=0;i<27;i++){
-            stgCreateShotA1(this.pos[0],this.pos[1],3,i/27*360+a,"mZY",0,b);
+        var w=27-diff*11;
+        for(var i=0;i<w;i++){
+            stgCreateShotA1(this.pos[0],this.pos[1],3,i/w*360+a,"mZY",0,b);
             stg_last.script=BossSLZ.NonSpell6["laserMovement"+b];
             stg_last.keep=1;
         }
@@ -1160,8 +1177,9 @@ BossSLZ.NonSpell6.prototype.script=function(){
 
     if(this.f==420){
         var a=stg_rand(360);
+        var w=20-diff*10;
         this.q=a;
-        for(var i=0;i<20;i++){
+        for(var i=0;i<w;i++){
             var l=new ComplexLaser(60,1);
             stgAddObject(l);
             l.target_length=40;
@@ -1171,14 +1189,15 @@ BossSLZ.NonSpell6.prototype.script=function(){
             // l.setTexture("white",286,128,286,192,0);
             l.texture_width=10;
             stgSetPositionA1(l,this.pos[0],this.pos[1]);
-            l.move.setSpeed(5,i/20*360+a);
+            l.move.setSpeed(5,i/w*360+a);
             l.script=BossSLZ.NonSpell6.laserDefault;
             l.blend=blend_add;
         }
     }
     if(this.f==430){
         var a=this.q+120/20;
-        for(var i=0;i<20;i++){
+        var w=20-diff*10;
+        for(var i=0;i<w;i++){
             var l=new ComplexLaser(60,1);
             stgAddObject(l);
             l.target_length=35;
@@ -1188,14 +1207,15 @@ BossSLZ.NonSpell6.prototype.script=function(){
             // l.setTexture("white",286,128,286,192,0);
             l.texture_width=10;
             stgSetPositionA1(l,this.pos[0],this.pos[1]);
-            l.move.setSpeed(5,i/20*360+a);
+            l.move.setSpeed(5,i/w*360+a);
             l.script=BossSLZ.NonSpell6.laserDefault;
             l.blend=blend_add;
         }
     }
     if(this.f==440){
         var a=this.q+240/20;
-        for(var i=0;i<20;i++){
+        var w=20-diff*10;
+        for(var i=0;i<w;i++){
             var l=new ComplexLaser(60,1);
             stgAddObject(l);
             l.target_length=30;
@@ -1205,7 +1225,7 @@ BossSLZ.NonSpell6.prototype.script=function(){
             // l.setTexture("white",286,128,286,192,0);
             l.texture_width=10;
             stgSetPositionA1(l,this.pos[0],this.pos[1]);
-            l.move.setSpeed(5,i/20*360+a);
+            l.move.setSpeed(5,i/w*360+a);
             l.script=BossSLZ.NonSpell6.laserDefault;
             l.blend=blend_add;
         }
@@ -1296,7 +1316,7 @@ BossSLZ.NonSpell6.laserDefault=function(){
 };
 
 BossSLZ.Spell6=function(boss){
-    bossDefineSpellA(boss,this,"记忆【正意的威光】",1500,60*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【正意的威光】"+(diff?"(Easy)":""),1500,60*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -1365,7 +1385,7 @@ BossSLZ.Spell6.prototype.script=function(){
 
 BossSLZ.Spell6.newLaser=function(spell,x,y,dir){
     var l=new StraightLaser(0,500,0,0,12,32);
-    l.setWidth(32);
+    l.setWidth(32-diff*24);
     l.turnHalfOn(20);
     stgAddObject(l);
     l.setTexture("laser1",0,16,0,64,192,256,1);
@@ -1390,6 +1410,8 @@ BossSLZ.Spell6.laser_script=function(){
         var dy=sin(this.rotate[2]);
         var dw=0;
         var dt=stg_rand_int(2,6);
+        dx=dx*(1+diff);
+        dy=dy*(1+diff);
         p[0]+=4*dx;
         p[1]+=4*dy;
         if(stg_rand(1)>0.5)dt=-dt;
@@ -1407,7 +1429,7 @@ BossSLZ.Spell6.laser_script=function(){
                 stg_last.script=BossSLZ.Spell6.blt_script;
                 dt++;
                 if(dt==0){
-                    dt=stg_rand_int(5,8);
+                    dt=stg_rand_int(5-diff*3,8-diff*5);
                 }
             }
             p[0]+=4*dx;
@@ -1481,21 +1503,21 @@ BossSLZ.NonSpell7.shotscript1=function(){
     }
     if(this.frame==112){
         smallSE();
-        stgCreateShotW2(this.pos[0],this.pos[1],1,90,"tJD",12,2,37,1,360,0);
+        stgCreateShotW2(this.pos[0],this.pos[1],1,90,"tJD",12,2,37-diff*20,1,360,0);
        // stgCreateShotW2(this.pos[0],this.pos[1],1,90+180/36,"tDD",12,2,37,1,360,0);
        // stgDeleteSelf();
     }
     if(this.frame==120){
         smallSE();
        // stgCreateShotW2(this.pos[0],this.pos[1],1,90,"tJD",12,2,37,1,360,0);
-        stgCreateShotW2(this.pos[0],this.pos[1],1.05,90+180/36,"tDD",12,2,37,1.05,360,0);
+        stgCreateShotW2(this.pos[0],this.pos[1],1.05,90+180/36,"tDD",12,2,37-diff*20,1.05,360,0);
         stgDeleteSelf();
     }
 };
 
 
 BossSLZ.Spell7=function(boss){
-    bossDefineSpellA(boss,this,"记忆【新升的神灵】",3500,60*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【新升的神灵】"+(diff?"(Easy)":""),3500,60*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -1517,7 +1539,7 @@ BossSLZ.Spell7.prototype.script=function(){
 
     if(this.frame>=60){
         if(this.life>2000) {
-            if (this.frame % 5 == 0) {
+            if (this.frame % (5+diff*5) == 0) {
                 var x = stg_rand(0, stg_frame_w);
                 var x0 = stg_frame_w / 2 + sin(this.frame * PI180) * 80;
                 if (x > x0 + 35 || x < x0 - 35) {
@@ -1541,7 +1563,7 @@ BossSLZ.Spell7.prototype.script=function(){
             }else{
                 this.a = 0;
             }
-            if (this.frame % 1 == 0) {
+            if (this.frame % (1+diff*5) == 0) {
                 var x = stg_rand(0, stg_frame_w);
                 var x0 = stg_frame_w / 2 + sin(this.frame * PI180) * 80;
                 if (x > x0 + 35 || x < x0 - 35) {
@@ -1626,7 +1648,7 @@ BossSLZ.NonSpell8.prototype.script=function(){
     }
     if(this.f>60&& this.f<=120 && this.f%6==0){
         shotSE();
-        stgCreateShotW2(this.pos[0],this.pos[1],this.a3,this.a1,"sFZMD",0,4,30,this.a3,360,0,BossSLZ.NonSpell8.wshot1);
+        stgCreateShotW2(this.pos[0],this.pos[1],this.a3,this.a1,"sFZMD",0,4,30-diff*18,this.a3,360,0,BossSLZ.NonSpell8.wshot1);
         this.a1+= this.a2*1.7;
         this.a3-=0.2;
     }
@@ -1636,7 +1658,7 @@ BossSLZ.NonSpell8.prototype.script=function(){
     }
     if(this.f>120&& this.f<=180 && this.f%6==0){
         shotSE();
-        stgCreateShotW2(this.pos[0],this.pos[1],this.a3,this.a1,"sFZMD",0,2,30,this.a3,360,0,BossSLZ.NonSpell8.wshot1);
+        stgCreateShotW2(this.pos[0],this.pos[1],this.a3,this.a1,"sFZMD",0,2,30-diff*18,this.a3,360,0,BossSLZ.NonSpell8.wshot1);
         this.a1 -= this.a2*1.7;
         this.a3-=0.14;
     }
@@ -1673,7 +1695,7 @@ BossSLZ.NonSpell8.shotscript2=function(){
 };
 
 BossSLZ.Spell8=function(boss){
-    bossDefineSpellA(boss,this,"记忆【天翻地覆】",3000,60*60,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【天翻地覆】"+(diff?"(Easy)":""),3000,60*60,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -1820,7 +1842,7 @@ BossSLZ.Spell8.Phase.prototype.script=function(){
         if(this.f%5==0){
             stgCreateShotW2(this.pos[0],this.pos[1],1.2,this.a,"sFZMD",0,0,9,1.2,360,0,BossSLZ.Spell8.wshot1);
         }
-        this.a+=this.b*0.4;
+        this.a+=this.b*(0.4-diff*0.3);
     }
     if(this.frame%135==0){
         this.b=stg_rand(1)>0.5?1:-1;
@@ -1848,7 +1870,7 @@ BossSLZ.Spell8.shotscript1=function(){
 };
 
 BossSLZ.Spell9=function(boss){
-    bossDefineSpellA(boss,this,"【弹幕函数图样】",6000,60*104,12500000,0.8);
+    bossDefineSpellA(boss,this,"【弹幕函数图样】"+(diff?"(Easy)":""),6000,60*104,12500000,0.8);
     this.is_time_spell=1;
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
@@ -2140,7 +2162,7 @@ BossSLZ.Spell9.Sampler2D=function(spell,func1,func2,pos,time,samplemode,sampleti
     this.t=time;
     this.m=samplemode;
     //0:根据1的方向+para走，子弹朝向2
-    this.i=sampletime;
+    this.i=sampletime*(1+diff*2);
     //this.d=sampledist;
     this.f1=func1;
     this.f2=func2;
@@ -2235,7 +2257,7 @@ BossSLZ.Spell9.Sampler2D.prototype.script=function(){
 
 
 BossSLZ.Spell10=function(boss){
-    bossDefineSpellA(boss,this,"记忆【纯净的弹幕地狱】",6000,60*120,12500000,0.8);
+    bossDefineSpellA(boss,this,"记忆【纯净的弹幕地狱】"+(diff?"(Easy)":""),6000,60*120,12500000,0.8);
     this.hitby=new StgHitDef();
     this.hitby.setPointA1(0,0,50);
     this.hitdef=new StgHitDef();
@@ -2316,14 +2338,15 @@ BossSLZ.Spell10.ld=function(){
         var x=stg_rand(stg_frame_w/6)+stg_frame_w/3*2;
         var y=stg_rand(stg_frame_h/6)+stg_frame_h/4;
         var a0=atan2(stg_frame_h-y,stg_frame_w/2-x)/PI180;
-        for(var i=0;i<30;i++){
-            stgCreateShotR1(x,y,2,360*i/30+a0,"sXY",6,2,80,0);
+        var w=30-diff*14;
+        for(var i=0;i<w;i++){
+            stgCreateShotR1(x,y,2,360*i/w+a0,"sXY",6,2,80,0);
         }
         x=stg_frame_w/3-stg_rand(stg_frame_w/6);
         y=stg_rand(stg_frame_h/6)+stg_frame_h/4;
         a0=atan2(stg_frame_h-y,stg_frame_w/2-x)/PI180;
-        for(var i=0;i<30;i++){
-            stgCreateShotR1(x,y,2,360*i/30+a0,"sXY",6,2,80,0);
+        for(var i=0;i<w;i++){
+            stgCreateShotR1(x,y,2,360*i/w+a0,"sXY",6,2,80,0);
         }
     }
 };
@@ -2332,14 +2355,15 @@ BossSLZ.Spell10.fd=function(){
         var x=stg_rand(stg_frame_w/6)+stg_frame_w/3*2;
         var y=stg_rand(stg_frame_h/6)+stg_frame_h/4;
         var a0=atan2pr([x,y],stgGetRandomPlayer().pos)+360/32;
-        for(var i=0;i<16;i++){
-            stgCreateShotR1(x,y,1.4,360*i/16+a0,"sXY",6,4,80,0);
+        var w=16-diff*4;
+        for(var i=0;i<w;i++){
+            stgCreateShotR1(x,y,1.4+diff,360*i/w+a0,"sXY",6,4,80,0);
         }
         x=stg_frame_w/3-stg_rand(stg_frame_w/6);
         y=stg_rand(stg_frame_h/6)+stg_frame_h/4;
         a0=atan2pr([x,y],stgGetRandomPlayer().pos)+360/32;
-        for(var i=0;i<16;i++){
-            stgCreateShotR1(x,y,1.4,360*i/16+a0,"sXY",6,4,80,0);
+        for(var i=0;i<w;i++){
+            stgCreateShotR1(x,y,1.4+diff,360*i/w+a0,"sXY",6,4,80,0);
         }
     }
 };
