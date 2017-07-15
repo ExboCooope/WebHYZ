@@ -15,7 +15,7 @@ shw.setting_sync.on_select={
             stg_refresher_type=shw.refresh_mode-1;
         }
         stgSaveData("refresh",shw.refresh_mode);
-        shw.setting_sync.mtext="垂直同步："+["自动","关闭","开启"][shw.refresh_mode];
+        shw.setting_sync.mtext="垂直同步："+["自动","开启","关闭"][shw.refresh_mode];
     }
 };
 shw.sprite_mode=0;

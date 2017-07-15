@@ -107,7 +107,7 @@ shw_loader.init=function(){
         if(shw.refresh_mode){
             stg_refresher_type=shw.refresh_mode-1;
         }
-        shw.setting_sync.mtext="垂直同步："+["自动","关闭","开启"][shw.refresh_mode];
+        shw.setting_sync.mtext="垂直同步："+["自动","开启","关闭"][shw.refresh_mode];
 
         shw.sprite_mode=1-shw.sprite_mode;
         shw.sprite_mode=stgLoadData("spritemode")||0;

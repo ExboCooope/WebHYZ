@@ -478,7 +478,7 @@ function stgDefaultFinishSpellCheck(time){
             }else{
                 stgPlaySE("se_fault");
             }
-            stgBossFinishSpellHistory(spell.boss,spell,spell.is_time_spell);
+            stgBossFinishSpellHistory(spell.boss,spell,spell.is_time_spell&&(spell.score > 0));
         }
         spell.life=0;
         stgDeleteSelf();
