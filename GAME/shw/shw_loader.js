@@ -267,6 +267,12 @@ shw_loader.init=function(){
     stgAddObject(test);
     test.self_rotate=0.05;*/
 
+    var hint=new RenderText(12,460,"默认操作：Z 确认、射击   X 取消、雷   Shift 低速  方向键 移动");
+    stgAddObject(hint);
+    stg_last.render.font="20px 黑体";
+    stg_last.render.color="#000";
+
+
 };
 
 shw_loader.script=function(){
