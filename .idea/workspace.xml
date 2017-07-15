@@ -28,21 +28,11 @@
     <splitter split-orientation="horizontal" split-proportion="0.45245126">
       <split-first>
         <leaf>
-          <file leaf-file-name="boss_slz.js" pinned="false" current="false" current-in-tab="true">
+          <file leaf-file-name="boss_slz.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/GAME/boss_slz.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.3438914" vertical-offset="38" max-vertical-offset="47690">
-                  <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="lstg_api.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/lstg_api.js">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6821">
-                  <caret line="4" column="9" selection-start-line="4" selection-start-column="9" selection-end-line="4" selection-end-column="9" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="42626" max-vertical-offset="48146">
+                  <caret line="2273" column="14" selection-start-line="2273" selection-start-column="14" selection-end-line="2273" selection-end-column="14" />
                   <folding />
                 </state>
               </provider>
@@ -51,8 +41,18 @@
           <file leaf-file-name="shw_level.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/GAME/shw/shw_level.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2318">
-                  <caret line="28" column="25" selection-start-line="28" selection-start-column="25" selection-end-line="28" selection-end-column="25" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="627" max-vertical-offset="3287">
+                  <caret line="60" column="40" selection-start-line="60" selection-start-column="27" selection-end-line="60" selection-end-column="40" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="stagePressureTest.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/GAME/stagePressureTest.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="513" max-vertical-offset="2660">
+                  <caret line="48" column="21" selection-start-line="39" selection-start-column="12" selection-end-line="48" selection-end-column="21" />
                   <folding />
                 </state>
               </provider>
@@ -61,21 +61,19 @@
           <file leaf-file-name="default_bullets.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/GAME/default_bullets.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="6792" max-vertical-offset="10583">
+                <state vertical-scroll-proportion="0.0" vertical-offset="7106" max-vertical-offset="10583">
                   <caret line="374" column="76" selection-start-line="374" selection-start-column="76" selection-end-line="374" selection-end-column="76" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="shw_menu.js" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="shw_menu.js" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/GAME/shw/shw_menu.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1463">
-                  <caret line="23" column="77" selection-start-line="23" selection-start-column="77" selection-end-line="23" selection-end-column="77" />
-                  <folding>
-                    <element signature="e#0#39#0" expanded="false" />
-                  </folding>
+                <state vertical-scroll-proportion="0.2541806" vertical-offset="0" max-vertical-offset="2432">
+                  <caret line="12" column="48" selection-start-line="12" selection-start-column="48" selection-end-line="12" selection-end-column="48" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -83,8 +81,8 @@
           <file leaf-file-name="STGCORE.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/STGCORE.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="6736" max-vertical-offset="33763">
-                  <caret line="393" column="5" selection-start-line="387" selection-start-column="5" selection-end-line="393" selection-end-column="5" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="24900" max-vertical-offset="33763">
+                  <caret line="1352" column="10" selection-start-line="1352" selection-start-column="10" selection-end-line="1352" selection-end-column="10" />
                   <folding />
                 </state>
               </provider>
@@ -120,11 +118,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="default_item_script.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/GAME/default_item_script.js">
+          <file leaf-file-name="shaders.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/WebGL/shaders.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="171" max-vertical-offset="2147">
-                  <caret line="35" column="47" selection-start-line="35" selection-start-column="47" selection-end-line="35" selection-end-column="47" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="2043" max-vertical-offset="8094">
+                  <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
                   <folding />
                 </state>
               </provider>
@@ -137,8 +135,8 @@
           <file leaf-file-name="index_shw.html" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/index_shw.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="-5.928571" vertical-offset="784" max-vertical-offset="1653">
-                  <caret line="50" column="46" selection-start-line="50" selection-start-column="46" selection-end-line="50" selection-end-column="46" />
+                <state vertical-scroll-proportion="-6.607143" vertical-offset="784" max-vertical-offset="1653">
+                  <caret line="51" column="49" selection-start-line="51" selection-start-column="49" selection-end-line="51" selection-end-column="49" />
                   <folding />
                 </state>
               </provider>
@@ -154,18 +152,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="frame_bg.png" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/GAME/shw/frame_bg.png">
-              <provider selected="true" editor-type-id="images">
-                <state />
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="default_lib.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/GAME/default_lib.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="15963" max-vertical-offset="17347">
-                  <caret line="870" column="102" selection-start-line="870" selection-start-column="75" selection-end-line="870" selection-end-column="102" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="1658" max-vertical-offset="17347">
+                  <caret line="59" column="21" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="21" />
                   <folding />
                 </state>
               </provider>
@@ -181,21 +172,31 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="hyz_shaders.js" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_shaders.js">
+          <file leaf-file-name="hyz_level.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_level.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="15124">
-                  <caret line="342" column="54" selection-start-line="342" selection-start-column="54" selection-end-line="342" selection-end-column="54" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="9572" max-vertical-offset="10469">
+                  <caret line="545" column="0" selection-start-line="545" selection-start-column="0" selection-end-line="545" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="hyz_shaders.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_shaders.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="17279" max-vertical-offset="23408">
+                  <caret line="931" column="76" selection-start-line="931" selection-start-column="76" selection-end-line="931" selection-end-column="76" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/index.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.8032221" vertical-offset="518" max-vertical-offset="1672">
-                  <caret line="64" column="30" selection-start-line="64" selection-start-column="30" selection-end-line="64" selection-end-column="30" />
+                <state vertical-scroll-proportion="-10.0" vertical-offset="518" max-vertical-offset="1672">
+                  <caret line="42" column="46" selection-start-line="42" selection-start-column="46" selection-end-line="42" selection-end-column="46" />
                   <folding />
                 </state>
               </provider>
@@ -204,18 +205,28 @@
           <file leaf-file-name="hyz_system.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_system.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="4361" max-vertical-offset="20558">
-                  <caret line="251" column="5" selection-start-line="251" selection-start-column="5" selection-end-line="251" selection-end-column="5" />
+                <state vertical-scroll-proportion="0.0" vertical-offset="1644" max-vertical-offset="20558">
+                  <caret line="117" column="40" selection-start-line="117" selection-start-column="40" selection-end-line="117" selection-end-column="40" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="shw_loader.js" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="shw_loader.js" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/GAME/shw/shw_loader.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="2318" max-vertical-offset="5453">
-                  <caret line="128" column="80" selection-start-line="128" selection-start-column="80" selection-end-line="128" selection-end-column="80" />
+                <state vertical-scroll-proportion="0.2541806" vertical-offset="1900" max-vertical-offset="6080">
+                  <caret line="112" column="53" selection-start-line="112" selection-start-column="53" selection-end-line="112" selection-end-column="53" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="STGCONTROLLER.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/STGCONTROLLER.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="1487" max-vertical-offset="8284">
+                  <caret line="94" column="9" selection-start-line="94" selection-start-column="9" selection-end-line="94" selection-end-column="9" />
                   <folding />
                 </state>
               </provider>
@@ -255,15 +266,12 @@
         <option value="$PROJECT_DIR$/players/espshoot.js" />
         <option value="$PROJECT_DIR$/res/resource_holder.js" />
         <option value="$PROJECT_DIR$/WebGL/rendertarget.js" />
-        <option value="$PROJECT_DIR$/WebGL/shaders.js" />
-        <option value="$PROJECT_DIR$/GAME/hyz/hyz_shaders.js" />
         <option value="$PROJECT_DIR$/STGGLOBAL.js" />
         <option value="$PROJECT_DIR$/GAME/spell_test.js" />
         <option value="$PROJECT_DIR$/STGBULLET.js" />
         <option value="$PROJECT_DIR$/GAME/hyz/hyz_ui.js" />
         <option value="$PROJECT_DIR$/GAME/default_graphics.js" />
         <option value="$PROJECT_DIR$/lstg_api.js" />
-        <option value="$PROJECT_DIR$/GAME/hyz/hyz_level.js" />
         <option value="$PROJECT_DIR$/players/player_byakuren.js" />
         <option value="$PROJECT_DIR$/GAME/default_spellcard_system.js" />
         <option value="$PROJECT_DIR$/index_shw.html" />
@@ -271,19 +279,22 @@
         <option value="$PROJECT_DIR$/index_hyz.html" />
         <option value="$PROJECT_DIR$/GAME/default_player_script.js" />
         <option value="$PROJECT_DIR$/index.html" />
-        <option value="$PROJECT_DIR$/STGCORE.js" />
-        <option value="$PROJECT_DIR$/GAME/shw/shw_menu.js" />
-        <option value="$PROJECT_DIR$/GAME/shw/shw_level.js" />
         <option value="$PROJECT_DIR$/GAME/hyz/hyz_loader.js" />
         <option value="$PROJECT_DIR$/GAME/hyz/hyz_system.js" />
         <option value="$PROJECT_DIR$/GAME/default_item_script.js" />
-        <option value="$PROJECT_DIR$/GAME/shw/shw_loader.js" />
         <option value="$PROJECT_DIR$/players/player_remilia.js" />
         <option value="$PROJECT_DIR$/GAME/default_lib.js" />
         <option value="$PROJECT_DIR$/players/player_ai.js" />
         <option value="$PROJECT_DIR$/GAME/default_bullets.js" />
-        <option value="$PROJECT_DIR$/GAME/boss_slz.js" />
         <option value="$PROJECT_DIR$/STGDISPLAY.js" />
+        <option value="$PROJECT_DIR$/WebGL/shaders.js" />
+        <option value="$PROJECT_DIR$/GAME/hyz/hyz_shaders.js" />
+        <option value="$PROJECT_DIR$/GAME/hyz/hyz_level.js" />
+        <option value="$PROJECT_DIR$/GAME/shw/shw_level.js" />
+        <option value="$PROJECT_DIR$/STGCORE.js" />
+        <option value="$PROJECT_DIR$/GAME/boss_slz.js" />
+        <option value="$PROJECT_DIR$/GAME/shw/shw_loader.js" />
+        <option value="$PROJECT_DIR$/GAME/shw/shw_menu.js" />
       </list>
     </option>
   </component>
@@ -323,7 +334,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -436,6 +446,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -466,6 +477,14 @@
     <configuration default="false" name="EMatrix.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="D:/Program Files/nodejs/node" path-to-js-file="$PROJECT_DIR$/WebGL/EMatrix.js" working-dir="$PROJECT_DIR$">
       <method />
     </configuration>
+    <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
+      <option name="VMOptions" />
+      <option name="arguments" />
+      <option name="filePath" />
+      <option name="scope" value="ALL" />
+      <option name="testName" />
+      <method />
+    </configuration>
     <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
       <option name="VMOptions" />
       <option name="arguments" />
@@ -476,12 +495,14 @@
       <option name="showConsoleOnStdOut" value="false" />
       <method />
     </configuration>
-    <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
-      <option name="VMOptions" />
-      <option name="arguments" />
+    <configuration default="true" type="CucumberJavaScriptRunConfigurationType" factoryName="Cucumber.js">
+      <option name="cucumberJsArguments" />
+      <option name="executablePath" />
       <option name="filePath" />
-      <option name="scope" value="ALL" />
-      <option name="testName" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
+      <envs />
       <method />
     </configuration>
     <configuration default="true" type="JSTestDriver:ConfigurationType" factoryName="JsTestDriver">
@@ -491,21 +512,11 @@
       <setting name="preferredDebugBrowser" value="Chrome" />
       <method />
     </configuration>
-    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
-      <envs />
-      <method />
-    </configuration>
-    <configuration default="true" type="CucumberJavaScriptRunConfigurationType" factoryName="Cucumber.js">
-      <option name="cucumberJsArguments" />
-      <option name="executablePath" />
-      <option name="filePath" />
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
       <method />
     </configuration>
     <configuration default="true" type="NodeWebKit" factoryName="Node-webkit">
       <option name="name" value="" />
-      <method />
-    </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
       <method />
     </configuration>
     <configuration default="true" type="mocha-javascript-test-runner" factoryName="Mocha">
@@ -544,7 +555,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -559,11 +570,11 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19300517" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19300517" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24958494" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -588,23 +599,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/players/espshoot.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="631" max-vertical-offset="1786">
-          <caret line="42" column="25" selection-start-line="42" selection-start-column="25" selection-end-line="42" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/favicon.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cardbg2_d.png">
-      <provider selected="true" editor-type-id="images">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/cardbg2_c.png">
       <provider selected="true" editor-type-id="images">
         <state />
@@ -696,7 +690,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="190" max-vertical-offset="1159">
           <caret line="26" column="40" selection-start-line="26" selection-start-column="40" selection-end-line="26" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -704,7 +697,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1051" max-vertical-offset="3173">
           <caret line="159" column="0" selection-start-line="159" selection-start-column="0" selection-end-line="159" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -712,7 +704,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1482">
           <caret line="29" column="50" selection-start-line="29" selection-start-column="50" selection-end-line="29" selection-end-column="50" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -740,7 +731,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3405" max-vertical-offset="4142">
           <caret line="36" column="9" selection-start-line="36" selection-start-column="9" selection-end-line="36" selection-end-column="9" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -769,25 +759,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="426" max-vertical-offset="2356">
           <caret line="35" column="44" selection-start-line="35" selection-start-column="44" selection-end-line="35" selection-end-column="44" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/shw/shw_menu.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1463">
-          <caret line="23" column="77" selection-start-line="23" selection-start-column="77" selection-end-line="23" selection-end-column="77" />
-          <folding>
-            <element signature="e#0#39#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_level.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1482" max-vertical-offset="10469">
-          <caret line="86" column="28" selection-start-line="86" selection-start-column="28" selection-end-line="86" selection-end-column="28" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -803,31 +774,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.2541806" vertical-offset="0" max-vertical-offset="4408">
           <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/index_hyz.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-22.214285" vertical-offset="670" max-vertical-offset="1539">
-          <caret line="68" column="36" selection-start-line="68" selection-start-column="36" selection-end-line="68" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_system.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4361" max-vertical-offset="20558">
-          <caret line="251" column="5" selection-start-line="251" selection-start-column="5" selection-end-line="251" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/shw/shw_level.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2318">
-          <caret line="28" column="25" selection-start-line="28" selection-start-column="25" selection-end-line="28" selection-end-column="25" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -835,14 +781,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="171" max-vertical-offset="2147">
           <caret line="35" column="47" selection-start-line="35" selection-start-column="47" selection-end-line="35" selection-end-column="47" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_shaders.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6235" max-vertical-offset="15124">
-          <caret line="342" column="54" selection-start-line="342" selection-start-column="54" selection-end-line="342" selection-end-column="54" />
           <folding />
         </state>
       </provider>
@@ -855,38 +793,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/shw/shw_loader.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2318" max-vertical-offset="5453">
-          <caret line="128" column="80" selection-start-line="128" selection-start-column="80" selection-end-line="128" selection-end-column="80" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/STGCORE.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6736" max-vertical-offset="33763">
-          <caret line="393" column="5" selection-start-line="387" selection-start-column="5" selection-end-line="393" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/default_player_script.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2242" max-vertical-offset="6384">
-          <caret line="140" column="26" selection-start-line="140" selection-start-column="26" selection-end-line="140" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/players/player_ai.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5879" max-vertical-offset="7619">
-          <caret line="337" column="43" selection-start-line="337" selection-start-column="43" selection-end-line="337" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GAME/default_bullets.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="6792" max-vertical-offset="10583">
@@ -895,18 +801,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/default_lib.js">
+    <entry file="file://$PROJECT_DIR$/WebGL/shaders.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="15963" max-vertical-offset="17347">
-          <caret line="870" column="102" selection-start-line="870" selection-start-column="75" selection-end-line="870" selection-end-column="102" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/boss_slz.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3438914" vertical-offset="38" max-vertical-offset="47690">
-          <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2043" max-vertical-offset="8094">
+          <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
           <folding />
         </state>
       </provider>
@@ -919,18 +817,130 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index_shw.html">
+    <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_level.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.928571" vertical-offset="784" max-vertical-offset="1653">
-          <caret line="50" column="46" selection-start-line="50" selection-start-column="46" selection-end-line="50" selection-end-column="46" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="9572" max-vertical-offset="10469">
+          <caret line="545" column="0" selection-start-line="545" selection-start-column="0" selection-end-line="545" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/stagePressureTest.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="513" max-vertical-offset="2660">
+          <caret line="48" column="21" selection-start-line="39" selection-start-column="12" selection-end-line="48" selection-end-column="21" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.8032221" vertical-offset="518" max-vertical-offset="1672">
-          <caret line="64" column="30" selection-start-line="64" selection-start-column="30" selection-end-line="64" selection-end-column="30" />
+        <state vertical-scroll-proportion="-10.0" vertical-offset="518" max-vertical-offset="1672">
+          <caret line="42" column="46" selection-start-line="42" selection-start-column="46" selection-end-line="42" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index_shw.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-6.607143" vertical-offset="784" max-vertical-offset="1653">
+          <caret line="51" column="49" selection-start-line="51" selection-start-column="49" selection-end-line="51" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index_hyz.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-22.214285" vertical-offset="670" max-vertical-offset="1539">
+          <caret line="68" column="36" selection-start-line="68" selection-start-column="36" selection-end-line="68" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/players/player_ai.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5879" max-vertical-offset="7619">
+          <caret line="337" column="43" selection-start-line="337" selection-start-column="43" selection-end-line="337" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/default_player_script.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="2242" max-vertical-offset="6384">
+          <caret line="140" column="26" selection-start-line="140" selection-start-column="26" selection-end-line="140" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/STGCORE.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="24900" max-vertical-offset="33763">
+          <caret line="1352" column="10" selection-start-line="1352" selection-start-column="10" selection-end-line="1352" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/boss_slz.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="42626" max-vertical-offset="48146">
+          <caret line="2273" column="14" selection-start-line="2273" selection-start-column="14" selection-end-line="2273" selection-end-column="14" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/shw/shw_level.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="627" max-vertical-offset="3287">
+          <caret line="60" column="40" selection-start-line="60" selection-start-column="27" selection-end-line="60" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/default_lib.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1658" max-vertical-offset="17347">
+          <caret line="59" column="21" selection-start-line="59" selection-start-column="21" selection-end-line="59" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_system.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1644" max-vertical-offset="20558">
+          <caret line="117" column="40" selection-start-line="117" selection-start-column="40" selection-end-line="117" selection-end-column="40" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/STGCONTROLLER.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1487" max-vertical-offset="8284">
+          <caret line="94" column="9" selection-start-line="94" selection-start-column="9" selection-end-line="94" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/hyz/hyz_shaders.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="17279" max-vertical-offset="23408">
+          <caret line="931" column="76" selection-start-line="931" selection-start-column="76" selection-end-line="931" selection-end-column="76" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/shw/shw_loader.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2541806" vertical-offset="1900" max-vertical-offset="6080">
+          <caret line="112" column="53" selection-start-line="112" selection-start-column="53" selection-end-line="112" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/shw/shw_menu.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2541806" vertical-offset="0" max-vertical-offset="2432">
+          <caret line="12" column="48" selection-start-line="12" selection-start-column="48" selection-end-line="12" selection-end-column="48" />
           <folding />
         </state>
       </provider>

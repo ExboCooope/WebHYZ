@@ -237,8 +237,14 @@ function WebglDMA(shader,iDefaultCapability){
            gl.enableVertexAttribArray(t[2]);
       }
     this.objectParser=null;
-
+    this.last_index=0;
+    this.invalid_min=0;
+    this.invalid_max=-1;
 }
+WebglDMA.prototype.invalidate=function(i){
+    if(i<this.invalid_min)this.invalid_min=i;
+    if(i>this.invalid_max)this.invalid_max=i;
+};
 WebglDMA.prototype.parseObject=function(oObject){
     if(!oObject.dma){
         oObject.dma=[];
@@ -249,11 +255,17 @@ WebglDMA.prototype.parseObject=function(oObject){
     var gl=_gl;
     if(oObject.dma[this.id]===undefined){
         flush=1;
-        for(i=0;i<this.usage.length;i++){
-            if(!this.usage[i]){
-                break;
+        if(!this.usage[this.last_index]){
+            i=this.last_index;
+
+        }else{
+            for(i=this.last_index;i<this.usage.length;i++){
+                if(!this.usage[i]){
+                    break;
+                }
             }
         }
+        this.last_index=i+1;
         if(i==this.usage.length && i>=this.cap){
             console.log("Reaching vector pool capability "+this.cap+", new capability "+(this.cap+this.capa)+" .");
             var n=(this.cap+this.capa);
@@ -311,6 +323,7 @@ WebglDMA.prototype.deleteObject=function(oObject){
     }
     i=oObject.dma[this.id];
     this.usage[i]=null;
+    if(i<this.last_index)this.last_index=i;
 };
 
 WebglDMA.prototype.frameStart=function(){
@@ -320,6 +333,8 @@ WebglDMA.prototype.frameStart=function(){
  //       gl.enableVertexAttribArray(t[2]);
   //  }
     this.indexn=0;
+    this.invalid_min=this.cap+1;
+    this.invalid_max=-1;
 };
 
 WebglDMA.prototype.draw=function(){
@@ -332,6 +347,8 @@ WebglDMA.prototype.draw=function(){
        // gl.enableVertexAttribArray(t[2]);
         if(t[4]){
             gl.bufferData(gl.ARRAY_BUFFER,this.buffers[j],gl.STREAM_DRAW);
+        }else if(this.invalid_min<=this.invalid_max){
+            gl.bufferSubData(gl.ARRAY_BUFFER,this.invalid_min*4*t[1]*4,this.buffers[j].subarray(this.invalid_min*t[1]*4,(this.invalid_max+1)*t[1]*4));
         }
         gl.vertexAttribPointer(t[2], t[1], gl.FLOAT, false, t[1]*4, 0);
     }
@@ -361,14 +378,15 @@ function shader1_object_parser(oDMA,oObject,iIndex,iNew){
     oDMA.buffers[4].set([r,r,r,r],iIndex*4);
     if(iNew) {
         oDMA.buffers[1].set(oObject.render.aRec,iIndex*8);
-        gl.bindBuffer(gl.ARRAY_BUFFER,oDMA.glbuffers[1]);
-        gl.bufferSubData(gl.ARRAY_BUFFER,iIndex*8*4,oObject.render.aRec);
+     //   gl.bindBuffer(gl.ARRAY_BUFFER,oDMA.glbuffers[1]);
+    //    gl.bufferSubData(gl.ARRAY_BUFFER,iIndex*8*4,oObject.render.aRec);
         oDMA.buffers[3].set(oObject.render.aColor,iIndex*16);
-        gl.bindBuffer(gl.ARRAY_BUFFER,oDMA.glbuffers[3]);
-        gl.bufferSubData(gl.ARRAY_BUFFER,iIndex*16*4,oObject.render.aColor);
+     //   gl.bindBuffer(gl.ARRAY_BUFFER,oDMA.glbuffers[3]);
+      //  gl.bufferSubData(gl.ARRAY_BUFFER,iIndex*16*4,oObject.render.aColor);
         oDMA.buffers[2].set(oObject.render.aUVT,iIndex*8);
-        gl.bindBuffer(gl.ARRAY_BUFFER,oDMA.glbuffers[2]);
-        gl.bufferSubData(gl.ARRAY_BUFFER,iIndex*8*4,oObject.render.aUVT);
+      //  gl.bindBuffer(gl.ARRAY_BUFFER,oDMA.glbuffers[2]);
+      //  gl.bufferSubData(gl.ARRAY_BUFFER,iIndex*8*4,oObject.render.aUVT);
+        oDMA.invalidate(iIndex);
     }
 }
 

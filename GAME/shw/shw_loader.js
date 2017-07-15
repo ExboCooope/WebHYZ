@@ -102,7 +102,24 @@ shw_loader.init=function(){
         stgShowCanvas("frame", 0, 0, 0, 0, 5);
         stgShowCanvas("ui", 0, 0, 0, 0, 20);
         //载入渲染器
-        stgAddShader("sprite_shader",hyzSpriteShader);
+
+        shw.refresh_mode=stgLoadData("refresh")||0;
+        if(shw.refresh_mode){
+            stg_refresher_type=shw.refresh_mode-1;
+        }
+        shw.setting_sync.mtext="垂直同步："+["自动","关闭","开启"][shw.refresh_mode];
+
+        shw.sprite_mode=1-shw.sprite_mode;
+        shw.sprite_mode=stgLoadData("spritemode")||0;
+        shw.setting_sprite.mtext="渲染方式（需重启）："+(!shw.sprite_mode?"点精灵":"四边形");
+
+        if(shw.sprite_mode){
+            stgAddShader("sprite_shader",hyzSpriteShader);
+        }else{
+            stgAddShader("sprite_shader",hyzSpriteShaderV2);
+        }
+       // stgAddShader("sprite_shader",hyzSpriteShader);
+     //   stgAddShader("point_shader",hyzSpriteShader);
         stgAddShader("basic_shader",hyzPrimitive2DShader);
         stgAddShader("testShader2", default_2d_misc_shader);
         stgAddShader("3d_shader", default_3d_shader);
@@ -233,6 +250,22 @@ shw_loader.init=function(){
       //  stgHideCanvas("frame");
     }
     stgClearCanvas("ui");
+/*
+    var test={};
+    test.render=new StgRender("point_shader");
+    renderApply2DTemplate(test,"remilia_boss_image",0);
+    test.layer=280;
+    stgSetPositionA1(test,100,100);
+    stgAddObject(test);
+    test.self_rotate=0.05;
+
+    test={};
+    test.render=new StgRender("sprite_shader");
+    renderApply2DTemplate(test,"remilia_boss_image",0);
+    test.layer=280;
+    stgSetPositionA1(test,200,100);
+    stgAddObject(test);
+    test.self_rotate=0.05;*/
 
 };
 
