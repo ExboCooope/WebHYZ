@@ -38,11 +38,21 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="STGDISPLAY.js" pinned="false" current="false" current-in-tab="false">
+          <file leaf-file-name="STGDISPLAY.js" pinned="false" current="true" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/STGDISPLAY.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6555">
-                  <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+                <state vertical-scroll-proportion="0.49364406" vertical-offset="5866" max-vertical-offset="6555">
+                  <caret line="321" column="9" selection-start-line="321" selection-start-column="9" selection-end-line="321" selection-end-column="9" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="boss_slz.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/GAME/boss_slz.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="3591" max-vertical-offset="48678">
+                  <caret line="18" column="71" selection-start-line="18" selection-start-column="71" selection-end-line="18" selection-end-column="71" />
                   <folding />
                 </state>
               </provider>
@@ -98,11 +108,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="index.html" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/index.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.41666666" vertical-offset="138" max-vertical-offset="703">
-                  <caret line="17" column="19" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+                <state vertical-scroll-proportion="-7.964286" vertical-offset="138" max-vertical-offset="703">
+                  <caret line="19" column="6" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="6" />
                   <folding />
                 </state>
               </provider>
@@ -232,10 +242,8 @@
         <option value="$PROJECT_DIR$/GAME/default_player_select_page.js" />
         <option value="$PROJECT_DIR$/test.html" />
         <option value="$PROJECT_DIR$/STGMATH.js" />
-        <option value="$PROJECT_DIR$/STGDISPLAY.js" />
         <option value="$PROJECT_DIR$/STGCONTROLLER.js" />
         <option value="$PROJECT_DIR$/index_test.html" />
-        <option value="$PROJECT_DIR$/index.html" />
         <option value="$PROJECT_DIR$/GAME/hyz/hyz_system.js" />
         <option value="$PROJECT_DIR$/GAME/shw/shw_menu.js" />
         <option value="$PROJECT_DIR$/GAME/default_graphics.js" />
@@ -261,6 +269,8 @@
         <option value="$PROJECT_DIR$/players/player_remilia.js" />
         <option value="$PROJECT_DIR$/GAME/element_system.js" />
         <option value="$PROJECT_DIR$/bios.js" />
+        <option value="$PROJECT_DIR$/index.html" />
+        <option value="$PROJECT_DIR$/STGDISPLAY.js" />
       </list>
     </option>
   </component>
@@ -552,7 +562,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="37" y="0" width="1883" height="1040" extended-state="1" />
+    <frame x="37" y="0" width="1883" height="1040" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -725,14 +735,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/GAME/boss_slz.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="3135" max-vertical-offset="48678">
-          <caret line="176" column="25" selection-start-line="176" selection-start-column="25" selection-end-line="176" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GAME/default_spellcard_system.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="8225" max-vertical-offset="11913">
@@ -890,14 +892,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/STGDISPLAY.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6555">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/STGGAMEFRAME.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="463">
@@ -948,8 +942,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41666666" vertical-offset="138" max-vertical-offset="703">
-          <caret line="17" column="19" selection-start-line="17" selection-start-column="19" selection-end-line="17" selection-end-column="19" />
+        <state vertical-scroll-proportion="-7.964286" vertical-offset="138" max-vertical-offset="703">
+          <caret line="19" column="6" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GAME/boss_slz.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3591" max-vertical-offset="48678">
+          <caret line="18" column="71" selection-start-line="18" selection-start-column="71" selection-end-line="18" selection-end-column="71" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/STGDISPLAY.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.49364406" vertical-offset="5866" max-vertical-offset="6555">
+          <caret line="321" column="9" selection-start-line="321" selection-start-column="9" selection-end-line="321" selection-end-column="9" />
           <folding />
         </state>
       </provider>

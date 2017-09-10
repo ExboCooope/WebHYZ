@@ -235,8 +235,8 @@ function stgLoadSE(sName,sSource){
 
 function stgLoadBGM(sName,sSource,loopstart,looptime){
     var a=stgLoadSE(sName,sSource);
-  //  a.loopstart=loopstart;
-  //  a.looptime=looptime;
+    a.loopstart=loopstart;
+    a.looptime=looptime;
     a.loop=true;
     return a;
 }
@@ -311,13 +311,13 @@ function stgResumeSE(area){
     }
 }
 function _stgBgmLoop(){
-    return;
+    //return;
     if(_stg_se_pool["BGM"]){
         var a=_stg_se_pool["BGM"];
         if(a.loopstart){
             if(a.currentTime> a.loopstart){
-                a.fastSeek(a.currentTime-a.looptime);
-                //a.currentTime=a.currentTime-a.looptime;
+                //a.fastSeek(a.currentTime-a.looptime);
+                a.currentTime=a.currentTime-a.looptime;
             }
         }
     }
