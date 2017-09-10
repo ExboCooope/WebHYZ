@@ -37,6 +37,8 @@ var _hit_box_medium=new StgHitDef();
 _hit_box_medium.range=6;
 var _hit_box_large=new StgHitDef();
 _hit_box_large.range=14;
+var _hit_box_huge=new StgHitDef();
+_hit_box_huge.range=32;
 var _hit_box_laser={};
 
 var PIUP=90*PI180;
@@ -139,7 +141,7 @@ function render01BltParser(object,name){
         miscApplyAttr(object,BULLET[name].misc)
     }
     if(name=="tDD"){
-        hyz.dot_pool.add(object);
+        if(window.hyz)hyz.dot_pool.add(object);
     }
     if(BULLET[name].anim){
         object._anim=0;

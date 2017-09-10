@@ -1,6 +1,9 @@
 /**
  * Created by Exbo on 2015/11/8.
  */
+
+var stg_active_shader=0;
+
 function createCanvas(iWidth,iHeight){
     var a=document.createElement("canvas");
     a.setAttribute("width",""+iWidth);
@@ -167,6 +170,7 @@ function stgCreateCanvas(sName,iWidth,iHeight,iTextureType){
 
 function stgResizeCanvas(sName,x0,y0,dx,dy,iWidth,iHeight,scale){
     var a=stg_textures[sName];
+    if(!a)return;
     a.width = iWidth*scale;
     a.height = iHeight*scale;
     a.style.left=(x0+dx*scale)+"px";
@@ -231,8 +235,8 @@ function stgLoadSE(sName,sSource){
 
 function stgLoadBGM(sName,sSource,loopstart,looptime){
     var a=stgLoadSE(sName,sSource);
-  //  a.loopstart=loopstart;
-  //  a.looptime=looptime;
+    a.loopstart=loopstart;
+    a.looptime=looptime;
     a.loop=true;
     return a;
 }
@@ -307,13 +311,13 @@ function stgResumeSE(area){
     }
 }
 function _stgBgmLoop(){
-    return;
+    //return;
     if(_stg_se_pool["BGM"]){
         var a=_stg_se_pool["BGM"];
         if(a.loopstart){
             if(a.currentTime> a.loopstart){
-                a.fastSeek(a.currentTime-a.looptime);
-                //a.currentTime=a.currentTime-a.looptime;
+                //a.fastSeek(a.currentTime-a.looptime);
+                a.currentTime=a.currentTime-a.looptime;
             }
         }
     }

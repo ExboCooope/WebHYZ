@@ -9,67 +9,15 @@
     <title></title>
 </head>
 <body style="height: 100%;width:100%;margin: 0">
-<script src="STGCORE.js"></script>
-<script src="STGDISPLAY.js"></script>
-<script src="STGGLOBAL.js"></script>
-<script src="STGCONTROLLER.js"></script>
-<script src="STGMATH.js"></script>
-<script src="STGBULLET.js"></script>
-<script src="STGREPLAY.js"></script>
-<script src="STGMULTIPLAYER.js"></script>
-<script src="lstg_api.js"></script>
-<script src="WebGL/shaders.js"></script>
-<script src="WebGL/rendertarget.js"></script>
-<script src="WebGL/EMatrix.js"></script>
-<script src="WebGL/EMesh.js"></script>
-<script src="WebGL/OldGL.js"></script>
-<script src="GAME/default_lib.js"></script>
-<script src="GAME/default_bullets.js"></script>
-<script src="GAME/default_graphics.js"></script>
-<script src="GAME/default_player_script.js"></script>
-<script src="GAME/default_system_script.js"></script>
-<script src="GAME/default_spellcard_system.js"></script>
-<script src="GAME/default_multiplayer_script.js"></script>
-<script src="GAME/default_ui.js"></script>
-<script src="GAME/default_3d_shader.js"></script>
-<script src="GAME/Enemy01.js"></script>
-<script src="GAME/boss_slz.js"></script>
-<script src="GAME/default_item_script.js"></script>
-<script src="res/resource_holder.js"></script>
-<script src="GAME/IFE/ife_loader.js"></script>
-<script src="GAME/IFE/ife_menu.js"></script>
-<script src="GAME/IFE/ife_pause.js"></script>
-<script src="GAME/IFE/ife_system_script.js"></script>
-<script src="GAME/hyz/hyz_loader.js"></script>
-<script src="GAME/hyz/hyz_shaders.js"></script>
-<script src="GAME/hyz/hyz_system.js"></script>
-<script src="GAME/hyz/hyz_level.js"></script>
-<script src="GAME/hyz/hyz_ui.js"></script>
-<script src="GAME/shw/shw_loader.js"></script>
-<script src="GAME/shw/shw_level.js"></script>
-<script src="GAME/shw/shw_loading.js"></script>
-<script src="GAME/shw/shw_menu.js"></script>
-<script src="GAME/spell_test.js"></script>
-<script src="bg/game_background.js"></script>
-<script src="players/player_remilia.js"></script>
-<script src="players/espshoot.js"></script>
-<script src="players/player_ai.js"></script>
-<script src="players/player_byakuren.js"></script>
-<input class="rpy" id="1" type="file" />
+<script src="javastage.js"></script>
+<input class="rpy" id="1" type="file" hidden="true"/>
 <script>
-    stg_menu_script=shw.shell;
-    stgStart();
 
-    var q=document.getElementById("1");
-    q.onchange=function(){
-        upload(this.files[0]);
-        // hyz.item_playreplay.selectable=1;
+    javaStage.load(javaStage.group(javaStage.core_scripts,javaStage.webgl_scripts,javaStage.default_scripts,["bios"]),function(){
+        stg_menu_script=bios;
+        stgStart();
+    });
 
-    };
-    var stg_replay_onload=function(){
-        hyz.item_playreplay.selectable=1;
-        hyz.main_menu.setColor("#88F","#880");
-    };
     HTMLElement.prototype.setStatic=function(){
         this.addEventListener("selectstart",HTMLElement.preventSelectFunction,true);
         this.addEventListener("dragstart",HTMLElement.preventSelectFunction,true);

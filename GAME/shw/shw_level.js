@@ -46,11 +46,53 @@ shw.level.init=function(){
     };
     this.counter=0;
 
+    var a=th.objCreateDelayObject(30);
+    th.spriteSet(a,"th_title",4,250);
+   // var b=hyzGetFrameObject(0);
+    stgSetPositionA1(a,32+stg_frame_w/2, 16+50);
+    //stgSetPositionA1(a,529,32);
+    a.sid=0;
+    a.script=shw.title_bar_script;
+    renderSetSpriteScale(1,0,a);
+
+    stgAddObject(element_system);
+
+    a=new ElementBase(stg_frame_w+75,390,[255,0,0,255],[0,0,255,255],0.75,0);
+    a.sid=0;
+    stgAddObject(a);
+    a=new ElementBase(stg_frame_w+75,415,[140,102,53,255],[0,255,0,255],0.75,1);
+    a.sid=0;
+    stgAddObject(a);
+    a=new ElementBase(stg_frame_w+75,440,[255,255,0,255],[255,0,255,255],0.75,2);
+    a.sid=0;
+    stgAddObject(a);
+
+    a.script=function(){
+
+    };
+
+    hyzAddObject(new thc.ScoreDisplay(0,0),0);
 };
+
+shw.title_bar_script=function(){
+    if(this.frame<=30){
+        renderSetSpriteScale(1,this.frame/30,this);
+    }else if(this.frame==120){
+        luaMoveTo(530,32,80,1,this);
+    }else if(this.frame>120 && this.frame<=200){
+        this.rotate[2]=360*(this.frame-120)/80*PI180;
+    }
+    if(this.frame==200){
+        this.script=0;
+    }
+};
+
 shw.level.script=function(){
+    BGLeaf.create();
     if(stg_players_number==1){
         stg_players[1]=stg_players[0];
     }
+    //return;
     if(this.frame==30){
         if(stg_common_data.ai){
             stgAddObject(new BasicAI(stg_players[1]));

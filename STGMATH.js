@@ -151,6 +151,9 @@ function clamp(x1,x2,f){
     var q=1-f;
     return q*x1+f*x2;
 }
+function clip2(x1,x2,s){
+    return s<x1?x1:(s>x2?x2:s);
+}
 
 function extendlength(pos,dir,len){
     return [pos[0]+cos(dir)*len,pos[1]+sin(dir)*len];

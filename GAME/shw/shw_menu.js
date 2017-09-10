@@ -15,7 +15,7 @@ shw.setting_sync.on_select={
             stg_refresher_type=shw.refresh_mode-1;
         }
         stgSaveData("refresh",shw.refresh_mode);
-        shw.setting_sync.mtext="垂直同步："+["自动","关闭","开启"][shw.refresh_mode];
+        shw.setting_sync.mtext="垂直同步："+["自动","开启","关闭"][shw.refresh_mode];
     }
 };
 shw.sprite_mode=0;
@@ -35,7 +35,7 @@ shw.mode_select_menu=new MenuHolderA1([150,60],[10,20],hyz.main_menu);
 
 shw.phase_select_menu=new MenuHolderA1([360,60],[0,20],shw.mode_select_menu,1);
 
-(function(){
+shw.build_phase=function (){
     for(var i=0;i<BossSLZ.phases.length;i++){
         var item=new TextMenuItem("第"+(i+1)+"身",1,1,null,0);
         var onsel={
@@ -53,9 +53,15 @@ shw.phase_select_menu=new MenuHolderA1([360,60],[0,20],shw.mode_select_menu,1);
         item.on_select=onsel;
         shw.phase_select_menu.pushItem(item);
     }
-})();
+};
 
-
+shw.player_select_start={
+    init:function (){
+        stgDeleteSelf();
+        player_select_page.next=shw.mode_single_item.on_select;
+        stgAddObject(player_select_page);
+    }
+};
 
 shw.mode_single_item=new TextMenuItem("单人游戏",1,1,null,0);
 shw.mode_easy_item=new TextMenuItem("简单游戏",1,1,null,0);
@@ -63,24 +69,25 @@ shw.mode_ai_item=new TextMenuItem("双人游戏（AI）",1,1,null,0);
 shw.mode_double_item=new TextMenuItem("双人游戏",1,1,null,0);
 shw.mode_practice_item=new TextMenuItem("练习模式",1,1,shw.phase_select_menu,0);
 shw.mode_pressure=new TextMenuItem("性能测试",1,1,null,0);
+shw.mode_players=new TextMenuItem("选择玩家测试",1,1,shw.player_select_start,1);
+
+
 
 shw.mode_single_item.on_select={
     init:function(){
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        stgCreateInput(0);
-        shw.game_start_up.players=["remilia"];
+        th.gameSetPlayerCount(1);
+        if(stg_common_data.player0){
+            shw.game_start_up.players=[stg_common_data.player0.name];
+        }else{
+            shw.game_start_up.players=["remilia"];
+        }
         shw.game_start_up.commondata={};
         shw.startGame("shw_level");
     }
 };
 shw.mode_easy_item.on_select={
     init:function(){
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(1);
         shw.game_start_up.players=["remilia"];
         shw.game_start_up.commondata={difficulty:1};
         shw.startGame("shw_level");
@@ -88,10 +95,7 @@ shw.mode_easy_item.on_select={
 };
 shw.mode_pressure.on_select={
     init:function(){
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(1);
         shw.game_start_up.players=["remilia"];
         shw.game_start_up.commondata={pressure_test:1};
         shw.startGame("shw_level");
@@ -99,10 +103,7 @@ shw.mode_pressure.on_select={
 };
 shw.mode_ai_item.on_select={
     init:function(){
-        stg_players_number=2;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0,1];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(2,[0,1],0);
         shw.game_start_up.players=["remilia","reimu"];
         shw.game_start_up.commondata={ai:1};
         shw.startGame("shw_level");
@@ -110,10 +111,7 @@ shw.mode_ai_item.on_select={
 };
 shw.mode_double_item.on_select={
     init:function(){
-        stg_players_number=2;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0,1];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(2,[0,1],0);
         shw.game_start_up.players=["remilia","reimu"];
         shw.game_start_up.commondata={};
         shw.startGame("shw_level");
@@ -121,3 +119,4 @@ shw.mode_double_item.on_select={
 };
 
 shw.mode_select_menu.pushItems(shw.mode_single_item,shw.mode_easy_item,shw.mode_ai_item,shw.mode_double_item,shw.mode_practice_item,shw.mode_pressure);
+shw.mode_select_menu.pushItems(shw.mode_players);

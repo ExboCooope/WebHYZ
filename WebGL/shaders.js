@@ -421,3 +421,47 @@ function webglTextureAssign(tex,iUVT,w,h){
     }
     return new Float32Array([x,y,xn,y,xn,yn,x,yn]);
 }
+/*
+ 原始  R0*（1-A1A2） +  R1*R2*A1*A2，A0 *（1-A1A2）+ A1*A2
+ */
+/*
+ var blend_default=function(){
+ _gl.blendEquation(_gl.FUNC_ADD);
+ _gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+ }*/
+var blend_add=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFunc(_gl.ONE,_gl.ONE);
+};
+var blend_default=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+};
+var blend_test1=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.SRC_ALPHA,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+};
+var blend_test2=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    //_gl.blendFunc(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA);
+    _gl.blendFuncSeparate(_gl.ONE,_gl.ONE_MINUS_SRC_ALPHA,_gl.ONE_MINUS_DST_ALPHA,_gl.ONE);
+};
+var blend_test3=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.ZERO,_gl.SRC_COLOR,_gl.ZERO,_gl.ONE);
+};
+
+var blend_xor1=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.ONE_MINUS_DST_COLOR,_gl.ONE_MINUS_SRC_COLOR,_gl.ZERO,_gl.ONE);
+};
+var blend_copy=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFunc(_gl.ONE,_gl.ZERO);
+};
+var blend_clear=function(){
+    _gl.blendEquation(_gl.FUNC_ADD);
+    _gl.blendFuncSeparate(_gl.ZERO,_gl.ONE,_gl.ZERO,_gl.SRC_ALPHA);
+};
+
+blend_default=blend_test2;

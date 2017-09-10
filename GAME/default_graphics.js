@@ -557,29 +557,30 @@ var default_2d_misc_shader={
 };
 stg_shaders.testShader2=default_2d_misc_shader;
 
-
 function renderCreate2DTemplateA1(sTemplateName,sTextureName,vX,vY,vW,vH,iColorX,iColorY,oRotate,iCenter){
     renderCreate2DTemplateA1[sTemplateName]={
         tex:sTextureName,
         data:[vX,vY,vW,vH,iColorX,iColorY,oRotate],
-        c:iCenter
+        c:iCenter,
+        mode:1
     };
     return  renderCreate2DTemplateA1[sTemplateName];
 }
 function renderCreate2DTemplateA2(sTemplateName,sTextureName,vX,vY,vW,vH,iColorX,iColorY,oRotate,iCenter){
-    renderCreate2DTemplateA2[sTemplateName]={
+    renderCreate2DTemplateA1[sTemplateName]={
         tex:sTextureName,
         data:[vX,vY,vW,vH,iColorX,iColorY,oRotate],
-        c:iCenter
+        c:iCenter,
+        mode:2
     };
-    return  renderCreate2DTemplateA2[sTemplateName];
+    return  renderCreate2DTemplateA1[sTemplateName];
 }
 
 function renderApply2DTemplate2(oRender,sTemplate,iColor){
-    var oTemplate=renderCreate2DTemplateA2[sTemplate];
+    var oTemplate=renderCreate2DTemplateA1[sTemplate];
     iColor=iColor%(oTemplate.data[4]*oTemplate.data[5]);
-    var idy=iColor%oTemplate.data[4];
-    var idx=(iColor-idy)/oTemplate.data[4];
+    var idy=iColor%oTemplate.data[5];
+    var idx=(iColor-idy)/oTemplate.data[5];
     oRender.uvt=[oTemplate.data[0]+oTemplate.data[2]*idx,oTemplate.data[1]+oTemplate.data[3]*idy,oTemplate.data[2],oTemplate.data[3]];
     oRender.texture=oTemplate.tex;
     oRender.offset = [0, 0];
@@ -590,7 +591,7 @@ function renderApply2DTemplate2(oRender,sTemplate,iColor){
 }
 
 function renderApply2DTemplate3(oRender,sTemplate,iColor){
-    var oTemplate=renderCreate2DTemplateA2[sTemplate];
+    var oTemplate=renderCreate2DTemplateA1[sTemplate];
     iColor=iColor%(oTemplate.data[4]*oTemplate.data[5]);
     var idx=iColor%oTemplate.data[4];
     var idy=(iColor-idx)/oTemplate.data[4];
@@ -618,9 +619,13 @@ function renderObjectApply2DTemplate(object,sTemplate,iColor){
 }
 
 function renderApply2DTemplate(oRender,sTemplate,iColor){
+
     oRender=oRender||stg_target.render;
     if(oRender.render)oRender=oRender.render;
     var oTemplate=renderCreate2DTemplateA1[sTemplate];
+    if(oTemplate.mode==2){
+        return renderApply2DTemplate3(oRender,sTemplate,iColor);
+    }
     oRender.uvt=[oTemplate.data[0]+oTemplate.data[4]*iColor,oTemplate.data[1]+oTemplate.data[5]*iColor,oTemplate.data[2],oTemplate.data[3]];
     oRender.texture=oTemplate.tex;
     oRender.offset = [0, 0];
@@ -659,13 +664,13 @@ function renderApplyFullTexture(oRender,sTextureName){
     }
 }
 
-function RenderText(x,y,text){
-    var ax = new StgObject;
+function RenderText(x,y,text,noadd){
+    var ax = this;
     ax.render = new StgRender("testShader2");
     miscApplyAttr(ax.render,{type:2,x:x,y:y,color:"#000"});
     ax.layer = 100;
     ax.render.text=text||"";
-    stgAddObject(ax);
+    if(!noadd)stgAddObject(ax);
     /*
     var ay = new StgObject;
     ay.render = new StgRender("testShader2");
@@ -679,12 +684,21 @@ function RenderText(x,y,text){
     };
     stgAddObject(ay);
     */
-    return ax;
+    //return ax;
 }
 RenderText.prototype.setText=function(text){
     this.render.text=text;
     return this;
 };
+RenderText.prototype.setFont=function(fontname,size,color,backcolor){
+    if(fontname||size){
+        this.render.font=(size?''+(size>>0)+'px ':'')+(fontname?fontname:'');
+    }
+    this.render.color=color;
+    this.render.backcolor=backcolor;
+};
+
+
 
 var zoomer_shader={
     active:0,
@@ -848,3 +862,5 @@ RenderPrim.prototype.setVertexNum=function(n){
     }
     this.count=n;
 };
+
+

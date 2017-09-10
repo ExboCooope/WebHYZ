@@ -66,7 +66,8 @@ ife_loader.init=function(){
         var p3=new StgProcedure("ui",81,100);
         p3.shader_order=["testShader2"];
         stg_procedures["drawUI"] = p3;
-
+        p3.background="#000";
+        p3.transparent=true;
         //创建绘制流程
         stg_display = ["drawBackground","drawFrame","drawUI"];
 
@@ -90,15 +91,15 @@ ife_loader.init=function(){
 
 
 
+        ife.logo=new RenderText(20,580,"",true);
 
     }
 
-
-    ife.logo=new RenderText(20,580);
+    stgAddObject(ife.logo);
     if(IsPC() && !window.chrome){
-        ife.logo.render.text="JavaSTaGe v0.3.0 建议使用Chrome浏览器";
+        ife.logo.render.text="JavaSTaGe 建议使用Chrome浏览器";
     }else{
-        ife.logo.render.text="JavaSTaGe v0.3.0 内部版本  Exbo 2016/4/15";
+        ife.logo.render.text="JavaSTaGe by  Exbo 2017/9/10";
     }
     ife.logo.render.color="#000";
     stgAddObject(ife.resolution);
