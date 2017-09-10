@@ -75,10 +75,7 @@ shw.mode_players=new TextMenuItem("选择玩家测试",1,1,shw.player_select_sta
 
 shw.mode_single_item.on_select={
     init:function(){
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(1);
         if(stg_common_data.player0){
             shw.game_start_up.players=[stg_common_data.player0.name];
         }else{
@@ -90,10 +87,7 @@ shw.mode_single_item.on_select={
 };
 shw.mode_easy_item.on_select={
     init:function(){
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(1);
         shw.game_start_up.players=["remilia"];
         shw.game_start_up.commondata={difficulty:1};
         shw.startGame("shw_level");
@@ -101,10 +95,7 @@ shw.mode_easy_item.on_select={
 };
 shw.mode_pressure.on_select={
     init:function(){
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(1);
         shw.game_start_up.players=["remilia"];
         shw.game_start_up.commondata={pressure_test:1};
         shw.startGame("shw_level");
@@ -112,10 +103,7 @@ shw.mode_pressure.on_select={
 };
 shw.mode_ai_item.on_select={
     init:function(){
-        stg_players_number=2;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0,1];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(2,[0,1],0);
         shw.game_start_up.players=["remilia","reimu"];
         shw.game_start_up.commondata={ai:1};
         shw.startGame("shw_level");
@@ -123,10 +111,7 @@ shw.mode_ai_item.on_select={
 };
 shw.mode_double_item.on_select={
     init:function(){
-        stg_players_number=2;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0,1];
-        stgCreateInput(0);
+        th.gameSetPlayerCount(2,[0,1],0);
         shw.game_start_up.players=["remilia","reimu"];
         shw.game_start_up.commondata={};
         shw.startGame("shw_level");

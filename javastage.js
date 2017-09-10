@@ -84,18 +84,24 @@ javaStage.packages["弹幕回避能力测试1.0"]=[
     "GAME/IFE/ife_package"
 ];
 
-
+javaStage.load_text=document.createElement("div");
+javaStage.load_text.style.background="#FFF";
+javaStage.load_text.style.color="#000";
 
 javaStage.load=function(scripts,on_ready) {
+    document.body.appendChild(javaStage.load_text);
     var g=scripts;
     var ls=function(id) {
         var a = document.createElement("script");
         a.type = "text/javascript";
         a.src = g[id]+".js";
+        javaStage.load_text.innerHTML="Loading "+g[id];
         a.onload = function () {
             if(g[id+1]){
+               // setTimeout(a=>{ls(id+1);},100);
                 ls(id+1);
             }else{
+                document.body.removeChild(javaStage.load_text);
                 on_ready();
             }
         };

@@ -479,7 +479,11 @@ function stgDefaultFinishSpellCheck(time){
         stgBossSetNextSpellDelay(time,spell.boss);
         if(spell.is_spell) {
             if(spell.is_time_spell){
-                th.playerAddResource(stg_players[i],"score",spell.score);
+                for(var i=0;i<stg_players_number;i++){
+                    if(hyzIsInOneFrame(stg_players[i],spell)){
+                        th.playerAddResource(stg_players[i],"score",spell.score);
+                    }
+                }
             }else{
                 stgPlaySE("se_fault");
             }

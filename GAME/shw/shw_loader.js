@@ -25,7 +25,7 @@ var shw_loader={
 };
 
 shw_loader.init=function(){
-
+    th.gameSetPlayerCount(1);
     if(stg_common_data.restart){
         stgAddObject(shw.last_start_up);
         stg_display = ["drawBackground","drawCombineFrame","drawUI"];
@@ -183,11 +183,7 @@ shw_loader.init=function(){
         }
 
         //设置只有一个玩家
-        stg_players_number=1;
-        stg_local_player_pos=0;
-        stg_local_player_slot=[0];
-        //创建输入设备
-        stgCreateInput(0)//延迟为0
+
         //设置随机种子
         stg_rand_seed[0]=new Date().getTime();
         //等待资源下载完成
