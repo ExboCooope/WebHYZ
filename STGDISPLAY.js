@@ -1,6 +1,9 @@
 /**
  * Created by Exbo on 2015/11/8.
  */
+
+var stg_active_shader=0;
+
 function createCanvas(iWidth,iHeight){
     var a=document.createElement("canvas");
     a.setAttribute("width",""+iWidth);
@@ -167,6 +170,7 @@ function stgCreateCanvas(sName,iWidth,iHeight,iTextureType){
 
 function stgResizeCanvas(sName,x0,y0,dx,dy,iWidth,iHeight,scale){
     var a=stg_textures[sName];
+    if(!a)return;
     a.width = iWidth*scale;
     a.height = iHeight*scale;
     a.style.left=(x0+dx*scale)+"px";

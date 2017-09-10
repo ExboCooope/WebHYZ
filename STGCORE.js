@@ -486,7 +486,7 @@ function _StgDefaultPlayer(stgPlayerObject){
     stgPlayerObject.point_bonus=10000;
     stgPlayerObject.point=0;
     stgPlayerObject.pos=[0,0,0];
-    stgPlayerObject.key=[];
+    stgPlayerObject.key=[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     stgPlayerObject.state=stg_const.PLAYER_NORMAL;
     stgPlayerObject.invincible=0;
     stgPlayerObject.bombing=0;
@@ -531,7 +531,7 @@ function _stgMainLoop_BeforeHit(){
                     continue;
                 }
                 stg_local_player=stg_players[stg_local_player_pos];
-                stg_target=_pool[i];
+                stgSetTarget(_pool[i]);
                 _pool[i].beforehit();
             }
         }
@@ -548,7 +548,7 @@ function _stgMainLoop_RunScript(){
                     continue;
                 }
 
-                stg_target=_pool[i];
+                stgSetTarget(_pool[i]);
                 _pool[i].script();
             }
             if(_pool[i]._system){
@@ -556,13 +556,30 @@ function _stgMainLoop_RunScript(){
                     continue;
                 }
 
-                stg_target=_pool[i];
+                stgSetTarget(_pool[i]);
                 _pool[i]._system();
             }
         }
     }
     stg_target=null;
 }
+
+function stgClearPool(){
+    var i;
+    var pool=[];
+    var j=0;
+    for(i=0;i<_pool.length;i++){
+        if(_pool[i].finalize){
+            stgSetTarget(_pool[i]);
+            _pool[i].finalize();
+
+        }
+        _pool[i].active=0;
+        _pool[i].remove=1;
+    }
+    _pool=pool;
+}
+
 function _stgMainLoop_RemoveObjects(){
     var i;
     /*
@@ -591,9 +608,11 @@ function _stgMainLoop_RemoveObjects(){
     for(i=0;i<_pool.length;i++){
         if(_pool[i].remove){
             if(_pool[i].finalize){
-                stg_target=_pool[i];
+                stgSetTarget(_pool[i]);
                 _pool[i].finalize();
+
             }
+            _pool[i].active=0;
         }else{
             pool.push(_pool[i]);
             _pool[i].uid=j++;
@@ -877,7 +896,7 @@ function _stgMainLoop_Hit(){
             for (var j in _hit_pool) {
 
                 var b = _hit_pool[j];
-                if(hyz.battle_style==0 && b.sid!= a.sid)continue;
+                if(window.hyz && hyz.battle_style==0 && b.sid!= a.sid)continue;
                 if (stg_hit_check[s][b.side]) {
                     var d = stgDist(a.hitby, b.hitdef);
                     if(b.type==stg_const.OBJ_BULLET && d< a.graze_range){
@@ -886,9 +905,9 @@ function _stgMainLoop_Hit(){
                         }
                         if(!b.grazed[a.slot]){
                             b.grazed[a.slot]=1;
-                            a.graze++;
+                            //a.graze++;
                             if(a.on_graze){
-                                stg_target=a;
+                                stgSetTarget(a);
                                 a.on_graze(b,d);
                             }
                         }
@@ -898,7 +917,7 @@ function _stgMainLoop_Hit(){
                         //console.log(b);
                         a.hit_by_list.push(b);
                         b.hit_list.push(a);
-                        stg_target=b;
+                        stgSetTarget(b);
                         if(b.on_hit)b.on_hit(a,d);
 
                         stg_target=a;
@@ -948,7 +967,7 @@ function _stgMainLoop_Hit(){
         }else {
             for (var j=0;j<_hit_pool.length;j++) {
                 b = _hit_pool[j];
-                if(hyz.battle_style==0 && b.sid!= a.sid)continue;
+                if(window.hyz && hyz.battle_style==0 && b.sid!= a.sid)continue;
                 if (stg_hit_check[s][b.side]) {
                     d = stgDist(a.hitby, b.hitdef);
                     if (d < 0) {
@@ -956,7 +975,7 @@ function _stgMainLoop_Hit(){
                             if(b.penetrate>0) {
                                 a.hit_by_list.push(b);
                                 b.hit_list.push(a);
-                                stg_target=b;
+                                stgSetTarget(b);
                                 if(b.on_hit)b.on_hit(a,d);
                                 stg_target=a;
                                 if(a.on_hit_by)a.on_hit_by(b,d);
@@ -970,9 +989,9 @@ function _stgMainLoop_Hit(){
                         }else{
                             a.hit_by_list.push(b);
                             b.hit_list.push(a);
-                            stg_target=b;
+                            stgSetTarget(b);
                             if(b.on_hit)b.on_hit(a,d);
-                            stg_target=a;
+                            stgSetTarget(a);
                             if(a.on_hit_by)a.on_hit_by(b,d);
                         }
                     }
@@ -1014,6 +1033,12 @@ function _stgMainLoop_HitScript(){
 var stg_frame_height=448;
 var stg_frame_width=384;
 
+function _savelastkey(key){
+    for(var i=0;i<16;i++){
+        key[i+16]=key[i];
+    }
+}
+
 function _stgMainLoop_PlayerState(){
     var a;
     var i;
@@ -1033,7 +1058,7 @@ function _stgMainLoop_PlayerState(){
                     if(a.invincible==0 && a.state==stg_const.PLAYER_HIT){
                         a.state=stg_const.PLAYER_DEAD;
                         if(a.on_death){
-                            stg_target=a;
+                            stgSetTarget(a);
                             a.on_death();
                         }
                         a.invincible= a.down_time;
@@ -1043,7 +1068,9 @@ function _stgMainLoop_PlayerState(){
                         a.invincible= a.rebirth_time;
                     }
                // }
-
+                if(a.score> a.hiscore){
+                    a.hiscore= a.score;
+                }
             }
 
         }
@@ -1466,7 +1493,7 @@ function stgCreateRefresher(){
 function stgFreezeObject(oStgObject){
     for(var i=0;i<_pool.length;i++){
         if(_pool[i]==oStgObject){
-            _pool[i]={remove:1};
+            _pool[i]={active:1,remove:1};
             return;
         }
     }
@@ -1481,10 +1508,18 @@ function stgReturnObject(oStgObject){
 
 function stgAddObject(oStgObject){
     if(!oStgObject)return;
-
-    _pool.push(oStgObject);
-    oStgObject.uid=_pool.length;
-    var tmp=stg_target;
+    if(oStgObject.active&&oStgObject.remove){
+        if(oStgObject.finalize)oStgObject.finalize();
+        oStgObject.remove=0;
+        oStgObject.frame=0;
+    }else {
+        oStgObject.active = 1;
+        oStgObject.remove = 0;
+        oStgObject.frame = 0;
+        _pool.push(oStgObject);
+        oStgObject.uid=_pool.length;
+    }
+    var tmp=stgSetTarget(oStgObject);
     if(tmp){
         if(!(tmp.side===undefined)){
             oStgObject.side=tmp.side;
@@ -1494,10 +1529,7 @@ function stgAddObject(oStgObject){
         }
         oStgObject.parent=tmp;
     }
-    stg_target=oStgObject;
-    oStgObject.active=1;
-    oStgObject.remove=0;
-    oStgObject.frame=0;
+
     _stgApplyObject(oStgObject);
     if(oStgObject.init){
         oStgObject.init();
@@ -1522,7 +1554,7 @@ function stgAddObject(oStgObject){
             }
         }
     }
-    stg_target=tmp;
+    stgSetTarget(tmp);
     stg_last=oStgObject;
 }
 
@@ -1542,7 +1574,7 @@ _stgDeleteDelay.prototype.script=function(){
 function stgDeleteObject(oStgObject,time){
     if(!time) {
         oStgObject.remove = 1;
-        oStgObject.active = 0;
+        oStgObject.active = 1;
     }else{
        stgAddObject(new _stgDeleteDelay(oStgObject,time));
     }
@@ -1621,9 +1653,15 @@ function _stgChangeGameState(iNextGameState){
     _stg_next_game_state=iNextGameState;
 }
 
+function stgChangeGameState(iNextGameState){
+    _stg_next_game_state=iNextGameState;
+}
+
 function stgAddShader(sName,oShader){
     stg_shaders[sName]=oShader;
-    oShader.shader_init();
+    if(oShader){
+        oShader.shader_init();
+    }
 }
 var _start_level=[];
 function stgStartLevel(sLevelName,vaPlayerNames,oCommonData){
@@ -1632,9 +1670,7 @@ function stgStartLevel(sLevelName,vaPlayerNames,oCommonData){
 }
 
 function _stgStartLevel(){
-    for(var i in _pool){
-        stgDeleteObject(_pool[i]);
-    }
+    stgClearPool();
     _pool=[];
     if(!stg_in_replay){
         _start_level[2].rand_seed=stg_rand_seed[0];
@@ -1664,8 +1700,15 @@ function _addPlayer(sPlayerName,iSlot){
     var b=new StgObject();
     _StgDefaultPlayer(b);
     stg_players[iSlot]=b;
-    var p=new stg_player_templates[sPlayerName](iSlot);
-    hyzAddObject(p,iSlot+1);
+    var a=stg_player_templates[sPlayerName];
+    var p;
+    if(a.version){
+        b.slot=iSlot;
+        p=new stg_player_templates[sPlayerName](b);
+    }else{
+        p=new stg_player_templates[sPlayerName](iSlot);
+    }
+    window.hyzAddObject?hyzAddObject(p,iSlot+1):stgAddObject(p);
 }
 
 function stgStart(){
@@ -1769,4 +1812,11 @@ function stgRegisterModule(sModuleName,moduleobject){
 }
 function stgRegisterPlayer(sPlayerName,nPlayerMaker){
     stg_player_templates[sPlayerName]=nPlayerMaker;
+}
+var frame=0;
+function stgSetTarget(target){
+    var a=stg_target;
+    stg_target=target;
+    frame=target&&target.frame;
+    return a;
 }

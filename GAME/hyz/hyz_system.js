@@ -63,7 +63,7 @@ function hyzAddObject(object,side){
 
 
 
-hyz.main_menu=new MenuHolderA1([100,100],[0,50],ife_loader);
+hyz.main_menu=new MenuHolderA1([100,100],[0,50],0);
 hyz.item_start=new TextMenuItem("开始",1,1,null,1);
 
 hyz.item_playreplay=new TextMenuItem("回放",1,0,null,1);
@@ -1073,4 +1073,24 @@ HyzPrimitive2DVertexList.prototype.useLaser=function(){
     GlBufferInput(hyzLaserShader, "aTexture",this.tlist);
 };
 
+function HyzLuaVertexBuffer(gl,maxsize){
+    this.vtx=new HyzPrimitive2DVertexList(maxsize);
+    this.head=0;
+    this.mode=gl.TRIANGLES;
+    this.texture="";
+    this.gl=gl;
+}
+
+HyzLuaVertexBuffer.prototype.flush=function(){
+    if(!this.head)return;
+    var gl=this.gl;
+    gl.drawArrays(this.mode,0,this.head);
+    this.head=0;
+};
+
+HyzLuaVertexBuffer.prototype.setTexture=function(texname){
+    if(texname!=this.texture){
+
+    }
+};
 

@@ -6,11 +6,7 @@ var shw={};
 shw.shell={};
 shw.shell.init=function(){
     stgLoadModuleObject(shw.loading);
-    stg_players_number=1;
-    stg_local_player_pos=0;
-    stg_local_player_slot=[0];
-    //创建输入设备
-    stgCreateInput(0)//延迟为0
+    th.gameSetPlayerCount(1);
     stg_wait_for_all_texture=1;
 };
 shw.shell.script=function(){
@@ -20,6 +16,8 @@ shw.shell.script=function(){
         stgDeleteSelf();
     }
 };
+
+
 
 
 var shw_loader={
@@ -68,7 +66,10 @@ shw_loader.init=function(){
         //stgLoadModuleObject(shw.loading);
         stgLoadModuleObject(BossSLZ);
         stgLoadModule("boss_system");
-        stgLoadModuleObject(stg_player_templates["player_byakuren"]);
+        for(var pn in stg_player_templates){
+            stgLoadModuleObject(stg_player_templates[pn]);
+        }
+        stgLoadModuleObject(th);
 
         loadHyzFont();
         loadItemSystem();
@@ -172,6 +173,7 @@ shw_loader.init=function(){
 
 
         stg_procedures["drawCombineFrame"].transparent=1;
+       // stg_procedures["drawCombineFrame"].sid=3;
         stg_procedures["drawUI"].transparent=1;
         //创建绘制流程
         for(var i in stg_player_templates){
@@ -208,6 +210,8 @@ shw_loader.init=function(){
         hyz.full_screen_object.layer=220;
         ApplyFullTexture(hyz.full_screen_object,"frame_full");
 
+        th.scriptLoadScript("GAME/element_system.js");
+
 /*
         stgCreateCanvas("frame_right_smear",stg_frame_w,stg_frame_h,stg_const.TEX_CANVAS3D_TARGET);
         stgCreateProcedure1("drawRightFrameSmear","frame_right_smear",10,80,"sprite_shader","#000");
@@ -220,7 +224,7 @@ shw_loader.init=function(){
 
 */      stg_procedures["drawBGFrame"]={};
 
-
+        shw.build_phase();
         gLoadMenuSystem();
 /*
         hyz.item_start.on_select={
@@ -273,7 +277,30 @@ shw_loader.init=function(){
     stg_last.render.color="#000";
 
 
+
+
+    renderCreate2DTemplateA2("test_animation","test_animation",0,0,14,14,18,6,0,1);
+    th.spriteAnimationCreate("test_animation");
+    th.spriteAnimationSetFrameA1("test_animation",0,"test_animation",20,20,1);
+    th.spriteAnimationSetFrameA1("test_animation",1,"test_animation",21,20,2);
+    th.spriteAnimationSetFrameA1("test_animation",2,"test_animation",22,20,0);
+    /*
+    var a=th.objCreateObject();
+    a.layer=250;
+    th.spriteAnimationApply(a,"test_animation");
+    stgAddObject(a);
+    renderSetSpriteColor(255,0,0,255,a);
+    stgSetPositionA1(a,100,10);
+
+    var b=th.objCreateObject();
+    th.spriteSet(b,"test_animation",20,250);
+    renderSetSpriteColor(0,255,0,255,b);
+    stgSetPositionA1(b,120,10);
+    */
 };
+
+stgCreateImageTexture("test_animation","res/ascii.png");
+
 
 shw_loader.script=function(){
     //
@@ -304,6 +331,11 @@ shw.last_start_up=0;
 shw.game_start_up={};
 shw.game_start_up.init=function(){
     shw.last_start_up=this;
+    shw.loading.finish=false;
+
+
+
+
     stgAddObject(shw.loading);
 };
 shw.game_start_up.script=function(){
@@ -316,6 +348,42 @@ shw.game_start_up.script=function(){
             stgStartLevel(this.level, this.players||["remilia"], this.commondata||{});
         }else{
             replayStartLevel(0);
+        }
+    }
+};
+
+function BGLeaf(x,y){
+    this.x=x;
+    this.y=y;
+}
+BGLeaf.prototype.init=function(){
+    th.spriteSet(this,"boss_leaf",0,21);
+    renderSetObjectSpriteBlend(this,blend_add);
+    stgEnableMove(this);
+    stgSetPositionA1(this,this.x,this.y);
+    this.rotate[2]=stg_rand(PI2);
+    this.self_rotate=stg_rand(-1.5,1.5)*PI180;
+    this.move.setSpeed(stg_rand(1,4),stg_rand(95,170));
+    this.scales=[stg_rand(0.8,3),stg_rand(0.3,1.0)];
+    renderSetSpriteScale(this.scales[0],this.scales[1],this);
+    renderSetSpriteColor(255,200,100,150,this);
+};
+BGLeaf.prototype.script=function(){
+    if(this.pos[0]<-20||this.pos[1]>stg_frame_h+20){
+        stgDeleteSelf();
+        return;
+    }
+    if(this.frame%8==0){
+        this.move.speed_angle_acceleration+=stg_rand(-1,1)*PI180;
+        this.move.speed_angle_acceleration=clip2(-1*PI180,1*PI180,this.move.speed_angle_acceleration);
+    }
+    this.move.speed_angle=clip2(95*PI180,170*PI180,this.move.speed_angle);
+    renderSetSpriteScale(0.4+0.3*sind(this.scales[0]*this.frame),this.scales[1]);
+};
+BGLeaf.create=function(){
+    if(stg_target.frame%48==0) {
+        for (var i = 0; i < 8; i++) {
+            stgAddObject(new BGLeaf(stg_frame_w + stg_rand(40), stg_rand(80)));
         }
     }
 };

@@ -81,7 +81,7 @@ Default_Player_Sikieiki.prototype.init=function(){
     var c=new StgObject();
     c.render=new StgRender("sprite_shader");
     c.self_rotate=0.04;
-    c.base= a.base;
+    c.base= {target:b,type:stg_const.BASE_MOVE};
     renderCreate2DTemplateA1("pan_ding_dian","pl_effect",0,112,64,64,64,0,0,1);
     renderApply2DTemplate(c.render,"pan_ding_dian",0);
     c.layer=stg_const.LAYER_HINT;
@@ -196,9 +196,9 @@ TestShotController.prototype.script=function(){
         this.optionformat=key_slow;
     }
 
-    if(key_bomb) {
-        hyzSetSuperPauseTime(60);
-    }
+    //if(key_bomb) {
+    //    hyzSetSuperPauseTime(60);
+    //}
 
 
 };

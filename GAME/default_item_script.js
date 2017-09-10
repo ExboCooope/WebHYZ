@@ -14,6 +14,14 @@ function deleteShotToItem(shot){
     a.attracter=stgGetRandomPlayer();
 }
 
+function _pointCollect(player){
+    var pb=player.point_bonus;
+    var q=pb*(this.full?1:0.5+0.5*(stg_frame_h-player.pos[1])/stg_frame_h);
+    q=q>>0;
+    q=q-(q%10);
+    player.content["score"]=(player.content["score"]||0)+q;
+}
+
 function deleteAllShot(ignore_resistance){
     for(var i in _pool){
         var k=_pool[i];
@@ -46,6 +54,9 @@ function gCreateItem(pos,type,count,range){
         a.hitdef.range=4;
         a.layer=stg_const.LAYER_ITEM;
         a.side=stg_const.SIDE_ENEMY;
+        if(type==stg_const.ITEM_SCORE){
+            a.on_collect=_pointCollect;
+        }
     }
     return a;
 }
@@ -102,6 +113,12 @@ function item_script_1(){
 
         }
         a.attracter=kp;
+
+        if(kp&&kp.pos[1]<130){
+            this.full=1;
+        }else{
+            this.full=0;
+        }
     }
 }
 

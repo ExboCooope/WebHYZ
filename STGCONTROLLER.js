@@ -180,6 +180,9 @@ function stgCreateInput(iInputDelay){
 var stg_local_player_slot=[0,1];
 
 function  _stgMainLoop_SendInput(){
+
+
+
     snapshotInput();
    // if(!stg_in_replay){
     for(var i=0;i<stg_local_player_slot.length;i++) {
@@ -206,6 +209,12 @@ function _stgMainLoop_GetInput(){
     _stg_save_input=(stg_game_state==stg_const.GAME_RUNNING)?1:0;
     if(stg_ignore_input)_stg_save_input=0;
 
+    for (var k = 0; k < stg_players_number; k++) {
+        _savelastkey(stg_players[k].key);
+    }
+    _savelastkey(stg_system_input);
+
+
     if(!stg_in_replay){
         var t=0;
         if(_key_sync_ready[_key_bottom]>=stg_players_number){
@@ -220,23 +229,23 @@ function _stgMainLoop_GetInput(){
             }
             for (var i = 0; i < stg_players_number; i++) {
                 if(!stg_players[i])stg_players[i]={};
-                stg_players[i].key=_unpackInput(_key_latency_pool[_key_bottom][i]);
+                _unpackInput2(_key_latency_pool[_key_bottom][i],stg_players[i].key);
                 t=t|_key_latency_pool[_key_bottom][i];
 
                 if(_stg_save_input){
                     _replay_pool[_replay_header][i]=_key_latency_pool[_key_bottom][i];
                 }
                 if(stg_ignore_input>=2){
-                    stg_players[i].key = _unpackInput(0);
+                     _unpackInput2(0,stg_players[i].key);
                 }
             }
             if(stg_ignore_input>=3){
-                stg_system_input = _unpackInput(0);
+                _unpackInput2(0,stg_system_input);
             }else {
                 if (stg_players_number == 0) {
-                    stg_system_input = _key_snapshot;
+                    copyKey(_key_snapshot,stg_system_input);
                 } else {
-                    stg_system_input = _unpackInput(t);
+                    _unpackInput2(t,stg_system_input);
                 }
             }
             var th=_key_sync_pool[(_key_bottom-1+_key_latency_pool.length)%_key_latency_pool.length];
@@ -272,12 +281,12 @@ function _stgMainLoop_GetInput(){
                 t=t|_key_latency_pool[_key_bottom][i];
             }
             if(stg_ignore_input>=3){
-                stg_system_input = _unpackInput(0);
+                 _unpackInput2(0,stg_system_input);
             }else {
                 if(_replay_watchers==0){
-                    stg_system_input=_key_snapshot;
+                    copyKey(_key_snapshot,stg_system_input);
                 }else {
-                    stg_system_input = _unpackInput(t);
+                     _unpackInput2(t,stg_system_input);
                 }
             }
 
@@ -288,7 +297,7 @@ function _stgMainLoop_GetInput(){
             if(_stg_save_input) {
                 for (var k = 0; k < stg_players_number; k++) {
                     if (!stg_players[k])stg_players[k] = {};
-                    stg_players[k].key = _unpackInput(_replay_pool[_replay_header][k]);
+                    _unpackInput2(_replay_pool[_replay_header][k],stg_players[k].key);
                 }
 
                 stg_events={};
@@ -309,7 +318,7 @@ function _stgMainLoop_GetInput(){
             }else if(stg_ignore_input>=2){
                 for (var k = 0; k < stg_players_number; k++) {
                     if (!stg_players[k])stg_players[k] = {};
-                    stg_players[k].key = _unpackInput(0);
+                     _unpackInput2(0,stg_players[k].key);
                 }
             }
         }else{
@@ -403,6 +412,18 @@ function _unpackInput(t){
     }
     return ipt;
 }
+function _unpackInput2(t,key){
+    for(var i=0;i<16;i++){
+        key[i]=(t%2);
+        t=t>>1;
+    }
+}
+function copyKey(src,target){
+    for(var i=0;i<16;i++){
+        target[i]=src[i];
+    }
+}
+
 
 var _replay_pool=[];
 var _replay_header=0;

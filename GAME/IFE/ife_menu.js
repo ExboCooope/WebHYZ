@@ -279,7 +279,7 @@ function gLoadMenuSystem(){
 
     g_keysetter=new MenuHolderA1([40,40],[0,30],ife.main_menu);
 
-    ife.key_setter=new TextMenuItem("键位设置(触屏勿动)",1,1,{init:function(){temp_key=clone(_key_map);stgDeleteSelf();stgAddObject(g_keysetter)}},1);
+    ife.key_setter=new TextMenuItem("键位设置(触屏勿动)",1,1,{init:function(){temp_key=clone(_key_map[0]);stgDeleteSelf();stgAddObject(g_keysetter)}},1);
     ife.main_menu.pushItem( ife.key_setter);
 
    var tf=function() {
@@ -328,7 +328,7 @@ function gLoadMenuSystem(){
         }
         a = new TextMenuItem("Back", 1, 1,ife.main_menu, 1);
         g_keysetter.pushItem(a);
-        a = new TextMenuItem("Save", 1, 1,{script:function(){stgDeleteSelf();_key_map=clone(temp_key);stgSaveKeyMap();}}, 0);
+        a = new TextMenuItem("Save", 1, 1,{script:function(){stgDeleteSelf();_key_map[0]=clone(temp_key);stgSaveKeyMap();}}, 0);
         g_keysetter.pushItem(a);
         tf2();
     };
@@ -339,7 +339,7 @@ function gLoadMenuSystem(){
 
 }
 
-var temp_key=_key_map;
+var temp_key=_key_map[0];
 
 var g_keysetter={};
 var g_keysetter2={};

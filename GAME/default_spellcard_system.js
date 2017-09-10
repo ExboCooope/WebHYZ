@@ -465,6 +465,11 @@ function stgDefaultFinishSpellCheck(time){
     if(spell.life<0){
         stgDeleteSelf();
         stgBossSetNextSpellDelay(time,spell.boss);
+        for(var i=0;i<stg_players_number;i++){
+            if(hyzIsInOneFrame(stg_players[i],spell)){
+                th.playerAddResource(stg_players[i],"score",spell.score);
+            }
+        }
         if(spell.is_spell) {
             stgBossFinishSpellHistory(spell.boss, spell, spell.score > 0);
         }
@@ -474,7 +479,7 @@ function stgDefaultFinishSpellCheck(time){
         stgBossSetNextSpellDelay(time,spell.boss);
         if(spell.is_spell) {
             if(spell.is_time_spell){
-
+                th.playerAddResource(stg_players[i],"score",spell.score);
             }else{
                 stgPlaySE("se_fault");
             }

@@ -55,6 +55,7 @@ BossSLZ.prototype.init=function(){
         }
         stgBossAddPhase(q);
     }else{
+        //stgBossAddPhase([new BossSLZ.NonSpell0(this)]);
         stgBossAddPhase([new BossSLZ.NonSpell1(this),new BossSLZ.Spell1(this)]);//红
         stgBossAddPhase([new BossSLZ.NonSpell2(this),new BossSLZ.Spell2(this)]);//妖
         stgBossAddPhase([new BossSLZ.NonSpell3(this),new BossSLZ.Spell3(this)]);//永
@@ -120,16 +121,42 @@ BossSLZ.NonSpell0=function(boss){
 };
 BossSLZ.NonSpell0.prototype.init=function(){
     this.invincible=120;
-    luaMoveTo(stg_frame_w/2,80,60,1,this.boss);
+    luaMoveTo(stg_frame_w/2,120,60,1,this.boss);
     stgAddObject(new BossSpellInitObject(this));
+    this.a=0;
 };
 BossSLZ.NonSpell0.prototype.script=function(){
 
     if(stgDefaultFinishSpellCheck(60)){
         stgDeleteSubShot(this,true);
     }
+    if(this.frame>60){
+        if(this.frame%10==0){
+            for(var i=0;i<5;i++){
+                var a=this.a+i*360/5;
+                for(var j=0;j<5;j++){
+                    stgCreateShotA1(this.pos[0],this.pos[1],2,a,"sMD",0,i);
+                    stg_last.move.speed_angle_acceleration=(j-2)*0.6*PI180;
+                    stg_last.script=BossSLZ.NonSpell0.blt_script;
+                }
+            }
+            this.a+=5;
+        }
+    }
     stgClipObject(32,stg_frame_w-32,32,stg_frame_h/2-32,this.boss);
 };
+BossSLZ.NonSpell0.blt_script=function(){
+    if(this.frame==80){
+        var a=this.move.speed_angle_acceleration*this.frame;
+        stg_last.move.speed_angle_acceleration+=stg_rand(-0.6,0.6)*PI180;
+        this.move.speed_angle-=2*a;
+        this.move.speed_angle+=5*PI180;
+    }
+    if(this.frame==180){
+        this.move.speed_angle_acceleration=0;
+    }
+};
+
 
 BossSLZ.NonSpell1=function(boss){
     bossDefineNonSpellA(boss,this,7500,30*60);
@@ -190,7 +217,7 @@ BossSLZ.SpellBg1=function(spell){
 BossSLZ.SpellBg1.prototype.init=function(){
     var a={};
     renderCreateSpriteRender(a);
-    a.layer=21;
+    a.layer=22;
     renderApply2DTemplate(a.render,"cardbg2_d",0);
     a.base=new StgBase(this,0,1);
     a.sid=this.sid;

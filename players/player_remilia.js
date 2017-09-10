@@ -1,10 +1,15 @@
 /**
  * Created by Exbo on 2017/1/8.
  */
-function Player_Remilia(iPosition){
+
+th.scriptLoadScript("players/espshoot.js");
+
+function Player_Remilia(oPlayer){
+    var iPosition=oPlayer.slot||0;
+    this.player=oPlayer;
     this.player_pos=iPosition;
 }
-
+Player_Remilia.version=2;
 stgRegisterPlayer("remilia",Player_Remilia);
 
 stg_player_templates["remilia"]=Player_Remilia;
@@ -12,7 +17,7 @@ stg_player_templates["remilia"]=Player_Remilia;
 Player_Remilia.prototype.init=function(){
     Player_Remilia.pre_load();
     this.side=stg_const.SIDE_PLAYER;
-    var b=new StgObject();
+    var b=this.player;
     _StgDefaultPlayer(b);
     b.hitby=new StgHitDef();
    b.hitby.setPointA1(0,0,0);
@@ -22,6 +27,7 @@ Player_Remilia.prototype.init=function(){
     };
     b.on_graze=function(){
         stgPlaySE("se_graze");
+        th.playerAddResource(this,"graze",1);
         var a=new GrazeParticle(this.pos[0],this.pos[1],stg_rand(0,360));
         stgAddObject(a);
     };
@@ -31,7 +37,7 @@ Player_Remilia.prototype.init=function(){
         }
     }
     stg_players[this.player_pos]=b;
-    stgSetPositionA1(b,stg_frame_width/2,stg_frame_height*0.8);
+    stgSetPositionA1(b,stg_frame_w/2,stg_frame_h*0.8);
 
     var c=new StgGrazer(b);
     stgAddObject(b);
@@ -58,11 +64,14 @@ Player_Remilia.on_death=function(){
 
 Player_Remilia.player_script=function(){
 
-    if(this.content.bomb){
-        this.bomb+=this.content.bomb;
-        this.content.bomb=0;
-        if(this.bomb>8)this.bomb=8;
-    }
+    th.playerCheckResourceA1(this,"bomb",8);
+    var q=this.graze;
+    th.playerCheckResourceA1(this,"graze");//擦弹
+    q=this.graze-q;
+    th.playerAddResource(this,"point_bonus",q);
+    th.playerCheckResourceA2(this,"point_bonus",500000,10);//最大得点
+    th.playerCheckResourceA1(this,"life",8);
+    th.playerCheckResourceA1(this,"score",2000000000);
 
     this.t=this.t||0;
     this._c=this._c||0;

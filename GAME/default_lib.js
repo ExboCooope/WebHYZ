@@ -187,12 +187,12 @@ MenuHolderA1.prototype.script=function(){
     var k=stg_system_input;
     var flag0=0;
     if(that.rolldir==0){
-        if(k[stg_const.KEY_UP] || k[stg_const.KEY_LEFT]) {
+        if(th.actionKeyDown(k,stg_const.KEY_UP)||th.actionKeyDown(k,stg_const.KEY_LEFT)){//k[stg_const.KEY_UP] || k[stg_const.KEY_LEFT]) {
             that.rolldir=-1;
             that.rolllock=60;
             sel--;
             flag0=1;
-        }else if(k[stg_const.KEY_DOWN] || k[stg_const.KEY_RIGHT]) {
+        }else if(th.actionKeyDown(k,stg_const.KEY_DOWN)||th.actionKeyDown(k,stg_const.KEY_RIGHT)) {
             that.rolldir=1;
             that.rolllock=60;
             sel++;
@@ -232,8 +232,9 @@ MenuHolderA1.prototype.script=function(){
         sel=(sel+pool.length+that.rolldir) %pool.length;
     }
     this.select_id=sel;
-    if(k[stg_const.KEY_SHOT]){
-        if(!TextMenuItem.sellock){
+    //if(k[stg_const.KEY_SHOT]){
+       // if(!TextMenuItem.sellock){
+    if(th.actionKeyDown(k,stg_const.KEY_SHOT)){
             that.selectfunction(pool[sel]);
             /*
             if(pool[sel].select_remove){
@@ -247,19 +248,22 @@ MenuHolderA1.prototype.script=function(){
             stgAddObject(pool[sel].on_select);
             stgPlaySE("se_ok");
             */
-        }
+        //}
     }else{
         TextMenuItem.sellock=0;
     }
 
-    if(k[stg_const.KEY_SPELL]){
-        if(!TextMenuItem.backlock){
-
+    if(th.actionKeyDown(k,stg_const.KEY_SPELL)){
+        //if(!TextMenuItem.backlock){
+            if(that.menu_return==this || !that.menu_return) {
+                stgPlaySE("se_cancel");
+                return;
+            }
             for(var j in pool){
                 stgDeleteObject(pool[j]);
             }
             stgDeleteObject(this);
-            TextMenuItem.backlock=1;
+        //    TextMenuItem.backlock=1;
             if(that.menu_return){
                 if(this.is_sub){
                     this.parent.active=1;
@@ -268,7 +272,7 @@ MenuHolderA1.prototype.script=function(){
                 }
             }
             stgPlaySE("se_cancel");
-        }
+      //  }
     }else{
         TextMenuItem.backlock=0;
     }
@@ -679,6 +683,17 @@ function stgDeleteSubShot(parent,toitem){
                 }else{
                     stgDeleteObject(a);
                 }
+            }
+        }
+    }
+}
+
+function stgDeleteSubObjects(parent){
+    for(var i=0;i<_pool.length;i++){
+        var a=_pool[i];
+        if(!a.remove){
+            if(stgIsParent(parent,a)){
+                stgDeleteObject(a);
             }
         }
     }
