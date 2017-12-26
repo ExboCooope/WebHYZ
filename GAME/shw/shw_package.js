@@ -13,5 +13,5 @@ th.scriptLoadScript("GAME/TankWar/tankwar.js");
 th.scriptLoadScript("GAME/shw/shw_practice.js");
 //th.scriptLoadScript("Thlib/background/temple/temple.js");
 //th.scriptLoadScript("Thlib/background/hongmoguan/stage3bg.js");
-th.scriptLoadScript("Thlib/background/river/river.js");
-th.scriptLoadScript("Thlib/background/temple2/magic_forest.js");
+th.scriptLoadScript("THlib/background/river/river.js");
+th.scriptLoadScript("THlib/background/temple2/magic_forest.js");
