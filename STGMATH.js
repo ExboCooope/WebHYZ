@@ -174,3 +174,35 @@ POW2[1<<10]=1;
 POW2[1<<11]=1;
 POW2[1<<12]=1;
 
+function strLen(str){
+    var i=0;
+    var n=str.length;
+    for(var j=0;j<n;j++){
+        if(str.charCodeAt(j)>=255){
+            i++;
+        }
+    }
+    return i+n;
+}
+function strEnter(str,length){
+    var rt=[];
+    var i=0;
+    var a=0;
+    var l=0;
+    var n=str.length;
+    for(var j=0;j<n;j++){
+        a=((str.charCodeAt(j)>=255)?2:1);
+        if(str[j]=='\n'){
+            rt.push(str.slice(l,j));
+            l=j+1;
+            i=0;
+        }else if(i+a>length){
+            rt.push(str.slice(l,j));
+            l=j;
+            i=0;
+        }
+        i+=a;
+    }
+    rt.push(str.slice(l,n));
+    return rt;
+}

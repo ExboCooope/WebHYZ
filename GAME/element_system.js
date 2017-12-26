@@ -7,6 +7,11 @@ renderCreate2DTemplateA1("ele_num","th_res",0,12*32,32,32,32,0,0,1);
 renderCreate2DTemplateA1("ele_max","th_res",4*32,12*32,64,32,0,0,0,1);
 renderCreate2DTemplateA1("ele_text","th_res",0,15*32,32,32,32,0,0,1);
 
+stgCreateImageTexture("fairy_circle","res/fairy_circle.png");
+renderCreate2DTemplateA1("fairy_circle_w","fairy_circle",128,177,64,64,0,0,0,1);
+
+
+
 var element_system={};
 element_system.init=function(){
     if(!stg_common_data.element){
@@ -18,6 +23,8 @@ element_system.init=function(){
         element_system.lgz[i]=stg_players[i].graze;
         element_system.gzcd[i]=0;
     }
+    stgCreate2DBulletTemplateA1("eD","bullet",0,400,16,16,16,0,PIUP,1,_hit_box_medium,{move_rotate:1});
+
 };
 element_system.script=function(){
     var add=[0,0,0];
@@ -39,9 +46,10 @@ element_system.script=function(){
                 element_system.gzcd[i]=45;
             }
             if(p.pos[1]<stg_frame_h/3){
-                add[2]-=1;
-            }else if(p.pos[1]<stg_frame_h/2){
                 add[2]-=2;
+            }
+            if(p.pos[1]<stg_frame_h/2){
+                add[2]-=1;
             }
             if(p.bombing){
                 add[2]+=2;
@@ -61,7 +69,14 @@ element_system.script=function(){
 
 
 };
-
+element_system.getLevel=function(id){
+    if(!stg_common_data.element)return 0;
+    var i= stg_common_data.element[id];
+    i=(i>=0?(i/200)>>0:-((-i/200)>>0));
+    if(i>3)return 3;
+    if(i<-3)return -3;
+    return i;
+};
 
 
 
@@ -79,10 +94,10 @@ ElementBase.prototype.init=function(){
     var x=this.x;
     var y=this.y;
     var s=this.scale;
-    this.vtx.setVertex(0,0,0,0,14*32,255,255,255,256)//左上角
-    this.vtx.setVertex(1,0,32*s,0,15*32,255,255,255,256)//左下角
-    this.vtx.setVertex(2,6*32*s,32*s,6*32,15*32,255,255,255,256)//右下角
-    this.vtx.setVertex(3,6*32*s,0,6*32,14*32,255,255,255,256)//右上角
+    this.vtx.setVertex(0,0,0,0,14*32,255,255,255,256);//左上角
+    this.vtx.setVertex(1,0,32*s,0,15*32,255,255,255,256);//左下角
+    this.vtx.setVertex(2,6*32*s,32*s,6*32,15*32,255,255,255,256);//右下角
+    this.vtx.setVertex(3,6*32*s,0,6*32,14*32,255,255,255,256);//右上角
     renderCreatePrimitiveRender(this);
     this.render.texture="th_res";
     this.layer=260;
@@ -100,8 +115,16 @@ ElementBase.prototype.init=function(){
     th.spriteSet(a,"ele_text",this.idx*2,262);
     stgSetPositionA1(a,this.x+32*6*s+14,this.y+16*s);
 
-};
 
+
+};
+ElementBase.prototype.script=function() {
+    if(this.frame==2){
+        for(var i=0;i<stg_players_number;i++){
+            stgAddObject(new element_system.FireOptionController(stg_players[i]));
+        }
+    }
+};
 
 ElementBase.prototype.on_render=function(gl){
 
@@ -150,4 +173,70 @@ ElementBase.prototype.on_render=function(gl){
 ElementBase.prototype.finalize=function(){
     stgDeleteSubObjects(this);
     this.vtx.clear();
+};
+
+element_system.FireOptionController=function(player){
+    this.player=player;
+    this.base=new StgBase(player,thc.BASE_COPY,1,1);
+};
+
+element_system.FireOptionController.prototype.init=function(){
+    this.options=[];
+    for(var i=0;i<3;i++){
+        var a={};
+        th.spriteSet(a,"fairy_circle_w",0,thc.LAYER_PLAYER);
+        renderSetSpriteColor(255,0,0,128,a);
+        renderSetObjectSpriteBlend(a,blend_add);
+        renderSetSpriteScale(0.3,0.3,a);
+        a.self_rotate=0.1;
+        stgEnableMove(a);
+        a.base=new StgBase(this.player,thc.BASE_MOVE,1,1);
+        this.options[i]=a;
+    }
+    this.count=0;
+};
+element_system.FireOptionController.prototype.shot=function(objbase) {
+    stgCreateShotP1(objbase.pos[0]-4,objbase.pos[1],12,270,"eD",0,0,1,60);
+    stgCreateShotP1(objbase.pos[0]+4,objbase.pos[1],12,270,"eD",0,0,1,60);
+    renderSetObjectSpriteBlend(stg_last,blend_add);
+};
+element_system.FireOptionController.prototype.script=function(){
+    var l=element_system.getLevel(0);
+    if(l<0)l=0;
+    var i=0;
+    if(l!=this.count){
+        if(l>this.count){
+            for(i=this.count;i<l;i++){
+                stgAddObject(this.options[i]);
+            }
+        }else{
+            for(i=l;i<this.count;i++){
+                stgDeleteObject(this.options[i]);
+            }
+        }
+        if(l==1){
+            this.options[0].move.pos[0]=0;
+            this.options[0].move.pos[1]=-40;
+        }else if(l==2){
+            this.options[0].move.pos[0]=20;
+            this.options[0].move.pos[1]=-35;
+            this.options[1].move.pos[0]=-20;
+            this.options[1].move.pos[1]=-35;
+        }else if(l==3){
+            this.options[0].move.pos[0]=20;
+            this.options[0].move.pos[1]=-30;
+            this.options[1].move.pos[0]=0;
+            this.options[1].move.pos[1]=-40;
+            this.options[2].move.pos[0]=-20;
+            this.options[2].move.pos[1]=-30;
+        }
+    }
+    if(th.actionCoolDown("t",3,this.player.key[thc.KEY_SHOT])){
+        for(i=0;i<l;i++){
+            this.shot(this.options[i]);
+        }
+    }
+
+
+    this.count=l;
 };

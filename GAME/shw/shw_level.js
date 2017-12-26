@@ -17,14 +17,16 @@ shw.set_up_frame_object={
 
 shw.level={};
 shw.level.init=function(){
+    this.sid=1;
     stgReturnObject(shw.loading);
     stgReturnObject(shw.loading.left_gate);
     stgReturnObject(shw.loading.right_gate);
     hyz.battle_style=1;
    // hyzSetBattleStyle(1,0);
     stgAddObject(shw.set_up_frame_object);
-    stgAddObject(background_controller);
-    stgAddObject(background_01);
+   // stgAddObject(background_controller);
+  //  stgAddObject(background_01);
+    stgAddObject(new river_background());
     stgAddObject(hyz.magicCircle);
     stg_players[0].sid=1;
     stg_common_data.current_hit=[0,0];
@@ -55,7 +57,7 @@ shw.level.init=function(){
     a.script=shw.title_bar_script;
     renderSetSpriteScale(1,0,a);
 
-    stgAddObject(element_system);
+   // stgAddObject(element_system);
 
     a=new ElementBase(stg_frame_w+75,390,[255,0,0,255],[0,0,255,255],0.75,0);
     a.sid=0;
@@ -67,11 +69,13 @@ shw.level.init=function(){
     a.sid=0;
     stgAddObject(a);
 
-    a.script=function(){
 
-    };
+    //shw.practice.showDialog(50,50,200,400,20,"这是一段很长的对话，哈哈哈哈\n或或或或或，爱德华哦啊哈佛私房话","#FFF");
 
     hyzAddObject(new thc.ScoreDisplay(0,0),0);
+
+  //  stgCreateShotA1(100,100,0,45,"sLD",0,0);
+
 };
 
 shw.title_bar_script=function(){
@@ -88,11 +92,14 @@ shw.title_bar_script=function(){
 };
 
 shw.level.script=function(){
+
+
     BGLeaf.create();
+   // return;
     if(stg_players_number==1){
         stg_players[1]=stg_players[0];
     }
-    //return;
+
     if(this.frame==30){
         if(stg_common_data.ai){
             stgAddObject(new BasicAI(stg_players[1]));
@@ -106,6 +113,7 @@ shw.level.script=function(){
             return;
         }
         this.boss=new BossSLZ();
+       // this.boss=new BossESC();
         stgAddObject(this.boss);
     }
     if(this.frame>=60){

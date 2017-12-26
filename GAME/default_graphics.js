@@ -492,7 +492,7 @@ var default_2d_misc_shader={
         var t=render;
         t.cx=object.pos?object.pos[0]:0;
         t.cy=object.pos?object.pos[1]:0;
-        pool[l].push(t);
+        pool[l].push(t._obj||t);
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
     draw_frame:function(procedureName){
         var pool=default_2d_misc_shader.pool;
@@ -613,6 +613,7 @@ function _renderApply2DTemplate(oRender,oTemplate,iColor){
         renderApply2DCenter(oRender);
     }
 }
+
 function renderObjectApply2DTemplate(object,sTemplate,iColor){
     if(!object.render)object.render=new StgRender("sprite_shader");
     renderApply2DTemplate(object.render,sTemplate,iColor);

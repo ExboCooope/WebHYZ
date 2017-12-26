@@ -408,6 +408,7 @@ function stgApplyEnemy(e){
     e.on_hit_by=default_enemy_onhitby;
     e.type=stg_const.OBJ_ENEMY;
     e.score=10;
+    e.side=stg_const.SIDE_ENEMY;
     return e;
 }
 
@@ -885,6 +886,105 @@ function stgAddHitBy(object){
 }
 
 
+function stgEnginePlayerHit(a, s){
+    a= a._obj;
+    for (var j in _hit_pool) {
+
+        var b = _hit_pool[j];
+        if(window.hyz && hyz.battle_style==0 && b.sid!= a.sid)continue;
+        if (stg_hit_check[s][b.side]) {
+            var d = stgDist(a.hitby, b.hitdef);
+            if(b.type==stg_const.OBJ_BULLET && d< a.graze_range){
+                if(!b.grazed){
+                    b.grazed=[];
+                }
+                if(!b.grazed[a.slot]){
+                    b.grazed[a.slot]=1;
+                    //a.graze++;
+                    if(a.on_graze){
+                        stgSetTarget(a);
+                        a.on_graze(b,d);
+                    }
+                }
+            }
+
+            if (d < 0) {
+                //console.log(b);
+                a.hit_by_list.push(b);
+                b.hit_list.push(a);
+                stgSetTarget(b);
+                if(b.on_hit)b.on_hit(a,d);
+
+                stg_target=a;
+                if(a.on_hit_by)a.on_hit_by(b,d);
+
+                if(b.type==stg_const.OBJ_BULLET){
+
+                    if(!b.invincible){
+                        if(!a.invincible && a.state==stg_const.PLAYER_NORMAL){
+                            a.state=stg_const.PLAYER_HIT;
+                            a.invincible= a.counter_bomb_time;
+                        }
+                        /*
+                         b.penetrate--;
+                         if(b.penetrate<=0){
+                         b.fade_remove=33;
+                         b.alpha=255;
+                         b.ignore_hit=1;
+                         }*/
+
+
+                    }
+                }
+
+                if(b.type==stg_const.OBJ_ENEMY){
+                    if(!a.invincible && a.
+                        state==stg_const.PLAYER_NORMAL){
+                        a.state=stg_const.PLAYER_HIT;
+                        a.invincible= a.
+
+                            counter_bomb_time;
+                    }
+                }
+
+                if(b.type==stg_const.OBJ_ITEM){
+                    if(b.content){
+                        for(var i in b.
+                            content){
+                            a.content[i]=(a.
+                                content[i]||0)+ b.content[i];
+                        }
+                    }
+                    stg_target=b;
+                    if(b.on_collect)b.
+                        on_collect(a);
+                    stg_target=a;
+                    if(a.on_collect)a.on_collect(b);
+                    stgDeleteObject(b);
+                }
+            }
+        }
+    }
+    return {b:b, d:d};
+}
+function _bulletHit(a,b,d){
+    b= b._obj;
+    a= a._obj;
+    if(b.penetrate>0) {
+        a.hit_by_list.push(b);
+        b.hit_list.push(a);
+        stgSetTarget(b);
+        if(b.on_hit)b.on_hit(a,d);
+        stg_target=a;
+        if(a.on_hit_by)a.on_hit_by(b,d);
+        b.penetrate--;
+        if (b.penetrate <= 0) {
+            b.fade_remove = 33;
+            b.alpha = b.alpha||255;
+            b.ignore_hit = 1;
+        }
+    }
+}
 function _stgMainLoop_Hit(){
     var i;
     var j;
@@ -893,6 +993,10 @@ function _stgMainLoop_Hit(){
         var a=_hit_by_pool[i];
         var s=a.side;
         if(a.type==stg_const.OBJ_PLAYER){
+
+            stgEnginePlayerHit(a,s);
+
+/*
             for (var j in _hit_pool) {
 
                 var b = _hit_pool[j];
@@ -930,13 +1034,7 @@ function _stgMainLoop_Hit(){
                                     a.state=stg_const.PLAYER_HIT;
                                     a.invincible= a.counter_bomb_time;
                                 }
-                                /*
-                                b.penetrate--;
-                                if(b.penetrate<=0){
-                                    b.fade_remove=33;
-                                    b.alpha=255;
-                                    b.ignore_hit=1;
-                                }*/
+
 
 
                             }
@@ -963,36 +1061,23 @@ function _stgMainLoop_Hit(){
                         }
                     }
                 }
-            }
+            }*/
         }else {
             for (var j=0;j<_hit_pool.length;j++) {
-                b = _hit_pool[j];
+                var b = _hit_pool[j];
                 if(window.hyz && hyz.battle_style==0 && b.sid!= a.sid)continue;
                 if (stg_hit_check[s][b.side]) {
-                    d = stgDist(a.hitby, b.hitdef);
+                    var d = stgDist(a.hitby, b.hitdef);
                     if (d < 0) {
                         if(b.type==stg_const.OBJ_BULLET){
-                            if(b.penetrate>0) {
-                                a.hit_by_list.push(b);
-                                b.hit_list.push(a);
-                                stgSetTarget(b);
-                                if(b.on_hit)b.on_hit(a,d);
-                                stg_target=a;
-                                if(a.on_hit_by)a.on_hit_by(b,d);
-                                b.penetrate--;
-                                if (b.penetrate <= 0) {
-                                    b.fade_remove = 33;
-                                    b.alpha = b.alpha||255;
-                                    b.ignore_hit = 1;
-                                }
-                            }
+                            _bulletHit(a,b,d);
                         }else{
                             a.hit_by_list.push(b);
                             b.hit_list.push(a);
                             stgSetTarget(b);
-                            if(b.on_hit)b.on_hit(a,d);
+                            if(b.on_hit)b.on_hit.call(b._obj,a,d);
                             stgSetTarget(a);
-                            if(a.on_hit_by)a.on_hit_by(b,d);
+                            if(a.on_hit_by)a.on_hit_by.call(a._obj,b,d);
                         }
                     }
 
@@ -1146,7 +1231,7 @@ function _stgEngineObjInit(a){
         a.rotate=[0,0,0];
     }
     if(a.on_move){
-        a.on_move();
+        a.on_move.call(a._obj);
     }
     if(a.hitby)a.hit_by_list=[];
     if(a.hitdef)a.hit_list=[];
@@ -1376,8 +1461,12 @@ function _stgMainLoop_Engine2(){
     for(i=0;i<_pool.length;i++){
         if(_pool[i].active && (!stg_super_pause_time|| _pool[i].ignore_super_pause)){
             a=_pool[i];
+            stgSetTarget(a);
+            a=a.core;
+            _stgMainLoop_Engine2Ex(a);
+            /*
             a.frame++;
-            _stgEngineObjInit(a);
+           // _stgEngineObjInit(a);
             if(a.move){
                 _stgEngineObjMove(a.move,a);
             }
@@ -1433,9 +1522,71 @@ function _stgMainLoop_Engine2(){
 
             if(a.type==stg_const.OBJ_ENEMY){
                 stg_enemy.push(a);
-            }
+            }*/
         }
     }
+}
+
+function _stgMainLoop_Engine2Ex(a){
+
+        a.frame++;
+        _stgEngineObjInit(a);
+        if(a.move){
+            _stgEngineObjMove(a.move,a);
+        }
+        if(a.after_move){
+            a.after_move.call(a._obj);
+        }
+        if(a.opos){
+            a.pos[0]+= a.opos[0];
+            a.pos[1]+= a.opos[1];
+            a.pos[2]+= a.opos[2];
+        }
+        if(a.base){
+            _stgEngineObjBase(a, a.base, a.base.target);
+        }
+        if(a.clip){
+            if(a.pos[0]<a.clip[0])a.pos[0]=a.clip[0];
+            if(a.pos[1]<a.clip[1])a.pos[1]=a.clip[1];
+            if(a.pos[0]>stg_frame_w-a.clip[2])a.pos[0]=stg_frame_w-a.clip[2];
+            if(a.pos[1]>stg_frame_h-a.clip[3])a.pos[1]=stg_frame_h-a.clip[3];
+        }
+        if(a.look_at){
+            _stgEngineObjLookAt(a, a.look_at);
+        }
+        if(a.self_rotate){
+            a.rotate[2]+=a.self_rotate;
+        }
+        if(a.orotate){
+            a.rotate[0]+= a.orotate[0];
+            a.rotate[1]+= a.orotate[1];
+            a.rotate[2]+= a.orotate[2];
+        }
+        if(a.hitby && !a.ignore_hit){
+            _stgEngineObjHit(a, a.hitby,_hit_by_pool);
+        }
+        if(a.hitdef && !a.ignore_hit){
+            _stgEngineObjHit(a, a.hitdef,_hit_pool);
+        }
+        if(a.invincible)a.invincible--;
+        if(a.type==stg_const.OBJ_BULLET && a.render){
+            _stgEngineBulletEffect(a);
+        }
+        if(a.fade_remove){
+            _stgEngineFade(a);
+        }
+
+        if (a.type == stg_const.OBJ_BULLET || a.type == stg_const.OBJ_ENEMY || a.type == stg_const.OBJ_ITEM) {
+            if(!a.keep) {
+                if (a.pos[0] > stg_frame_w +32 || a.pos[0] <  -32 ||a.pos[1] > stg_frame_h +32||a.pos[1] < -32){
+                    stgDeleteObject(a);
+                }
+            }
+        }
+
+        if(a.type==stg_const.OBJ_ENEMY){
+            stg_enemy.push(a);
+        }
 }
 function _stgMainLoop_Engine(){
     _stgMainLoop_Engine0();
@@ -1506,7 +1657,27 @@ function stgReturnObject(oStgObject){
     stg_last=oStgObject;
 }
 
+function stgAddObjects(oStgObject){
+    for(var i=0;i<oStgObject.length;i++) {
+        stgAddObject(oStgObject[i]);
+    }
+}
+
 function stgAddObject(oStgObject){
+    //_stgApplyObject(oStgObject);
+    var tmp=stgSetTarget(oStgObject);
+    if(tmp){
+        if(!(tmp.side===undefined)){
+            oStgObject.side=tmp.side;
+        }
+        if(oStgObject.sid===undefined){
+            oStgObject.sid=tmp.sid;
+        }
+        oStgObject.parent=tmp;
+    }
+    if(!oStgObject.core){
+        new StgCore(oStgObject);
+    }
     if(!oStgObject)return;
     if(oStgObject.active&&oStgObject.remove){
         if(oStgObject.finalize)oStgObject.finalize();
@@ -1519,18 +1690,11 @@ function stgAddObject(oStgObject){
         _pool.push(oStgObject);
         oStgObject.uid=_pool.length;
     }
-    var tmp=stgSetTarget(oStgObject);
-    if(tmp){
-        if(!(tmp.side===undefined)){
-            oStgObject.side=tmp.side;
-        }
-        if(oStgObject.sid===undefined){
-            oStgObject.sid=tmp.sid;
-        }
-        oStgObject.parent=tmp;
-    }
+    
 
-    _stgApplyObject(oStgObject);
+
+
+
     if(oStgObject.init){
         oStgObject.init();
     }
@@ -1572,6 +1736,7 @@ _stgDeleteDelay.prototype.script=function(){
 };
 
 function stgDeleteObject(oStgObject,time){
+    oStgObject=oStgObject._obj||oStgObject;
     if(!time) {
         oStgObject.remove = 1;
         oStgObject.active = 1;
@@ -1579,6 +1744,15 @@ function stgDeleteObject(oStgObject,time){
        stgAddObject(new _stgDeleteDelay(oStgObject,time));
     }
 }
+
+function stgDeleteObjects(oStgObjects){
+    for(var i=0;i<oStgObjects.length;i++){
+        if(oStgObjects[i]){
+            stgDeleteObject(oStgObjects[i]);
+        }
+    }
+}
+
 var _temp_pool;
 function _stgMainLoop_Pause(){
     if(stg_game_state==stg_const.GAME_RUNNING){

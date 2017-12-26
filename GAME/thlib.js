@@ -144,6 +144,15 @@ th.playerSaveAttribute=function(player,data){
         a[th.player_data[i]]=player[th.player_data[i]];
     }
 };
+th.playerSetSpeed=function(player,speedfast,speedslow){
+    player.move_speed[0]=speedfast;
+    player.move_speed[1]=speedslow;
+};
+th.playerGetSpeed=function(player){
+    return player.move_speed;
+};
+
+
 
 //binds movements from a standard player texture
 th.playerBindTexture=function(texturename){
@@ -288,7 +297,46 @@ th.actionKeyDown=function(key,keyid){
 th.actionKeyUp=function(key,keyid){
     return (!key[keyid])&&(key[keyid+16]);
 };
+th._current_step="_step";
+th.actionStepUse=function(varname){
+    th._current_step=varname;
+};
+th.actionStepSet=function(step,varname){
+    varname=varname||th._current_step;
+    stg_target[varname]=[step,0];
+};
 
+th.actionStepSingle=function(step,varname){
+    varname=varname||th._current_step;
+    if(stg_target[varname][0]==step && stg_target[varname+"_"]!=step){
+        stg_target[varname+"_"]=step;
+        return true;
+    }
+    return false;
+};
+
+th.actionStep=function(step,varname){
+    varname=varname||th._current_step;
+    if(stg_target[varname][0]==step){
+        stg_target[varname][1]++;
+        return stg_target[varname][1];
+    }else{
+        return 0;
+    }
+};
+th.actionStepTime=function(step,varname){
+    varname=varname||th._current_step;
+    return stg_target[varname][1]==step;
+};
+th.actionStepTimeAfter=function(time,varname){
+    varname=varname||th._current_step;
+    return stg_target[varname][1]>=time;
+};
+th.actionStepNext=function(varname){
+    varname=varname||th._current_step;
+    stg_target[varname][0]++;
+    stg_target[varname][1]=0;
+};
 
 //frame display function
 th.frameCreateCanvas=function(name,width,height,x,y,mode){
@@ -379,6 +427,46 @@ tho._spriteAnimationFunction=function(){
 
 
 //thc
+
+thc.Dialog=function(x,y,w,h,fonth,lines){
+    var a=this;
+    a.layer=90;
+    a.render=new StgRender("testShader2");
+    miscApplyAttr(a.render,{type:1,x:x,y:y,w:w,h:h,alpha:128,color:"#000"});
+    this.fonth=fonth;
+    var dy=h-fonth*lines;
+    dy=dy/(lines+1);
+    this.dy=dy;
+    this.lines=lines;
+    this.w=(w-dy-dy)/fonth*2;
+    this.texts=[];
+    for(var i=0;i<lines;i++){
+        a=new RenderText(x,y+i*(fonth+dy),"");
+        a.setFont("宋体",fonth,"#000","#888");
+        this.texts.push(a);
+    }
+};
+
+thc.Dialog.prototype.setText=function(id,text,color0,color1){
+    this.texts[id].setText(text);
+    if(color0){
+        this.texts[id].render.color=color0;
+    }
+    if(color1){
+        this.texts[id].render.backcolor=color1;
+    }
+};
+thc.Dialog.prototype.setTexts=function(text,color0,color1){
+    var rt=strEnter(text,this.w);
+    for(var i=0;i<rt.length;i++){
+        this.setText(i,rt[i],color0,color1);
+    }
+};
+
+thc.Dialog.prototype.finalize=function(){
+    stgDeleteObjects(this.texts);
+};
+
 thc.CutInA1=function(x,y,templatename,color,time){
     this.ignore_super_pause=1;
     time=time||60;

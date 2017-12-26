@@ -45,18 +45,18 @@ shw_loader.init=function(){
         bullet00Assignment();//初始化子弹文理绑定
         //载入音效
         stgLoadSE("se_alert","se/se_alert.wav").ready=1;
-        stgLoadSE("se_graze","se/se_graze.wav").ready=1;
+        stgLoadSE("se_graze","se/se_graze.wav",0.5).ready=1;
         stgLoadSE("se_select","se/se_select00.wav").ready=1;
         stgLoadSE("se_dead","se/se_pldead00.wav").ready=1;
-        stgLoadSE("se_ok","se/se_ok00.wav").ready=1;
-        stgLoadSE("se_cancel","se/se_cancel00.wav").ready=1;
+        stgLoadSE("se_ok","se/se_ok00.wav",0.3).ready=1;
+        stgLoadSE("se_cancel","se/se_cancel00.wav",0.3).ready=1;
         stgLoadSE("se_extend","se/se_extend.wav").ready=1;
-        stgLoadSE("se_cast","se/se_cat00.wav").ready=1;
+        stgLoadSE("se_cast","se/se_cat00.wav",0.3).ready=1;
         stgLoadSE("se_boss_cast","se/se_ch02.wav").ready=1;
         stgLoadSE("se_enemy_dead","se/se_enep00.wav").ready=1;
-        stgLoadSE("se_shot0","se/se_tan00.wav").ready=1;
-        stgLoadSE("se_shot1","se/se_tan01.wav").ready=1;
-        stgLoadSE("se_shot2","se/se_tan02.wav").ready=1;
+        stgLoadSE("se_shot0","se/se_tan00.wav",0.3).ready=1;
+        stgLoadSE("se_shot1","se/se_tan01.wav",0.3).ready=1;
+        stgLoadSE("se_shot2","se/se_tan02.wav",0.3).ready=1;
         stgLoadSE("se_boon01","se/se_boon01.wav").ready=1;
         stgLoadSE("se_kira02","se/se_kira02.wav").ready=1;
         stgLoadSE("se_laser","se/se_laser00.wav").ready=1;
@@ -65,6 +65,7 @@ shw_loader.init=function(){
         stgLoadModuleObject(esp);
         //stgLoadModuleObject(shw.loading);
         stgLoadModuleObject(BossSLZ);
+        stgLoadModuleObject(BossESC);
         stgLoadModule("boss_system");
         for(var pn in stg_player_templates){
             stgLoadModuleObject(stg_player_templates[pn]);
@@ -103,7 +104,7 @@ shw_loader.init=function(){
         stgShowCanvas("frame", 0, 0, 0, 0, 5);
         stgShowCanvas("ui", 0, 0, 0, 0, 20);
         //载入渲染器
-
+        stgAddShader("lua_shader",luaShader);
         shw.refresh_mode=stgLoadData("refresh")||0;
         if(shw.refresh_mode){
             stg_refresher_type=shw.refresh_mode-1;
@@ -157,7 +158,8 @@ shw_loader.init=function(){
 
         stgCreateProcedure2("drawCombineFrame","frame",201,300,["sprite_shader","basic_shader"],"#000");
     //    stgCreateProcedure1("drawBGFrame","frame_bg",101,200,"3d_shader","#FFF");
-        stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"3d_shader","#FFF");
+       // stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"3d_shader","#FFF");
+        stgCreateProcedure1("drawFullBGFrame","frame_full_bg",101,200,"lua_shader","#000");
 
         stgCreateProcedure1("drawUI","ui",81,100,"testShader2","#000");
 

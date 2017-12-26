@@ -47,7 +47,7 @@ function _runProcedure(sProcedure){
                             if (oProcedure.shader_order[j]) {
                                 if (_pool[i].render.shader_name == oProcedure.shader_order[j]) {
                                     s = stg_shaders[oProcedure.shader_order[j]];
-                                    if(s.object_frame)s.object_frame(_pool[i], _pool[i].render, sProcedure);
+                                    if(s.object_frame)s.object_frame(_pool[i]._obj, _pool[i].render, sProcedure);
 
                                 }
                             }
@@ -219,7 +219,7 @@ function stgClearCanvas(sName){
     }
 }
 
-function stgLoadSE(sName,sSource){
+function stgLoadSE(sName,sSource,vol){
     if(stg_textures[sName])return stg_textures[sName];
     var a=document.createElement("audio");
     a.type=stg_const.TEX_AUDIO;
@@ -230,6 +230,7 @@ function stgLoadSE(sName,sSource){
     a.src=sSource;
     stg_textures[sName]=a;
     a.ready=1;
+    if(vol)a.volume=vol;
     return a;
 }
 

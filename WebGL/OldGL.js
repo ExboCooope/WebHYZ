@@ -77,6 +77,7 @@ WGLA._WGLBuffer.prototype.uploadData=function(dataid,datacount,usage){
         gl.bindBuffer(gl.ARRAY_BUFFER,this.glbuffer);
         gl.bufferSubData(gl.ARRAY_BUFFER,dataid*this.databytelength*this.datagroupcount,this.locateData(dataid,datacount));
     }
+
 };
 
 WGLA._WGLBuffer.prototype.uploadIndexData=function(dataid,datacount,usage){

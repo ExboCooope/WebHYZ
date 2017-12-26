@@ -24,6 +24,7 @@ javaStage.core_scripts=[
     "STGBULLET",
     "STGREPLAY",
     "STGMULTIPLAYER",
+    "STGOBJECT",
     "lstg_api"];
 javaStage.webgl_scripts=[
     "WebGL/shaders",
@@ -89,6 +90,8 @@ javaStage.load_text.style.background="#FFF";
 javaStage.load_text.style.color="#000";
 
 javaStage.load=function(scripts,on_ready) {
+
+
     document.body.appendChild(javaStage.load_text);
     var g=scripts;
     var ls=function(id) {

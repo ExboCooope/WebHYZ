@@ -205,6 +205,14 @@ BossDynamicAura.prototype.init=function(){
     this.target=0;
     this.base=new StgBase(this.boss,stg_const.BASE_COPY,1);
 };
+
+BossDynamicAura.prototype.changeSize=function(newsize){
+    this.size=newsize;
+    var s=this.size;
+    this.screen.buffer.set([-s,-s,-s,s,s,s,s,-s]);
+    this.screen.uploadData();
+};
+
 BossDynamicAura.prototype.on_render=function(gl,target){
     var s=this.size;
     var w=target.width;
@@ -286,7 +294,7 @@ BossNameObject.prototype.init=function() {
     this.text.sid=0;
     this.text.base=new StgBase(this.boss,0,1);
     stgAddObject(this.text);
-    stg_last.render.font="6px 黑体";
+    stg_last.render.font="12px 黑体";
     stg_last.render.color="#6D8";
     stg_last.render.textAlign="left";
 };
@@ -364,7 +372,7 @@ BossTime.prototype.init=function(){
     this.text=new RenderText(0,0,"");
     this.text.base=new StgBase(this,stg_const.BASE_NONE,1);
     stgAddObject(this.text);
-    stg_last.render.font="8px 黑体";
+    stg_last.render.font="12px 黑体";
     stg_last.render.color="#EEE";
     stg_last.render.backcolor="#111";
     stg_last.render.textAlign="right";
@@ -439,7 +447,7 @@ BossScoreHistory.prototype.init=function(){
     this.text=new RenderText(0,0,"");
     this.text.base=new StgBase(this,stg_const.BASE_NONE,1);
     stgAddObject(this.text);
-    stg_last.render.font="4px Fixedsys";
+    stg_last.render.font="9px Fixedsys";
     stg_last.render.color="#EEE";
     stg_last.render.backcolor="#111";
     stg_last.render.textAlign="right";

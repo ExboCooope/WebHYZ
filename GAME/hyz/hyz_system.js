@@ -244,21 +244,21 @@ hyz_pause_menu.pushItem(hyz_pause_menu.a2);
 
 
 hyz.pause_script={canvas:null,lock:0};
+hyz.pause_script.canvas = stgCreateCanvas("pause",640,480,stg_const.TEX_CANVAS2D);
 hyz.pause_script.init=function(){
     MenuHolderA1.sellock=1;
     if(!stg_common_data.spell_practice)stgPauseSE("BGM");
-    if(!this.canvas){
-        this.canvas=stgCreateCanvas("pause",640,480,stg_const.TEX_CANVAS2D);
-    }
+   //// if(!this.canvas){
+   //     this.canvas=
+   // }
     stgAddObject(hyz.resolution);
     stgShowCanvas("pause",0,0,0,0,10);
     stgClearCanvas("pause");
-   // hyz.resolution.scale=0;//refresh
-    hyz.resolution.invalidate=1;
-    // stgPauseSE("BGM");
-    // stgHideCanvas("ui");
-    // stgHideCanvas("back");
-    // stgHideCanvas("frame");
+    var w=document.body.clientWidth;
+    var h=document.body.clientHeight;
+    var q=w/640>h/480?h/480:w/640;
+    stgResizeCanvas("pause",(w-q*stg_width)/2,(h-q*stg_height)/2,0,0,stg_width,stg_height,q);
+
 
 
     var a2 = new StgProcedure("pause", 0, 100);
@@ -938,6 +938,7 @@ function hyzGetFrameObject(sid){
         if(sid==1 || sid==2){
             return hyz.full_screen_object;
         }
+        return hyz.full_screen_object;
     }
 }
 

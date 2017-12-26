@@ -13,7 +13,7 @@ stg.enemySystem={};
 stg.enemySystem.pre_load=function(){
     stgCreateImageTexture("fairy_red", "res/fairy_red.png");
     stgCreateImageTexture("fairy_circle","res/fairy_circle.png");
-    renderCreate2DTemplateA1("fairy_circle_w","fairy_circle",128,175,64,64,0,0,0,1);
+    renderCreate2DTemplateA1("fairy_circle_w","fairy_circle",128,177,64,64,0,0,0,1);
 
 };
 stgRegisterModule("enemy_system",stg.enemySystem);
@@ -126,17 +126,33 @@ function DNHBossHolder(base,texturename){
     this.current_anime=null;
     this.current_head=1;
     this.current_frame=0;
-    this.current_id=0;
-    renderCreate2DTemplateA2(this.tname,texturename,0,0,128,128,4,8,0,1);
-    renderApply2DTemplate2(this.render,this.tname,0);
-}
+    this.current_id=-1;
+    this.current_prio=0;
 
+    this.base=new StgBase(base,stg_const.BASE_NONE,1);
+    this.layer=stg_const.LAYER_ENEMY;
+    this.resolve_move=1;
+    stgEnableMove(this);
+
+    renderCreate2DTemplateA2(this.tname,texturename,0,0,128,128,8,4,0,1);
+    renderApply2DTemplate2(this.render,this.tname,0);
+    this.addDefaultAnimations();
+}
+DNHBossHolder.prototype.on_move=function() {
+    this.pos[0]=this.boss.pos[0];
+    this.pos[1]=this.boss.pos[1];
+};
 //picids=[frame_speed,id0,id1,id2,...,idx,-loopidcount]
 DNHBossHolder.prototype.addAnimation=function(animename,picids){
     this.animes[animename]=picids;
 };
 DNHBossHolder.prototype.addDefaultAnimations=function(){
-
+    this.addAnimation("stand",[12,0,1,2,4,5,4,2,1,-8]);
+    this.addAnimation("left",[12,8,9,-1]);
+    this.addAnimation("right",[12,10,11,-1]);
+    this.addAnimation("cast1",[12,16,17,18,-1]);
+    this.addAnimation("cast2",[12,20,21,22,-1]);
+    this.temps=["stand","right","left","cast1"];
 };
 DNHBossHolder.prototype.run=function(){
     var e=this.boss;
@@ -146,22 +162,58 @@ DNHBossHolder.prototype.run=function(){
         var f=this.current_frame+1;
         var id=this.current_id>=0?this.current_id:0;
         if(this.current_anime) {
+            id=this.current_anime[this.current_head];
             if (f > this.current_anime[0]) {
                 this.current_head=this.current_head+1;
                 if( this.current_head>=this.current_anime.length){
-                    this.current_head=1;
-                }
-                id=this.current_anime[this.current_head];
-                if(id<0){
-                    this.current_head=this.current_head-id;
+                    this.current_anime=0;
+                }else{
                     id=this.current_anime[this.current_head];
+                    if(id<0){
+                        this.current_head=this.current_head+id;
+                        id=this.current_anime[this.current_head];
+                    }
                 }
+                f=0;
             }
         }
         this.current_frame=f;
         if(id!= this.current_id){
             this.current_id=id;
             renderApply2DTemplate2(this.render,this.tname,id);
+            this.update=1;
         }
     }
+};
+DNHBossHolder.prototype.playAnimationRaw=function(prio,brk,arr){
+    if(this.current_anime){
+        if(prio+brk<=this.current_prio){
+            return false;
+        }
+    }
+    this.current_anime=arr;
+    this.current_frame=0;
+    this.current_head=1;
+    this.current_prio=prio;
+};
+
+DNHBossHolder.prototype.script=function(){
+    //获得当前动作
+    var angle=this.move.speed?this.move.speed_angle/PI180:90;
+    var ani=0;
+    if(angle<0)angle=angle+360;
+    if(angle>105 && angle<235){
+        ani=2;
+    }else if(angle<75 || angle>285){
+        ani=1;
+    }
+    if(this.boss.cast){
+        ani=3;
+    }
+
+    if(this.anime!=ani || !this.current_anime){
+        this.anime=ani;
+        this.playAnimationRaw(1,1,this.animes[this.temps[ani]]);
+    }
+    this.run();
 };

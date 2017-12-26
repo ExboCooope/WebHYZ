@@ -69,7 +69,7 @@ function TextMenuItem(sText,iShow,iSelectable,oOnSelect,iSelectRemove,bEventType
 }
 
 
-TextMenuItem.prototype.script=function(){
+TextMenuItem.prototype._system=function(){
     var x=this.pos[0];
     var y=this.pos[1];
     var w=this.render.text.length*30;
@@ -92,6 +92,7 @@ TextMenuItem.prototype.script=function(){
 };
 TextMenuItem.sellock=0;
 TextMenuItem.backlock=0;
+
 
 function MenuHolderA1(vaPos,vaAddPos,oReturn,is_submenu){
     this.menu_pool=[];
@@ -159,8 +160,13 @@ MenuHolderA1.prototype.selectfunction=function(item){
         stgDeleteObject(this);
     }
     TextMenuItem.sellock=1;
-    item.on_select.menu_item=item;
-    stgAddObject(item.on_select);
+
+    if(typeof(item.on_select)=="function" ){
+        item.on_select(this);
+    }else{
+        item.on_select.menu_item=item;
+        stgAddObject(item.on_select);
+    }
     stgPlaySE("se_ok");
 };
 
@@ -280,6 +286,175 @@ MenuHolderA1.prototype.script=function(){
 
 };
 
+function MenuHolderA2(vaPos,vaAddPos,oReturn,is_submenu,keygroup){
+    this.menu_pool=[];
+    this.select_id=0;
+    this.menu_pos=vaPos;
+    this.menu_add_pos=vaAddPos;
+    this.rolldir=0;
+    this.rolllock=0;
+    this.menu_return=oReturn;
+    this.is_sub=is_submenu;
+    this.key=keygroup||stg_system_input;
+}
+MenuHolderA2.prototype.setColor=function(color1,color2){
+    if(!color2)color2=color1;
+    for(var i=0;i<this.menu_pool.length;i++){
+        this.menu_pool[i].render.color=this.menu_pool[i].selectable?color1:color2;
+    }
+};
+MenuHolderA2.prototype.pushItem=function(oMenuItem){
+    var i=this.menu_pool.length;
+    this.menu_pool.push(oMenuItem);
+    var pos=this.menu_pos;
+    var posa=this.menu_add_pos;
+    if(! oMenuItem.pos) oMenuItem.pos=[];
+    oMenuItem.pos[0]=pos[0]+posa[0]*i;
+    oMenuItem.pos[1]=pos[1]+posa[1]*i;
+    oMenuItem.menu=this;
+    //  stgAddObject(oMenuItem.cleaner);
+    // stgAddObject(oMenuItem);
+};
+
+MenuHolderA2.prototype.pushItems=function(){
+    for(var i=0;i<arguments.length;i++){
+        this.pushItem(arguments[i]);
+    }
+};
+
+MenuHolderA2.prototype.init=function(){
+    if(this.is_sub){
+        this.parent.active=0;
+    }
+    var that=this;
+    var pool=that.menu_pool;
+
+    var sel=that.select_id;
+    stgAddObjects(pool);
+};
+
+MenuHolderA2.prototype.gDeleteMenu=function(){
+    var pool=this.menu_pool;
+    for(var j in pool){
+        stgDeleteObject(pool[j]);
+    }
+    stgDeleteObject(this);
+};
+
+MenuHolderA2.prototype.selectfunction=function(item){
+    var pool=this.menu_pool;
+    if(item.select_remove){
+        for(var j=0;j<pool.length;j++){
+            stgDeleteObject(pool[j]);
+        }
+        stgDeleteObject(this);
+    }
+    TextMenuItem.sellock=1;
+
+    if(typeof(item.on_select)=="function" ){
+        item.on_select(this);
+    }else{
+        item.on_select.menu_item=item;
+        stgAddObject(item.on_select);
+    }
+    stgPlaySE("se_ok");
+};
+MenuHolderA2.prototype.changeSelection=function(item){
+    var that=this;
+    var pool=that.menu_pool;
+    var pos=that.menu_pos;
+    var posa=that.menu_add_pos;
+    for(var i=0;i<pool.length;i++){
+        var a=pool[i];
+        var r= a.render;
+        a.pos[0]=pos[0]+posa[0]*i;
+        a.pos[1]=pos[1]+posa[1]*i;
+        a.highlight=false;
+        if(item==a){
+            that.select_id=i;
+            a.highlight=true;
+        }
+    }
+};
+MenuHolderA2.prototype._system=function(){
+    var that=this;
+    var pool=that.menu_pool;
+    var sel=that.select_id;
+   var k=this.key;
+    var flag0=0;
+    if(that.rolldir==0){
+        if(th.actionKeyDown(k,stg_const.KEY_UP)||th.actionKeyDown(k,stg_const.KEY_LEFT)){//k[stg_const.KEY_UP] || k[stg_const.KEY_LEFT]) {
+            that.rolldir=-1;
+            that.rolllock=60;
+            sel--;
+            flag0=1;
+        }else if(th.actionKeyDown(k,stg_const.KEY_DOWN)||th.actionKeyDown(k,stg_const.KEY_RIGHT)) {
+            that.rolldir=1;
+            that.rolllock=60;
+            sel++;
+            flag0=1;
+        }
+    }else if(that.rolldir==1){
+        if(k[stg_const.KEY_DOWN] || k[stg_const.KEY_RIGHT]) {
+            that.rolllock--;
+            if(that.rolllock<=0){
+                that.rolllock=10;
+                sel++;
+                flag0=1;
+            }
+
+        }else{
+            that.rolllock=0;
+            that.rolldir=0;
+        }
+    }else if(that.rolldir==-1){
+        if(k[stg_const.KEY_UP] || k[stg_const.KEY_LEFT]) {
+            that.rolllock--;
+            if(that.rolllock<=0){
+                that.rolllock=10;
+                sel--;
+                flag0=1;
+            }
+        }else{
+            that.rolllock=0;
+            that.rolldir=0;
+        }
+    }
+    var pck=0;
+    if(flag0)stgPlaySE("se_select");
+    sel=(sel+pool.length) %pool.length;
+    while(!pool[sel].selectable && pck<pool.length){
+        pck++;
+        sel=(sel+pool.length+that.rolldir) %pool.length;
+    }
+   if(this.select_id!=sel){
+       this.changeSelection(pool[sel]);
+   }
+
+    if(th.actionKeyDown(k,stg_const.KEY_SHOT)) {
+        that.selectfunction(pool[sel]);
+    }
+    if(th.actionKeyDown(k,stg_const.KEY_SPELL)){
+        if(that.menu_return==this || !that.menu_return) {
+            stgPlaySE("se_cancel");
+            return;
+        }
+        stgDeleteObjects(pool);
+        stgDeleteObject(this);
+        if(that.menu_return){
+            if(this.is_sub){
+                this.parent.active=1;
+            }else {
+                stgAddObject(that.menu_return);
+            }
+        }
+        stgPlaySE("se_cancel");
+    }
+};
+
+
+
+
 function defaultDrawBackground(sTexName){
     var a1 = new StgObject;
     a1.render = new StgRender("testShader2");
@@ -301,6 +476,8 @@ function defaultShowBGM(sBGMName){
     var a1=new RenderText(35,445);
     a1.render.text="BGM: "+sBGMName;
     a1.render.alpha=0;
+    a1.render.color="#000";
+    a1.render.backcolor="#888";
     a1.f=0;
     a1.script=function(){
         if(a1.f<=30){
@@ -416,6 +593,13 @@ function renderSetSpriteColor(r,g,b,a,obj) {
     if (!obj.render)return;
     obj.alpha= a;
     obj.render.color=[r/255.0,g/255.0,b/255.0];
+    obj.update=1;
+}
+function renderSetSpriteColorRaw(r,g,b,a,obj) {
+    if (!obj)obj = stg_target;
+    if (!obj.render)return;
+    obj.alpha= (a*255)>>0;
+    obj.render.color=[r,g,b];
     obj.update=1;
 }
 function renderCreateSpriteRender(object){

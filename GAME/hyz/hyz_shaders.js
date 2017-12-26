@@ -828,6 +828,13 @@ var hyzSpriteShaderV2={
         if(this.mode==0) {
 
         }else if(this.mode==1){
+            if(object.alpha!= object.last_alpha){
+                object.update=1;
+                object.last_alpha=object.alpha;
+            }
+            var ta=(object.alpha===undefined?1:object.alpha/255);
+           var t= this.object_framex(object.core,render,procedureName,ta,object.update);
+            /*
             if (!render.texture)return;
             if(this.smear && !render.smear){
                 return;
@@ -874,10 +881,59 @@ var hyzSpriteShaderV2={
                     object.render._color[3]=ta;                }
             }
             object.render._w=w0*render.scale[0];
-            object.render._h=h0*render.scale[1];
+            object.render._h=h0*render.scale[1];*/
+            if(!t)return;
             t.parseObject(object);
         }
     }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
+
+    object_framex:function(object,render,procedureName,ta,u){
+        if (!render.texture)return;
+        if(this.smear && !render.smear){
+            return;
+        }
+        var t;
+        var q=this.dma_pool;
+        if(!q) {
+            q = {};
+            this.dma_pool=q;
+        }
+        if(!q[render.texture]){
+            t=new WebglDMAX(this,1000);
+            t.frameStart();
+            q[render.texture]=t;
+            t.objectParser = shader2_object_parserV2;
+        }
+        t=q[render.texture];
+
+        if(!this.active_pool[render.texture]){
+            this.active_pool[render.texture]=t;
+        }
+        var w0=render.uvt[2];
+        w0=w0<0?-w0:w0;
+        var h0=render.uvt[3];
+        h0=h0<0?-h0:h0;
+        if(!render.webgl || u){
+            render.webgl=1;
+            if(!render._color){
+                render._color=new Float32Array(4);
+            }
+            if(render.color) {
+                render._color[0]=render.color[0];
+                render._color[1]=render.color[1];
+                render._color[2]=render.color[2];
+                render._color[3]=ta;
+            }else{
+                render._color[0]=1;
+                render._color[1]=1;
+                render._color[2]=1;
+                render._color[3]=ta;                }
+        }
+        render._w=w0*render.scale[0];
+        render._h=h0*render.scale[1];
+        return t;
+    }, //对每个参与该procedure和shader的物体会调用一次，负责绘制或将物体渲染信息缓存起来
+
     draw_layer:function(procedureName,layerid){
         if(stg_active_shader!=this){
             stg_active_shader=this;
