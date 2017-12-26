@@ -1353,15 +1353,18 @@ function _stgEngineObjHit(a,hit,pool) {
 }
 
 function _stgEngineBulletEffect(a){
+    a=a._obj;
+    var render=a.render;
+    if(!render)return;
     if(a.invincible && !a._shoted){
         if(!a._shot_scale) {
-            a._shot_scale = [a.render.scale[0], a.render.scale[1]];
+            a._shot_scale = [render.scale[0], render.scale[1]];
             a._shot_alpha = a.alpha||255;
         }
         var ms= a.invincible/6+1;
         if(ms>2)ms=2;
-        a.render.scale[0]= a._shot_scale[0]*ms;
-        a.render.scale[1]= a._shot_scale[1]*ms;
+        render.scale[0]= a._shot_scale[0]*ms;
+        render.scale[1]= a._shot_scale[1]*ms;
         a.alpha= 100;
         a.update=1;
 
@@ -1569,7 +1572,7 @@ function _stgMainLoop_Engine2Ex(a){
             _stgEngineObjHit(a, a.hitdef,_hit_pool);
         }
         if(a.invincible)a.invincible--;
-        if(a.type==stg_const.OBJ_BULLET && a.render){
+        if(a.type==stg_const.OBJ_BULLET){
             _stgEngineBulletEffect(a);
         }
         if(a.fade_remove){

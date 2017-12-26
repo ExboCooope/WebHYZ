@@ -78,18 +78,38 @@
           <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/index.html">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0" vertical-offset="190" max-vertical-offset="684">
-                  <caret line="10" column="48" selection-start-line="10" selection-start-column="48" selection-end-line="10" selection-end-column="48" />
+                <state vertical-scroll-proportion="-14.25" vertical-offset="0" max-vertical-offset="684">
+                  <caret line="21" column="53" selection-start-line="21" selection-start-column="53" selection-end-line="21" selection-end-column="53" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="shw_package.js" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="STGBULLET.js" pinned="false" current="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/STGBULLET.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0" vertical-offset="757" max-vertical-offset="3173">
+                  <caret line="31" column="22" selection-start-line="31" selection-start-column="22" selection-end-line="31" selection-end-column="22" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="shw_package.js" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/GAME/shw/shw_package.js">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.39390245" vertical-offset="0" max-vertical-offset="820">
+                <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="437">
                   <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="STGCORE.js" pinned="false" current="true" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/STGCORE.js">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.88917196" vertical-offset="25484" max-vertical-offset="38038">
+                  <caret line="1378" column="23" selection-start-line="1378" selection-start-column="23" selection-end-line="1378" selection-end-column="23" />
                   <folding />
                 </state>
               </provider>
@@ -257,7 +277,6 @@
         <option value="$PROJECT_DIR$/STGShader/DefaultShaders.js" />
         <option value="$PROJECT_DIR$/GAME/default_graphics.js" />
         <option value="$PROJECT_DIR$/GAME/hyz/hyz_shaders.js" />
-        <option value="$PROJECT_DIR$/STGCORE.js" />
         <option value="$PROJECT_DIR$/STGOBJECT.js" />
         <option value="$PROJECT_DIR$/STGDISPLAY.js" />
         <option value="$PROJECT_DIR$/GAME/shw/shw_loader.js" />
@@ -272,6 +291,7 @@
         <option value="$PROJECT_DIR$/javastage.js" />
         <option value="$PROJECT_DIR$/GAME/shw/shw_level.js" />
         <option value="$PROJECT_DIR$/GAME/shw/shw_package.js" />
+        <option value="$PROJECT_DIR$/STGCORE.js" />
       </list>
     </option>
   </component>
@@ -280,8 +300,8 @@
     <config-path />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="244" />
-    <option name="y" value="782" />
+    <option name="x" value="155" />
+    <option name="y" value="42" />
     <option name="width" value="1689" />
     <option name="height" value="979" />
   </component>
@@ -559,7 +579,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="244" y="782" width="1689" height="979" extended-state="0" />
+    <frame x="155" y="42" width="1689" height="979" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -669,6 +689,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3246" max-vertical-offset="4142">
           <caret line="175" column="13" selection-start-line="175" selection-start-column="13" selection-end-line="175" selection-end-column="13" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -721,6 +742,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="342" max-vertical-offset="1387">
           <caret line="47" column="74" selection-start-line="47" selection-start-column="74" selection-end-line="47" selection-end-column="74" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -764,6 +786,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3318" max-vertical-offset="12141">
           <caret line="188" column="9" selection-start-line="188" selection-start-column="9" selection-end-line="188" selection-end-column="9" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -771,6 +794,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3886" max-vertical-offset="6574">
           <caret line="232" column="24" selection-start-line="232" selection-start-column="24" selection-end-line="232" selection-end-column="24" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -800,20 +824,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6384">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/STGCORE.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="9011" max-vertical-offset="38019">
-          <caret line="495" column="30" selection-start-line="495" selection-start-column="30" selection-end-line="495" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/STGBULLET.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="130" max-vertical-offset="3173">
-          <caret line="27" column="1" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="1" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -842,6 +853,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="4940" max-vertical-offset="7448">
           <caret line="281" column="24" selection-start-line="281" selection-start-column="24" selection-end-line="281" selection-end-column="24" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -849,6 +861,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="10621">
           <caret line="16" column="9" selection-start-line="16" selection-start-column="9" selection-end-line="16" selection-end-column="9" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -913,14 +926,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="190" max-vertical-offset="684">
-          <caret line="10" column="48" selection-start-line="10" selection-start-column="48" selection-end-line="10" selection-end-column="48" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/javastage.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.21219513" vertical-offset="1479" max-vertical-offset="2299">
@@ -931,8 +936,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GAME/shw/shw_package.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.39390245" vertical-offset="0" max-vertical-offset="820">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="437">
           <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-14.25" vertical-offset="0" max-vertical-offset="684">
+          <caret line="21" column="53" selection-start-line="21" selection-start-column="53" selection-end-line="21" selection-end-column="53" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/STGBULLET.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="757" max-vertical-offset="3173">
+          <caret line="31" column="22" selection-start-line="31" selection-start-column="22" selection-end-line="31" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/STGCORE.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.88917196" vertical-offset="25484" max-vertical-offset="38038">
+          <caret line="1378" column="23" selection-start-line="1378" selection-start-column="23" selection-end-line="1378" selection-end-column="23" />
           <folding />
         </state>
       </provider>
