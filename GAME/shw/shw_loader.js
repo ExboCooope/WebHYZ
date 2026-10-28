@@ -111,8 +111,10 @@ shw_loader.init=function(){
         }
         shw.setting_sync.mtext="垂直同步："+["自动","开启","关闭"][shw.refresh_mode];
 
-        shw.sprite_mode=1-shw.sprite_mode;
-        shw.sprite_mode=stgLoadData("spritemode")||0;
+        //渲染方式：默认四边形（hyzSpriteShader，gl.TRIANGLES）；
+        //只有玩家在设置里显式切过（存档里存的是 0）才用点精灵（hyzSpriteShaderV2，gl.POINTS）
+        var _spritemode_save=stgLoadData("spritemode");
+        shw.sprite_mode=(_spritemode_save===0)?0:1;
         shw.setting_sprite.mtext="渲染方式（需重启）："+(!shw.sprite_mode?"点精灵":"四边形");
 
         if(shw.sprite_mode){

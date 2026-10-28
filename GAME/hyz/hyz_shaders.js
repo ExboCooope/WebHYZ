@@ -1029,7 +1029,9 @@ var hyzSpriteShaderV2={
 };
 
 //stgAddShader("point_shader",hyzSpriteShaderV2);
-stgAddShader("sprite_shader",hyzSpriteShaderV2);
+//默认四边形渲染（hyzSpriteShader=gl.TRIANGLES）；点精灵是 hyzSpriteShaderV2（gl.POINTS），
+//由 SHW 包按存档里的“渲染方式”设置在载入时覆盖（见 shw_loader.js）
+stgAddShader("sprite_shader",hyzSpriteShader);
 
 
 function shader2_object_parserV2(oDMA,oObject,iIndex,iNew){

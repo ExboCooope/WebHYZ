@@ -18,7 +18,7 @@ shw.setting_sync.on_select={
         shw.setting_sync.mtext="垂直同步："+["自动","开启","关闭"][shw.refresh_mode];
     }
 };
-shw.sprite_mode=0;
+shw.sprite_mode=1;//默认四边形；真实取值在 shw_loader 里按存档决定
 shw.setting_sprite=new TextMenuItem("渲染方式：",1,1,null,0);
 shw.setting_sprite.on_select={
     init:function(){

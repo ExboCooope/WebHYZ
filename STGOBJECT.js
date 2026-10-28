@@ -49,12 +49,14 @@ StgCore.attrs=["pos","rotate","move","on_move","after_move","opos","base","look_
 
 StgCore.createProxy=function(obj,attr){
     if(!StgCore.getters[attr]){
-        StgCore.getters[attr]=function(){
-            return this.core[attr];
-        };
-        StgCore.setters[attr]=function(a){
-            return this.core[attr]=a;
-        }
+        //每条属性各自生成一个「具名」访问器：读写都编译成字段访问（NamedLoadIC/NamedStoreIC），
+        //IC 单态、可被 TurboFan 内联。
+        //不要再用 `function(){return this.core[attr];}` 这种共用字面量：attr 是运行期变量，
+        //this.core[attr] 只能编译成 KeyedLoadIC，而且这些闭包共享同一个 FeedbackVector，
+        //那一个槽位会看到 28 个不同的 key（以及数值/数组/对象混用的返回值），必然 megamorphic，
+        //优化器既折不成字段读取，也内联不掉 —— 9k 物体时这正好是最大的一处非渲染热点。
+        StgCore.getters[attr]=new Function("return function(){var c=this.core;return c."+attr+";}")();
+        StgCore.setters[attr]=new Function("return function(v){var c=this.core;return c."+attr+"=v;}")();
     }
     obj.__defineGetter__(attr,StgCore.getters[attr]);
     obj.__defineSetter__(attr,StgCore.setters[attr]);
