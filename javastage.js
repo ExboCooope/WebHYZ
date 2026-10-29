@@ -47,6 +47,12 @@ javaStage.default_scripts=[
     "GAME/default_hitbox_overlay", //判定形状 overlay（调试），必须在 default_graphics 之后
     "GAME/danmaku/danmaku_core",    //避弹算法：视野 + 记忆
     "GAME/danmaku/danmaku_pattern", //避弹算法：弹型分解
+    "GAME/danmaku/danmaku_group",   //避弹算法：单帧弹组分解 + 剖分评价（算法1/2）
+    "GAME/danmaku/danmaku_pipeline", //避弹算法：识别管线（视野/识别器/提交）
+    "GAME/danmaku/danmaku_shape",   //避弹算法：圆/椭圆形状归一
+    "GAME/danmaku/danmaku_laser",   //避弹算法：直线激光采样
+    "GAME/danmaku/danmaku_stable",  //避弹算法：稳定弹团识别器
+    "GAME/danmaku/danmaku_group_overlay", //避弹算法：弹链/弹团可视化
     "GAME/danmaku/danmaku_ai",      //避弹算法：规划 / 技巧 / 评价
     "GAME/danmaku/danmaku_overlay", //避弹算法：可视化 + 每帧驱动
     "GAME/thlib"];

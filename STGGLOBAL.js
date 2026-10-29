@@ -25,6 +25,15 @@ var stg_show_hitbox=0;
 //0=关，1=分析并显示弹型/影子/评价
 var stg_show_danmaku_ai=0;
 
+//弹链/弹团 overlay（单帧弹组分解，见 GAME/danmaku/danmaku_group_overlay.js）
+//0=关，1=显示弹链线/弹团圆/视野框。关掉时整条管线不跑（省掉密集帧的最大开销）。
+var stg_show_danmaku_group=0;
+//一帧最多报几条弹链 / 几个弹团（运行期可改）
+var stg_danmaku_group_max_chains=8;
+var stg_danmaku_group_max_clumps=6;
+//每几帧重算一次识别（1=60Hz，2=30Hz；单帧超过 25/50ms 时 overlay 会临时再放慢）
+var stg_danmaku_group_interval=2;
+
 
 var stg_game_state=0;
 var _stg_next_game_state=undefined;
