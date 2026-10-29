@@ -57,6 +57,9 @@ var danmakuPattern={
         }
 
         //1. 按回推源点聚类
+        //1. 按回推源点聚类 —— 同时按速度分桶：
+        //   同一个 Boss 会从同一个点同时发好几种弹（lDY 圈、mZY 圈、sXY 扇，速度 2.5/2.0/1.8 很接近），
+        //   只按源点聚会把它们混成一锅，角度网格和对称阶数就全乱了。速度用相对容差才能把 2.0 和 1.8 分开。
         var clusters=[],k;
         for(i=0;i<list.length;i++){
             var b=list[i],home=null,bd=this.origin_cell*this.origin_cell;
@@ -64,16 +67,18 @@ var danmakuPattern={
                 var c=clusters[k];
                 var dx=c.ox-b.ox,dy=c.oy-b.oy;
                 var d=dx*dx+dy*dy;
-                if(d<bd){bd=d;home=c;}
+                var sptol=_dm_max(0.06,c.sp*0.04);
+                if(d<bd&&_dm_abs(c.sp-b.sp)<=sptol){bd=d;home=c;}
             }
             if(home){
                 home.members.push(b);
                 home.n++;
-                //源点用成员均值慢慢修正（避免一开始被单发带偏）
+                //源点/速度用成员均值慢慢修正（避免一开始被单发带偏）
                 home.ox+= (b.ox-home.ox)/home.n;
                 home.oy+= (b.oy-home.oy)/home.n;
+                home.sp+= (b.sp-home.sp)/home.n;
             }else{
-                clusters.push({ox:b.ox,oy:b.oy,n:1,members:[b]});
+                clusters.push({ox:b.ox,oy:b.oy,sp:b.sp,n:1,members:[b]});
             }
         }
 
@@ -165,9 +170,82 @@ var danmakuPattern={
             bullets:m.map(function(a){return a.t;})
         };
 
-        if(spread<this.angle_multi){
-            //同向一列：多重弹
-            var g=this._mk(gid,"multi",base);
+        //---- 按「波」分组：同一帧发射的一批算一波（圈弹/排弹/多重齐射都是一波）----
+        //关键改动：判甩弹不再看"数组顺序里相邻两颗的角度差"（记忆里顺序会乱，
+        //真机实测同一帧同一组子弹，raw 顺序是有序的、记忆顺序是乱的，于是 raw 判 ring_whip、
+        //记忆判 fan）。现在只比较相邻两波的角度集合，顺序无关。
+        var volleys=this._volleys(m);
+        //对称阶数用整簇里最完整的那一波来估（缺弹会拉低集中度），再统一给每一波算相位；
+        //这样各波的相位才在同一把尺子上。用谐波集中度而不是"弹数/角间隙"，
+        //因为这一作 12 发一圈实际是 11 个角度（首尾重合），拿 12 当阶数相位会乱。
+        var bestV=null;
+        for(i=0;i<volleys.length;i++){
+            if(!bestV||volleys[i].n>bestV.n)bestV=volleys[i];
+        }
+        var ord=bestV?this._orderGuess(bestV):0;
+        if(ord>=3){
+            for(i=0;i<volleys.length;i++)this._volleyPhase(volleys[i],ord);
+        }
+        var kind="fan",sweep=0,conf=0.6,rot=0,seqCons=0;
+        //"圈"的判据：整组跨度够大，或者有 ≥2 波本身就铺得很宽（每波≥90°）。
+        //后者是为了扛视野裁剪：一圈 12 发只看见半圈时整组跨度不到 360°，但每波仍有 ~150°。
+        var wide=0;
+        for(i=0;i<volleys.length;i++){
+            if(volleys[i].spread>=1.5)wide++;
+        }
+        var ringish=(spread>=this.ring_spread)||(wide>=2);
+        if(volleys.length<2){
+            if(spread<this.angle_multi){
+                kind="multi";
+            }else if(ringish){
+                kind="ring";
+                conf=0.7;
+            }else{
+                kind="fan";
+            }
+        }else{
+            var deltas=[],pos=0,neg=0,sum=0,d;
+            for(i=1;i<volleys.length;i++){
+                d=this._pairOffset(volleys[i-1],volleys[i]);
+                if(d===null)continue;
+                deltas.push(d);
+                sum+=d;
+                if(d>0.02)pos++;else if(d<-0.02)neg++;
+            }
+            var rotCons=(deltas.length>0)?_dm_max(pos,neg)/deltas.length:0;
+            var meanDelta=deltas.length?sum/deltas.length:0;
+            //至少三波（两次相邻比较）才敢说"在转"：两波一对比，噪声很容易凑出一个大角度
+            var rotating=(deltas.length>=2&&rotCons>=0.6&&_dm_abs(meanDelta)>=0.02);
+            if(rotating){
+                kind=ringish?"ring_whip":"whip";
+                sweep=meanDelta>0?1:-1;
+                conf=_dm_min(1,0.55+rotCons*0.4);
+            }else if(ringish){
+                //多波 + 每波都很宽，但角度不转：就是连续发圈（圈弹），别硬说成圈甩
+                kind="ring";
+                conf=0.6;
+            }else if(spread<this.angle_multi){
+                kind="multi";
+            }else{
+                kind="fan";
+            }
+            rot=meanDelta;
+            seqCons=rotCons;
+        }
+        var g=this._mk(gid,kind,base);
+        g.sweep=sweep;
+        g.sweep_mag=rot;
+        g.seq_consistency=seqCons;
+        g.volleys=volleys.length;
+        g.order=ord||0;
+        g.deltas=[];   //调试用：相邻两波的旋转量（度）
+        for(i=1;i<volleys.length;i++){
+            var dt=this._pairOffset(volleys[i-1],volleys[i]);
+            if(dt!==null)g.deltas.push(_dm_round(dt*57.3*10)/10);
+        }
+        g.conf=conf;
+        if(kind==="multi"){
+            //沿方向看速度是递增还是递减
             var sorted=m.slice().sort(function(a,b){
                 return (a.x*_dm_cos(mean)+a.y*_dm_sin(mean))-(b.x*_dm_cos(mean)+b.y*_dm_sin(mean));
             });
@@ -177,59 +255,113 @@ var danmakuPattern={
             }
             g.speed_ramp=ramp?1:-1;   //1=沿方向速度递增,-1=递减
             g.conf=_dm_min(1,0.5+0.1*n);
-            out.groups.push(g);
-        }else{
-            // 角度铺开：复数弹 / 甩弹 / 圈弹
-            // 甩弹判据：按弹龄（先发→后发）排好，看相邻两发角度差是不是一直朝同一个方向。
-            // 用"增量一致性"而不是相关系数：圈甩绕满 360°，相对角度会在 ±PI 处折断，
-            // 相关系数会被这个断点破坏（实测 ring_whip 只有 0.6 的相关性）。
-            var srt=m.slice().sort(function(a,b){return b.age-a.age;});  //先发的在前
-            var sum=0,pos=0,neg=0,cum=0,ages=[],rels2=[];
-            var ageMax=srt[0].age,ageMin=srt[0].age;
-            for(i=0;i<srt.length;i++){
-                if(srt[i].age>ageMax)ageMax=srt[i].age;
-                if(srt[i].age<ageMin)ageMin=srt[i].age;
-            }
-            for(i=1;i<srt.length;i++){
-                var d=srt[i].ang-srt[i-1].ang;
-                while(d>_dm_PI)d-=_dm_PI*2;
-                while(d<-_dm_PI)d+=_dm_PI*2;
-                sum+=d;
-                if(d>0.004)pos++;else if(d<-0.004)neg++;
-                cum+=d;
-                rels2.push(cum);
-                ages.push(srt[i].age);
-            }
-            var consistency=(srt.length>1)?_dm_max(pos,neg)/_dm_max(1,pos+neg):0;
-            var seq=((ageMax-ageMin)>=2);   //同一批齐射（弹龄相同）不算"依次发射"
-            var corr=this._corr(rels2,ages);
-            var kind="fan",sweep=0,conf=0.6;
-            if(this._isSweep(consistency,sum,seq)){
-                kind="whip";
-                sweep=sum>0?1:-1;
-                conf=_dm_min(1,0.55+consistency*0.4);
-            }
-            if(spread>=this.ring_spread){
-                kind=(kind==="whip")?"ring_whip":"ring";
-                conf=_dm_max(conf,0.7);
-            }
-            var g2=this._mk(gid,kind,base);
-            g2.corr=corr;
-            g2.sweep=sweep;
-            g2.sweep_mag=sum;
-            g2.seq_consistency=consistency;
-            g2.conf=conf;
-            out.groups.push(g2);
         }
+        out.groups.push(g);
         return out;
     },
 
-    // 增量一致性 → 是否甩弹
-    _isSweep:function(consistency,sum,seq){
-        if(!seq)return false;
-        if(consistency<0.7)return false;
-        if(_dm_abs(sum)<0.06)return false;
-        return true;
+    //把同一源点簇按"发射帧"切成若干波，并算每波的角度统计
+    //注意顺序：age 大的先发，按"发射顺序"排（先发的在前），旋转量才是时间上的方向
+    _volleys:function(m){
+        var srt=m.slice().sort(function(a,b){return b.age-a.age;});
+        var vols=[],cur=null,i,j;
+        for(i=0;i<srt.length;i++){
+            var b=srt[i];
+            if(cur&&b.age===cur.age){
+                cur.members.push(b);
+            }else{
+                cur={age:b.age,members:[b]};
+                vols.push(cur);
+            }
+        }
+        for(i=0;i<vols.length;i++){
+            var v=vols[i],n=v.members.length,sx=0,sy=0;
+            for(j=0;j<n;j++){sx+=_dm_cos(v.members[j].ang);sy+=_dm_sin(v.members[j].ang);}
+            v.mean=_dm_atan2(sy,sx);
+            //方向性：圆平均向量的长度。一圈弹≈0，扇形弹≈1（用来判断"是不是绕了一圈"）
+            v.res=_dm_sqrt(sx*sx+sy*sy)/_dm_max(1,n);
+            v.n=n;
+            v.angles=[];
+            var hi=-9,lo=9;
+            for(j=0;j<n;j++){
+                var a=v.members[j].ang;
+                v.angles.push(a);
+                var da=a-v.mean;
+                while(da>_dm_PI)da-=_dm_PI*2;
+                while(da<-_dm_PI)da+=_dm_PI*2;
+                v.members[j].vrel=da;
+                if(da>hi)hi=da;
+                if(da<lo)lo=da;
+            }
+            v.angles.sort(function(p,q){return p-q;});
+            v.spread=(n>1)?(hi-lo):0;
+            this._volleyPhase(v);
+        }
+        return vols;
+    },
+
+    //"波的方向相位"：对 n 重对称的一圈弹，用 n 次谐波取相位 —— 圈弹整体转多少，相位就转多少，
+    //而且**跟看见几发无关**（缺掉几发不影响各发的 n·θ 同相），特别适合视野被裁掉一半的情况。
+    //相位天然只有模 2π/n（=角间距）的意义，所以"转 23°"和"转 -7°"是一回事，返回的就是那个慢的。
+    //order 由 _orderGuess 估（取整簇里最完整那一波的角间距），传进来就统一用这个 order。
+    _volleyPhase:function(v,order){
+        var n=v.n,i;
+        if(n<3)return null;
+        if(!order){
+            if(v.spread<=0.5)return null;
+            order=this._orderGuess(v);
+            if(!order)return null;
+        }
+        var sx=0,sy=0;
+        for(i=0;i<n;i++){
+            var a=v.angles[i]*order;
+            sx+=_dm_cos(a);
+            sy+=_dm_sin(a);
+        }
+        v.order=order;
+        v.phase=_dm_atan2(sy,sx)/order;
+        return v.phase;
+    },
+
+    //估计这一波的对称阶数。
+    //不能直接拿"波里有几发"当阶数：这一作的圈弹是 W2 按 angle_spread/(n-1) 铺满 360°，
+    //12 发实际是 11 个互不相同的角度（首尾重合），对称阶数是 11 不是 12。
+    //所以改用谐波集中度：对候选阶数 m，C(m)=|Σ e^{i·m·θ}|/n，只有真正的对称阶数才能让所有项同相。
+    //取 C 最大的那个（相同分数取小 m）；只看"第一个过线"会被少量子弹的偶然集中骗到。
+    _orderGuess:function(v){
+        var n=v.n,i,m;
+        if(n<3)return 0;
+        var bestM=0,bestC=0;
+        for(m=3;m<=16;m++){
+            var sx=0,sy=0;
+            for(i=0;i<n;i++){
+                sx+=_dm_cos(v.angles[i]*m);
+                sy+=_dm_sin(v.angles[i]*m);
+            }
+            var c=_dm_sqrt(sx*sx+sy*sy)/n;
+            if(c>bestC+0.015){
+                bestC=c;bestM=m;
+            }else if(c>=bestC-0.015&&m<bestM&&bestC<0.999){
+                bestM=m;   //分数接近时取更小的阶数（12 发均匀分布时 3/4/6 也合格，用粗的没问题）
+            }
+        }
+        if(bestC<0.9)return 0;
+        return bestM;
+    },
+
+    //两波之间的整体旋转量（在 ±角间距/2 内给出绝对值最小的那个解）
+    _pairOffset:function(a,b){
+        if(a.phase!==undefined&&b.phase!==undefined&&a.order===b.order){
+            var dd=b.phase-a.phase;
+            var spacing=_dm_PI*2/a.order;
+            while(dd>spacing/2)dd-=spacing;
+            while(dd<-spacing/2)dd+=spacing;
+            return dd;
+        }
+        var d2=b.mean-a.mean;
+        while(d2>_dm_PI)d2-=_dm_PI*2;
+        while(d2<-_dm_PI)d2+=_dm_PI*2;
+        return d2;
     },
 
     _mk:function(gid,kind,base){
