@@ -47,7 +47,7 @@ node .run-test/harness.mjs
 | 脚本清单 / 加载顺序 | [javastage.js](javastage.js) |
 | 主循环、对象系统、入口 `stgStart` | [STGCORE.js](STGCORE.js)（`_stgMainLoop:625`、`stgStart:1891`、`stgAddObject:1669`） |
 | 常量 / 键位 / 全局状态 | [STGGLOBAL.js](STGGLOBAL.js)（`KEY_MAP:135`） |
-| 关卡范例、主 Boss | [GAME/shw/shw_level.js](GAME/shw/shw_level.js)、[GAME/boss_slz.js](GAME/boss_slz.js) |
+| 关卡范例、主 Boss（沙砾子） | [GAME/shw/shw_level.js](GAME/shw/shw_level.js)、[GAME/boss_slz.js](GAME/boss_slz.js) |
 | 自机范例 | [players/player_reimu.js](players/player_reimu.js)（新版 `th.*`） |
 | 双画面机制 | [GAME/hyz/hyz_system.js](GAME/hyz/hyz_system.js)（`hyzSetBattleStyle:607`） |
 | 渲染底层 | [WebGL/shaders.js](WebGL/shaders.js)、[GAME/hyz/hyz_shaders.js](GAME/hyz/hyz_shaders.js) |
