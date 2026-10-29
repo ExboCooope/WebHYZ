@@ -4,14 +4,14 @@
  * 每关自动挂一个物体：
  *   script  —— 每帧驱动 danmakuAI.step()（感知/分型/规划/评价）
  *   render  —— 开着 stg_show_danmaku_ai 时，在 UI 画布上把弹型、源点、影子自机、
- *              危险热区和评价面板画出来（和命中判定 overlay 同一套画布机制，layer 99）
+ *              评价面板画出来（和命中判定 overlay 同一套画布机制，layer 99）
  *
  * 开关：全局变量 stg_show_danmaku_ai（STGGLOBAL.js）
- *   0 = 关；1 = 画弹型/影子/评价；2 = 再加危险热区
+ *   0 = 关；1 = 画弹型/影子/评价
  */
 //Math 方法加载时取出（同 STGCORE.js 的 var sin=Math.sin）
-var _dm_max=Math.max,_dm_min=Math.min,_dm_floor=Math.floor,_dm_ceil=Math.ceil;
-var _dm_heat=null;   // 热区网格的复用缓冲
+var _dm_max=Math.max,_dm_min=Math.min,_dm_floor=Math.floor,_dm_ceil=Math.ceil,
+    _dm_atan2=Math.atan2,_dm_sqrt=Math.sqrt;
 
 var danmakuView={
     layer:99,
@@ -23,8 +23,7 @@ var danmakuView={
         ring_whip:"rgba(255,60,60,0.9)",
         static:"rgba(160,160,160,0.8)",
         single:"rgba(220,220,220,0.7)",
-        ghost:"rgba(80,255,120,1)",
-        heat:"rgba(255,40,40,"
+        ghost:"rgba(80,255,120,1)"
     },
     draw:function(c){
         if(!stg_show_danmaku_ai)return;
@@ -45,7 +44,6 @@ var danmakuView={
         c.save();
         c.globalAlpha=1;
         c.lineJoin="round";
-        if(stg_show_danmaku_ai>=2)this.drawHeat(c,ox,oy);
         this.drawTracks(c,ox,oy);
         this.drawGroups(c,ox,oy);
         this.drawGhost(c,ox,oy);
@@ -68,42 +66,6 @@ var danmakuView={
         var zu=parseInt(ui.style.zIndex||"0",10)||0;
         var zf=parseInt(fr.style.zIndex||"0",10)||0;
         if(zu<=zf)ui.style.zIndex=""+(zf+1);
-    },
-
-    //危险热区：把未来 12 帧里每发弹会扫过的格子"打点"进网格，再按点数上色。
-    //（早期版本是逐格反过来扫所有弹幕，672 格 × 几百发太贵；改成逐弹打点后便宜一个数量级）
-    drawHeat:function(c,ox,oy){
-        var cell=16,H=12;
-        var obs=danmakuCore.visible();
-        if(!obs.length)return;
-        var gw=_dm_max(1,(_dm_ceil(stg_frame_w/cell))|0);
-        var gh=_dm_max(1,(_dm_ceil(stg_frame_h/cell))|0);
-        var n=gw*gh;
-        if(!_dm_heat||_dm_heat.length<n)_dm_heat=new Uint16Array(n);
-        else for(var z=0;z<n;z++)_dm_heat[z]=0;
-        var grid=_dm_heat;
-        for(var b=0;b<obs.length;b++){
-            var q=obs[b];
-            var rad=q.r+7;
-            for(var t=0;t<=H;t+=2){
-                var qx=q.x+q.vx*t,qy=q.y+q.vy*t;
-                var x0=_dm_max(0,_dm_floor((qx-rad)/cell));
-                var x1=_dm_min(gw-1,_dm_floor((qx+rad)/cell));
-                var y0=_dm_max(0,_dm_floor((qy-rad)/cell));
-                var y1=_dm_min(gh-1,_dm_floor((qy+rad)/cell));
-                for(var gx=x0;gx<=x1;gx++){
-                    for(var gy=y0;gy<=y1;gy++)grid[gy*gw+gx]++;
-                }
-            }
-        }
-        for(var idx=0;idx<n;idx++){
-            var v=grid[idx];
-            if(!v)continue;
-            var cx=idx%gw,cy=(idx-cx)/gw;
-            var a=v>6?0.30:(v>2?0.18:0.09);
-            c.fillStyle=this.COLORS.heat+a+")";
-            c.fillRect(ox+cx*cell,oy+cy*cell,cell,cell);
-        }
     },
 
     drawTracks:function(c,ox,oy){
@@ -149,53 +111,62 @@ var danmakuView={
         return m;
     },
 
+    //每组只用一根线把成员连起来：多重弹按沿射线的距离排（连出来是直线），
+    //复数/甩/圈按角度排（连出来是折线/环）。线色 = 该弹型的颜色。
     drawGroups:function(c,ox,oy){
         var pat=danmakuAI.pattern;
         if(!pat)return;
-        c.font="11px sans-serif";
-        c.textAlign="center";
-        c.textBaseline="bottom";
         for(var i=0;i<pat.groups.length;i++){
             var g=pat.groups[i];
             if(g.kind==="static")continue;
+            var bs=g.bullets;
+            if(!bs||bs.length<2)continue;
             var col=this.COLORS[g.kind]||this.COLORS.single;
-            var gx=ox+g.origin[0],gy=oy+g.origin[1];
-            //源点
-            c.strokeStyle=col;
-            c.lineWidth=1;
-            c.beginPath();
-            c.moveTo(gx-4,gy-4);c.lineTo(gx+4,gy+4);
-            c.moveTo(gx+4,gy-4);c.lineTo(gx-4,gy+4);
-            c.stroke();
-            //扇形：从源点到最远两发的角度范围
-            if(g.kind==="fan"||g.kind==="whip"||g.kind==="ring"||g.kind==="ring_whip"){
-                var a0=1e9,a1=-1e9,rmax=0;
-                for(var j=0;j<g.bullets.length;j++){
-                    var b=g.bullets[j];
-                    var dx=b.x-g.origin[0],dy=b.y-g.origin[1];
-                    var ang=Math.atan2(dy,dx);
-                    if(ang<a0)a0=ang;
-                    if(ang>a1)a1=ang;
-                    var d=Math.sqrt(dx*dx+dy*dy);
-                    if(d>rmax)rmax=d;
-                }
-                if(a1-a0<6.0&&rmax>4){
-                    var wr=_dm_min(rmax,360);
-                    c.globalAlpha=0.10;
-                    c.fillStyle=col;
-                    c.beginPath();
-                    c.moveTo(gx,gy);
-                    c.arc(gx,gy,wr,a0,a1);
-                    c.closePath();
-                    c.fill();
-                    c.globalAlpha=1;
-                }
+            var multi=(g.kind==="multi");
+            var j,b,dx=0,dy=0;
+            if(multi){
+                for(j=0;j<bs.length;j++){dx+=bs[j].vx;dy+=bs[j].vy;}
+                var len=_dm_sqrt(dx*dx+dy*dy);
+                if(len<1e-6){dx=0;dy=1;len=1;}
+                dx/=len;dy/=len;
             }
-            //标签
-            var lab=g.label+"×"+g.n;
-            if(g.aimed)lab+=" 狙";
-            c.fillStyle=col;
-            c.fillText(lab,gx,gy-6);
+            var ox0=g.origin[0],oy0=g.origin[1];
+            var pts=[],amin=1e9,amax=-1e9;
+            for(j=0;j<bs.length;j++){
+                b=bs[j];
+                var ax=b.x-ox0,ay=b.y-oy0;
+                var age=(b.src&&b.src.frame!==undefined)?b.src.frame:b.age;
+                if(age<amin)amin=age;
+                if(age>amax)amax=age;
+                pts.push({x:b.x,y:b.y,
+                    age:age,
+                    ang:_dm_atan2(ay,ax),
+                    d:multi?(ax*dx+ay*dy):_dm_sqrt(ax*ax+ay*ay)});
+            }
+            //多重弹：沿射线排（连出来是直线）；
+            //依次发射的（弹龄有差）：按发射顺序排 —— 甩弹连出来就是那条鞭子/螺旋；
+            //同时齐射的（弹龄相同）：按角度排 —— 复数弹/圈弹连出来是圆弧。
+            var byAge=!multi&&((amax-amin)>=2);
+            pts.sort(function(p,q){
+                if(multi)return p.d-q.d;
+                if(byAge)return q.age-p.age;
+                return p.ang-q.ang;
+            });
+            c.strokeStyle=col;
+            c.lineWidth=1.5;
+            c.globalAlpha=0.85;
+            //一组一条路径，但相邻两发隔太远就抬笔：否则一整圈弹幕会被连成横跨全屏的乱线
+            var gap=56,g2=gap*gap;
+            c.beginPath();
+            c.moveTo(ox+pts[0].x,oy+pts[0].y);
+            for(j=1;j<pts.length;j++){
+                var pv=pts[j-1],cu=pts[j];
+                var gx2=cu.x-pv.x,gy2=cu.y-pv.y;
+                if(gx2*gx2+gy2*gy2<=g2)c.lineTo(ox+cu.x,oy+cu.y);
+                else c.moveTo(ox+cu.x,oy+cu.y);
+            }
+            c.stroke();
+            c.globalAlpha=1;
         }
     },
 

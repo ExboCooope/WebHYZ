@@ -22,8 +22,8 @@ var _next_hitby_pool=[];
 var stg_show_hitbox=1;
 
 //避弹算法（弹型识别/影子自机/评价）的总开关，见 GAME/danmaku/：
-//0=关，1=分析并显示弹型/影子/评价，2=再加热区
-var stg_show_danmaku_ai=2;
+//0=关，1=分析并显示弹型/影子/评价
+var stg_show_danmaku_ai=1;
 
 
 var stg_game_state=0;
