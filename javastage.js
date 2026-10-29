@@ -44,6 +44,7 @@ javaStage.default_scripts=[
     "GAME/default_player_select_page",
     "GAME/default_player_script",
     "GAME/default_item_script",
+    "GAME/default_hitbox_overlay", //判定形状 overlay（调试），必须在 default_graphics 之后
     "GAME/thlib"];
 
 
