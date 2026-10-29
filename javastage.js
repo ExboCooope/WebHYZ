@@ -45,6 +45,10 @@ javaStage.default_scripts=[
     "GAME/default_player_script",
     "GAME/default_item_script",
     "GAME/default_hitbox_overlay", //判定形状 overlay（调试），必须在 default_graphics 之后
+    "GAME/danmaku/danmaku_core",    //避弹算法：视野 + 记忆
+    "GAME/danmaku/danmaku_pattern", //避弹算法：弹型分解
+    "GAME/danmaku/danmaku_ai",      //避弹算法：规划 / 技巧 / 评价
+    "GAME/danmaku/danmaku_overlay", //避弹算法：可视化 + 每帧驱动
     "GAME/thlib"];
 
 
