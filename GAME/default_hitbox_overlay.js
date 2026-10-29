@@ -109,6 +109,49 @@ function _stgHitboxFillEllipse(c,x,y,h){
     }
 }
 
+//type 2 的描边版（大椭圆只描边）
+function _stgHitboxStrokeEllipse(c,x,y,h){
+    var m=stg_hitbox_overlay.min_radius;
+    var rx=(h.rs===undefined||h.rs===null)?h.range:h.rs;
+    var ry=(h.re===undefined||h.re===null)?h.range:h.re;
+    if(!(rx>m))rx=m;
+    if(!(ry>m))ry=m;
+    var dir=h.rdir||0;
+    c.lineWidth=1.5;
+    if(c.ellipse){
+        c.beginPath();
+        c.ellipse(x,y,rx,ry,dir,0,PI2);
+        c.stroke();
+    }else{
+        c.save();
+        c.translate(x,y);
+        c.rotate(dir);
+        c.scale(1,ry/rx);
+        c.beginPath();
+        c.arc(0,0,rx,0,PI2);
+        c.stroke();
+        c.restore();
+    }
+}
+
+//type 1 的描边版（大激光只描边）
+function _stgHitboxStrokeCapsule(c,x,y,h){
+    var l1=h.ls||0,l2=h.le||0,r1=h.rs||0,r2=h.re||0,t;
+    if(l1>l2){t=l1;l1=l2;l2=t;t=r1;r1=r2;r2=t;}
+    var dir=h.rdir||0,s=sin(dir),co=cos(dir);
+    var x1=x+l1*co,y1=y+l1*s,x2=x+l2*co,y2=y+l2*s;
+    c.lineWidth=1.5;
+    c.beginPath();
+    c.moveTo(x1-r1*s,y1+r1*co);
+    c.lineTo(x2-r2*s,y2+r2*co);
+    c.lineTo(x2+r2*s,y2-r2*co);
+    c.lineTo(x1+r1*s,y1-r1*co);
+    c.closePath();
+    c.stroke();
+    if(r1>0.05){c.beginPath();c.arc(x1,y1,r1,0,PI2);c.stroke();}
+    if(r2>0.05){c.beginPath();c.arc(x2,y2,r2,0,PI2);c.stroke();}
+}
+
 //type 3：内径 rs、外径 re 的圆环带 —— 用线宽等于带宽的圆描边正好就是这条环
 function _stgHitboxStrokeRing(c,x,y,h){
     var r1=h.rs||0,r2=h.re||0,t;
@@ -140,13 +183,24 @@ function _stgHitboxDrawOne(c,o,h,ox,oy,group){
     c.fillStyle=color;
     c.strokeStyle=color;
     if(h.type==1){
-        _stgHitboxFillLaser(c,px,py,h);
+        //大激光（r 很大）只描边，不然一屏都被糊住
+        if((h.rs||0)>12||(h.re||0)>12)_stgHitboxStrokeCapsule(c,px,py,h);
+        else _stgHitboxFillLaser(c,px,py,h);
     }else if(h.type==2){
-        _stgHitboxFillEllipse(c,px,py,h);
+        if((h.rs||0)>12||(h.re||0)>12)_stgHitboxStrokeEllipse(c,px,py,h);
+        else _stgHitboxFillEllipse(c,px,py,h);
     }else if(h.type==3){
         _stgHitboxStrokeRing(c,px,py,h);
     }else{
-        _stgHitboxFillCircle(c,px,py,(h.range>m)?h.range:m);
+        var r=(h.range>m)?h.range:m;
+        if(r>12){
+            c.beginPath();
+            c.arc(px,py,r,0,PI2);
+            c.lineWidth=1.5;
+            c.stroke();
+        }else{
+            _stgHitboxFillCircle(c,px,py,r);
+        }
     }
     return 1;
 }
