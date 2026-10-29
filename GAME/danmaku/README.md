@@ -22,9 +22,14 @@
 ```js
 stg_show_danmaku_ai = 0;   // 关
 stg_show_danmaku_ai = 1;   // 分析 + 画弹型/影子自机/评价面板
-stg_show_danmaku_ai = 2;   // 再加危险热区（16px 网格，未来 12 帧的最小间距）
+stg_show_danmaku_ai = 2;   // 再加危险热区（16px 网格，未来 12 帧会被覆盖的格子）
 ```
 定义在 [STGGLOBAL.js](../../STGGLOBAL.js)。运行期在控制台改即可，下一帧生效。
+
+> 当前仓库里默认是 **`stg_show_hitbox=1` + `stg_show_danmaku_ai=2`**（都开着，方便直接看效果）。
+> 平时玩建议改回 0；机器吃不住就 `stg_show_danmaku_ai=1` 关掉热区。
+> 单帧开销（157 发弹幕、144 发在视野内实测）：`step()` 约 1.3ms（分型 0.65 + 规划 0.69）、
+> 绘制含热区 0.3ms / 不含 0.08ms —— 也就是 60fps 预算（16.7ms）的一成左右。
 
 ## 1. 感知与记忆（danmaku_core）
 

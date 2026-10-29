@@ -19,11 +19,11 @@ var _next_hitby_pool=[];
 //判定形状 overlay 的总开关（调试用）：0=不显示，1=显示当前帧所有 hitdef/hitby 的判定形状。
 //运行期可直接在控制台里改：stg_show_hitbox=1
 //画法/颜色见 GAME/default_hitbox_overlay.js
-var stg_show_hitbox=0;
+var stg_show_hitbox=1;
 
 //避弹算法（弹型识别/影子自机/评价）的总开关，见 GAME/danmaku/：
 //0=关，1=分析并显示弹型/影子/评价，2=再加热区
-var stg_show_danmaku_ai=0;
+var stg_show_danmaku_ai=2;
 
 
 var stg_game_state=0;

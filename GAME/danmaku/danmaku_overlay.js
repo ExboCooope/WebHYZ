@@ -10,7 +10,8 @@
  *   0 = 关；1 = 画弹型/影子/评价；2 = 再加危险热区
  */
 //Math 方法加载时取出（同 STGCORE.js 的 var sin=Math.sin）
-var _dm_max=Math.max,_dm_min=Math.min;
+var _dm_max=Math.max,_dm_min=Math.min,_dm_floor=Math.floor,_dm_ceil=Math.ceil;
+var _dm_heat=null;   // 热区网格的复用缓冲
 
 var danmakuView={
     layer:99,
@@ -69,33 +70,39 @@ var danmakuView={
         if(zu<=zf)ui.style.zIndex=""+(zf+1);
     },
 
-    //危险热区：粗略网格，每格取未来若干帧的最小间距
+    //危险热区：把未来 12 帧里每发弹会扫过的格子"打点"进网格，再按点数上色。
+    //（早期版本是逐格反过来扫所有弹幕，672 格 × 几百发太贵；改成逐弹打点后便宜一个数量级）
     drawHeat:function(c,ox,oy){
         var cell=16,H=12;
         var obs=danmakuCore.visible();
         if(!obs.length)return;
-        for(var gx=0;gx<stg_frame_w;gx+=cell){
-            for(var gy=0;gy<stg_frame_h;gy+=cell){
-                var cx=gx+cell*0.5,cy=gy+cell*0.5;
-                var minC=999;
-                for(var i=0;i<obs.length;i++){
-                    var q=obs[i];
-                    if(Math.abs(q.x-cx)>cell*4+q.r+40&&Math.abs(q.y-cy)>cell*4+q.r+40)continue;
-                    for(var t=0;t<=H;t+=2){
-                        var qx=q.x+q.vx*t,qy=q.y+q.vy*t;
-                        var dx=cx-qx,dy=cy-qy;
-                        var d=Math.sqrt(dx*dx+dy*dy)-q.r-6;
-                        if(d<minC)minC=d;
-                        if(minC<0)break;
-                    }
-                    if(minC<0)break;
-                }
-                if(minC<6){
-                    var a=minC<=0?0.35:0.12;
-                    c.fillStyle=this.COLORS.heat+a+")";
-                    c.fillRect(ox+gx,oy+gy,cell,cell);
+        var gw=_dm_max(1,(_dm_ceil(stg_frame_w/cell))|0);
+        var gh=_dm_max(1,(_dm_ceil(stg_frame_h/cell))|0);
+        var n=gw*gh;
+        if(!_dm_heat||_dm_heat.length<n)_dm_heat=new Uint16Array(n);
+        else for(var z=0;z<n;z++)_dm_heat[z]=0;
+        var grid=_dm_heat;
+        for(var b=0;b<obs.length;b++){
+            var q=obs[b];
+            var rad=q.r+7;
+            for(var t=0;t<=H;t+=2){
+                var qx=q.x+q.vx*t,qy=q.y+q.vy*t;
+                var x0=_dm_max(0,_dm_floor((qx-rad)/cell));
+                var x1=_dm_min(gw-1,_dm_floor((qx+rad)/cell));
+                var y0=_dm_max(0,_dm_floor((qy-rad)/cell));
+                var y1=_dm_min(gh-1,_dm_floor((qy+rad)/cell));
+                for(var gx=x0;gx<=x1;gx++){
+                    for(var gy=y0;gy<=y1;gy++)grid[gy*gw+gx]++;
                 }
             }
+        }
+        for(var idx=0;idx<n;idx++){
+            var v=grid[idx];
+            if(!v)continue;
+            var cx=idx%gw,cy=(idx-cx)/gw;
+            var a=v>6?0.30:(v>2?0.18:0.09);
+            c.fillStyle=this.COLORS.heat+a+")";
+            c.fillRect(ox+cx*cell,oy+cy*cell,cell,cell);
         }
     },
 
